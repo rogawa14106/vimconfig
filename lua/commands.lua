@@ -82,14 +82,3 @@ vim.api.nvim_create_user_command("GPV", function(opts)
     vim.cmd("!git push origin main")
 end, { nargs=1 })
 
---function! GitPushVimrc(commit_msg) abort
-    --let l:vimrcdir =  substitute(expand("$MYVIMRC"), '\v[/\\](init\.vim)|(.vimrc)', "", "")
-    --echo l:vimrcdir
-    --execute "cd " . l:vimrcdir
-    --execute "!git add ."
-    --execute '!git commit -m ' . a:commit_msg
-    --execute "!git push origin main"
---endfunction
---
---command! -nargs=1 GPV :call GitPushVimrc(<f-args>)
---}}}
