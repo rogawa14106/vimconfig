@@ -1,11 +1,14 @@
 vim.cmd[[
 "{{{ autocmd
 "{{{ ime off at insertmode leave TODO
-if has('windows') || has('wsl')
+if has('windows')
     augroup cancellIME
+        let myvimrc_path = substitute($MYVIMRC, '\\', '/', 'g')
+        let chime_path = substitute(myvimrc_path, '\v[^/]+$', '', '') . "bin/chime.exe"
+        let chime_cmd = "call system('" . chime_path . " 0')"
         autocmd!
-        autocmd InsertLeave  * : call system('chime 0')
-        autocmd CmdlineLeave * : call system('chime 0')
+        autocmd InsertLeave  * : execute chime_cmd
+        autocmd CmdlineLeave * : execute chime_cmd
     augroup END
 endif
 "}}}

@@ -1,0 +1,2 @@
+-- enable highlighting
+--vim.cmd("TSEnable highlight")

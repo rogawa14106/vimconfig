@@ -65,7 +65,7 @@ function! SwitchBuff(key) abort
     endif
 
     "abort switching at BuffCtl
-    if exists("s:bufctl_bufnr") && (bufnr() == s:bufctl_bufnr)
+    if exists("g:bufctl_bufnr") && (bufnr() == g:bufctl_bufnr)
         call HighlightEcho("warning", "operation is invalid at BuffCtl")
         return
     endif
@@ -116,20 +116,21 @@ function! SurroundStr(surround_char1, surround_char2) abort
 endfunction
 "}}}    
 "{{{ comment ---"
-let s:comment_char_dict = {
+let g:comment_char_dict = {
     \ "vim" : '"',
     \ "c"   : '//',
     \ "cs"  : '//',
     \ "py"  : '#',
     \ "ttl" : ';',
+    \ "lua" : '--',
     \ }
 
 function! CommentSelectedLine() abort
     let l:extension = expand("%:e")
     if expand("%:t") == '.vimrc'
         execute "noautocmd normal! ^i" . '"'
-    elseif has_key(s:comment_char_dict, l:extension)
-        execute "noautocmd normal! ^i" . s:comment_char_dict[l:extension]
+    elseif has_key(g:comment_char_dict, l:extension)
+        execute "noautocmd normal! ^i" . g:comment_char_dict[l:extension]
     endif
 endfunction
 

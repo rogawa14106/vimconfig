@@ -1,3 +1,4 @@
+-- commands --
 
 -- {{{ vimrc, init.vim
 vim.api.nvim_create_user_command("VIMRC", function(opts)
@@ -65,7 +66,8 @@ end, { nargs='?' })
 -- {{{ windows ui
 -- TODO create func that execute external command
 vim.api.nvim_create_user_command("HSB", function(opts)
-    vim.cmd("!hidesb -b")
+    local hidesb_cmd = "!" .. g_vimrcdir .. "/bin/hidesb.exe -b"
+    vim.cmd(hidesb_cmd)
 end, {})
 
 vim.api.nvim_create_user_command("HTB", function(opts)
@@ -73,12 +75,11 @@ vim.api.nvim_create_user_command("HTB", function(opts)
 end, {})
 -- }}}
 
---{{{ git push vimconfigfiles
+-- {{{ git push vimconfigfiles
 vim.api.nvim_create_user_command("GPV", function(opts)
-    local vimrcdir = string.gsub(vim.env.MYVIMRC, '[^\\/]+$', '')
-    vim.cmd("cd " .. vimrcdir)
+    vim.cmd("cd " .. g_vimrcdir)
     vim.cmd("!git add .")
     vim.cmd("!git commit -m " .. opts.args)
     vim.cmd("!git push origin main")
 end, { nargs=1 })
-
+--}}}

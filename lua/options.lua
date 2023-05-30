@@ -10,6 +10,7 @@ set.showmode = false
 set.wrap = false
 set.compatible = false
 set.hidden = true
+set.laststatus = 3
 
 -- tab, indent
 set.tabstop = 4
@@ -41,7 +42,7 @@ set.clipboard:append({'unnamedplus'})
 -- chars
 set.list = true
 set.fillchars:append({fold=' '})
-set.listchars:append({tab='^-'})
+set.listchars:append({tab='^-', space='_', eol='$'})
 set.matchpairs:append({'<:>'})
 
 -- path
@@ -56,3 +57,7 @@ elseif string.match(vim.env.USERNAME, '152440') then
 else
     set.guifont = 'ＭＳ ゴシック:h12'
 end
+
+vim.cmd[[
+    language en_US.utf8
+]]
