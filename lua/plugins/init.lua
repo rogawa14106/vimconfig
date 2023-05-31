@@ -8,11 +8,10 @@ require("packer").startup(function()
     use "nvim-treesitter/nvim-treesitter"
 
     -- language server page
-    use "neovim/nvim-lspconfig"
-    use "williamboman/mason.nvim"
-    use "williamboman/mason-lspconfig.nvim"
+    --use "neovim/nvim-lspconfig"
+    --use "williamboman/mason.nvim"
+    --use "williamboman/mason-lspconfig.nvim"
 end)
-
 -- === packer ===
 -- :PackerInstall
 --      Install Plugins
@@ -26,9 +25,14 @@ end)
 --      Compile config files
 
 -- === treesitter ===
+require("plugins.treesitter")
 -- :TSInstall <language>
 --      install LSP server
 -- :TSEnable highlight
 --      enable highlight
 
 -- === lsp ===
+
+-- === bildin ===
+require("plugins.netrw")
+

@@ -15,7 +15,7 @@ end, {})
 -- }}}
 
 -- {{{ toggle terguicolors
-vim.api.nvim_create_user_command("HSB", function(opts)
+vim.api.nvim_create_user_command("GUI", function(opts)
     vim.cmd("set termguicolors!")
 end, {})
 -- }}}
@@ -71,8 +71,17 @@ vim.api.nvim_create_user_command("HSB", function(opts)
 end, {})
 
 vim.api.nvim_create_user_command("HTB", function(opts)
-    vim.cmd("!hidetb")
+    local hidetb_cmd = "!" .. g_vimrcdir .. "/bin/hidetb.exe"
+    vim.cmd(hidetb_cmd)
 end, {})
+
+vim.api.nvim_create_user_command("FS", function(opts)
+    local hidesb_cmd = "!" .. g_vimrcdir .. "/bin/hidesb.exe -b"
+    local hidetb_cmd = "!" .. g_vimrcdir .. "/bin/hidetb.exe"
+    vim.cmd(hidesb_cmd)
+    vim.cmd(hidetb_cmd)
+end, {})
+
 -- }}}
 
 -- {{{ git push vimconfigfiles

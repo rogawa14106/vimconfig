@@ -264,7 +264,7 @@ function! ApplyUserSyntax() abort
     "vimrc header"
     if expand("%:p") == $MYVIMRC
         "AA highlight
-        syntax match uAA '^\"=.\+=\"'
+        syntax match uAA '/'
         "highlight! uAA cterm=none gui=none ctermfg=104 ctermbg=255 guifg=#95f0d0 guibg=#181818
         "highlight! uAA cterm=none gui=none ctermfg=104 ctermbg=255 guifg=#f5f0cd guibg=#181818
         highlight! uAA cterm=none gui=none ctermfg=104 ctermbg=255 guifg=#95d8e8 guibg=#181818
