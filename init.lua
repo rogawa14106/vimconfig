@@ -21,7 +21,7 @@
 -- To get executable file of the above command, run the following command.
 -- > git clone https://github.com/rogawa14106/vimconfig
 -- }}}
--- {{{ defined Ex commands (Press <S-*>, jump to script)"
+-- {{{ defined Ex commands"
 --  INIVIM
 --  VIMRC
 --  SP
@@ -33,7 +33,6 @@
 --  CPV
 --  GPV <commit msg: str>
 --  CMD <type: str>
---  RF <fontsize :int>
 -- }}}
 -- {{{ Difference from buildin
 -- install wbthomason/packer.nvim

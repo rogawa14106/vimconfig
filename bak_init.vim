@@ -647,10 +647,10 @@ function! ApplyUserSyntax() abort
     highlight! def link uHeader1 Type
 
     syntax match uHeader2 '^\s*=='
-    highlight! def link uHeader2 Statement
+    highlight! uHeader2 guifg=#45a080
 
     syntax match uHeader3 '^\s*==='
-    highlight! def link uHeader3 Title
+    highlight! uHeader3 guifg=#397874
 
     syntax match uMultiSpace '　'
     highlight! def link uMultiSpace WarningMsg
@@ -1445,6 +1445,17 @@ function! ResizeFont(num) abort
 endfunction
 command! -nargs=1 RF :call ResizeFont(<f-args>)
 "}}}
+function! PresentationMode() abort
+    :FS
+    :RF 50
+    :set cmdheight=0
+    :set laststatus=0
+    :set showtabline=0
+    :set nonu
+    :set nolist
+endfunction
+command! PRS :call PresentationMode()
+
 endif
 "=================================================================================================================================================================}}}
 "{{{ vim only
