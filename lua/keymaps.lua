@@ -1,3 +1,6 @@
+-- leader
+vim.g.mapleader = " "
+
 vim.cmd[[
 "{{{ mapping
 "{{{ override default key bind
@@ -13,13 +16,7 @@ endfunction
 
 map Q :call RemapQ()<CR>
 "}}}"
-"{{{ leader key
-let mapleader = "\<Space>"
-"}}}
 "{{{ normal mode
-"{{{ hide search highlighting
-nnoremap <silent> <C-c> :nohl<CR>
-"}}}
 "{{{ open netrw window
 function! WinExLeft() abort
     "open directory as root that current file exist
@@ -93,12 +90,6 @@ endfunction
 nnoremap <silent> <Leader>h :call SwitchBuff(-1)<CR>
 nnoremap <silent> <Leader>l :call SwitchBuff(1)<CR>
 "}}}
-"{{{ hiragana jump
-"ひらがなにたいしてえふもーしょんでいどうすることができる.りーだー,えふ,ろーまじをにゅうりょくでたいしょうのひらがなにとべる.:h digraph-table
-nnoremap <leader>f f<C-k>
-nnoremap <leader>F F<C-k>
-
-"}}}
 "}}}
 "{{{ visual mode
 "{{{ sorround ---"    
@@ -116,6 +107,7 @@ function! SurroundStr(surround_char1, surround_char2) abort
 endfunction
 "}}}    
 "{{{ comment ---"
+
 let g:comment_char_dict = {
     \ "vim" : '"',
     \ "c"   : '//',
@@ -124,7 +116,6 @@ let g:comment_char_dict = {
     \ "ttl" : ';',
     \ "lua" : '--',
     \ }
-
 function! CommentSelectedLine() abort
     let l:extension = expand("%:e")
     if expand("%:t") == '.vimrc'
@@ -137,24 +128,49 @@ endfunction
 vnoremap <silent> <Leader>/ :call CommentSelectedLine()<CR>
 "}}}
 "}}}
-"{{{ insert mode
-imap <C-c> <Esc>
-"}}}
-"{{{ insert and command mode
-"{{{ move into brackets when insert enclosing character ---"
-noremap! "" ""<Left>
-noremap! '' ''<Left>
-noremap! () ()<Left>
-noremap! [] []<Left>
-noremap! {} {}<Left>
-noremap! <> <><Left>
-noremap! %% %%<Left>
-"}}}
-"}}}
-"{{{ terminal mode
-"{{{ change mode to normal ---"
-tnoremap <C-\> <C-\><C-N>
-"}}}
-"}}}
 "=================================================================================================================================================================}}}
 ]]
+
+-- normal
+vim.keymap.set("n", "<C-c>", ":nohl<CR>") 
+vim.keymap.set("n", "<leader>f", "f<C-k>")
+vim.keymap.set("n", "<leader>F", "F<C-k>")
+
+--vim.keymap.set("n", "<C-d>", "<C-d>zz")
+--vim.keymap.set("n", "<C-u>", "<C-u>zz")
+
+--local comment_char_dict = {
+    --vim = '"',
+    --c   = '//',
+    --cs  = '//',
+    --py  = '#',
+    --ttl = ';',
+    --lua = '--',
+--}
+--vim.keymap.set("v", "<leader>/", (function()
+    --local extension = vim.fn.expand("%:e")
+    --if (vim.fn.expand("%:t") == '.vimrc') then
+        --vim.cmd(":noautocmd normal! I" .. comment_char_dict['vim'])
+    --elseif comment_char_dict[extension] ~= nil then
+        --vim.cmd("execute ':noautocmd normal! ^I" .. comment_char_dict[extension] .. "'")
+    --end
+--end))
+
+-- visual
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+
+-- insert
+vim.keymap.set("i", "<C-c>", "<Esc>")
+
+-- insert & command
+vim.keymap.set({"i", "c"}, '""', '""<Left>')
+vim.keymap.set({"i", "c"}, "''", "''<Left>")
+vim.keymap.set({"i", "c"}, "()", "()<Left>")
+vim.keymap.set({"i", "c"}, "[]", "[]<Left>")
+vim.keymap.set({"i", "c"}, "{}", "{}<Left>")
+vim.keymap.set({"i", "c"}, "<>", "<><Left>")
+vim.keymap.set({"i", "c"}, "%%", "%%<Left>")
+
+-- terminal
+vim.keymap.set("t", "<C-\\>", "<C-\\><C-N>")

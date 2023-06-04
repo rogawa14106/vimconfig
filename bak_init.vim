@@ -243,7 +243,7 @@ nnoremap <silent> <Leader>l :call SwitchBuff(1)<CR>
 "{{{ hiragana jump
 "ひらがなにたいしてえふもーしょんでいどうすることができる.りーだー,えふ,ろーまじをにゅうりょくでたいしょうのひらがなにとべる.:h digraph-table
 ""
-call digraph_setlist([['aa', 'あ'], ['ii', 'い'], ['uu', 'う'], ['ee', 'え'], ['oo', 'お'], ['xn', 'ん'], ['ji', 'じ']])
+"call digraph_setlist([['aa', 'あ'], ['ii', 'い'], ['uu', 'う'], ['ee', 'え'], ['oo', 'お'], ['xn', 'ん'], ['ji', 'じ']])
 nnoremap <leader>f f<C-k>
 nnoremap <leader>F F<C-k>
 
@@ -1446,13 +1446,15 @@ endfunction
 command! -nargs=1 RF :call ResizeFont(<f-args>)
 "}}}
 function! PresentationMode() abort
-    :FS
-    :RF 50
-    :set cmdheight=0
-    :set laststatus=0
-    :set showtabline=0
-    :set nonu
-    :set nolist
+    if exists("g:GuiLoaded")
+        FS
+        RF 35
+        "set cmdheight=0
+        "set laststatus=0
+        set showtabline=0
+        set nonu
+        set nolist
+    endif
 endfunction
 command! PRS :call PresentationMode()
 

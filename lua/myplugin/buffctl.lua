@@ -3,7 +3,7 @@ if has('nvim')
 "{{{ FloatingBuffCtl (buffer operation window)
 "{{{ Main(Floating Window)
 function! BuffCtlFloat() abort
-    noautocmd normal! mz
+    "noautocmd normal! mz
     let g:winid = win_getid()
 
     let l:buflineinfo =  MakeBuffCtlLineInfo()
@@ -172,7 +172,7 @@ function! SelectBuffFloat(splittype) abort
     call nvim_win_close(g:bufctl_winid, v:true)
     "move to the window that was open at the beginning
     call win_gotoid(g:winid)
-    noautocmd normal! `z
+    "noautocmd normal! `z
     "open buffer
     if a:splittype == "H"
         botright split

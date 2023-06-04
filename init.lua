@@ -1,11 +1,11 @@
 -- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ --
---        ___  ____    ___  ___  _________    ___        ___   ___  ____   --
---       /  / /    |  /  / /  / /        /   /  /       /  /  /  / /    |  --
---      /  / /  /  | /  / /  / /---  /--/   /  /       /  /  /  / /  |  |  --
---     /  / /  /|  |/  / /  /    /  /      /  /       /  /  /  / /  /|  |  --
---    /  / /  / |  |  / /  /    /  /      /  /       /  /  /  / /  /_|  |  --
---   /  / /  /  |    / /  /    /  / __   /  /_____  /  /__/  / /  /  |  |  --
---  /__/ /__/   |___/ /__/    /__/ /_/  /________/ /________/ /__/   |__|  --
+--        ___  ____    ___  ___  ___________  ___        ___   ___  ____   --
+--       /##/ /####|  /##/ /##/ /##########/ /##/       /##/  /##/ /####|  --
+--      /##/ /##/##| /##/ /##/     /##/     /##/       /##/  /##/ /##|##|  --
+--     /##/ /##/|##|/##/ /##/     /##/     /##/       /##/  /##/ /##/|##|  --
+--    /##/ /##/ |##|##/ /##/     /##/     /##/       /##/  /##/ /#######|  --
+--   /##/ /##/  |####/ /##/     /##/ __  /##/_____  /##/__/##/ /##/  |##|  --
+--  /##/ /##/   |###/ /##/     /##/ /#/ /########/ /########/ /##/   |##|  --
 --                                                                         --
 -- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ --
 
@@ -43,10 +43,13 @@
 
 -- global var ============================================================================================================{{{
 
+local myvimrc = vim.env.MYVIMRC
 if vim.fn.has('windows') then
-    g_myvimrc_sub = string.gsub(vim.env.MYVIMRC, '\\', '/')
+    myvimrc_sub = string.gsub(myvimrc, '\\', '/')
+else
+    myvimrc_sub = myvimrc
 end
-    g_vimrcdir = string.gsub(g_myvimrc_sub, '[^/]+$', '')
+g_vimrcdir = string.gsub(myvimrc_sub, '[^/]+$', '')
 
 --========================================================================================================================}}}
 
@@ -79,11 +82,13 @@ require("myplugin.buffctl")
 -- floatScrool
 require("myplugin.floatscroll")
 
+-- bulidin plugins
+require("plugins.netrw")
+
 -- plugins (packer.nvim managed)
--- > git clone https://github.com/wbthomason/packer.nvim AppData/Local/nvim-data/pack/packer/opt/packer.nvim
 if vim.fn.isdirectory("~/AppData/Local/nvim-data/pack/packer/opt/packer.nvim") then
+    --$ git clone https://github.com/wbthomason/packer.nvim AppData/Local/nvim-data/pack/packer/opt/packer.nvim
     require("plugins")
 end
 --require("lsp")
 --========================================================================================================================}}}
-

@@ -2,7 +2,8 @@ vim.cmd[[
 "{{{ utility
 "{{{ foldtext
 function! MyFoldtext() abort
-    return printf("[%4d lines ] %s", v:foldend - v:foldstart + 1, getline(v:foldstart))
+    let l:line = substitute(getline(v:foldstart), '{', "", "g")
+    return printf("[%4d lines ] %s", v:foldend - v:foldstart + 1, l:line)
 endfunction
 
 set foldtext=MyFoldtext()

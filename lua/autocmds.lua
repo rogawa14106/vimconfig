@@ -1,17 +1,5 @@
 vim.cmd[[
 "{{{ autocmd
-"{{{ ime off at insertmode leave TODO
-if has('windows')
-    augroup cancellIME
-        let myvimrc_path = substitute($MYVIMRC, '\\', '/', 'g')
-        let chime_path = substitute(myvimrc_path, '\v[^/]+$', '', '') . "bin/chime.exe"
-        let chime_cmd = "call system('" . chime_path . " 0')"
-        autocmd!
-        autocmd InsertLeave  * : execute chime_cmd
-        autocmd CmdlineLeave * : execute chime_cmd
-    augroup END
-endif
-"}}}
 "{{{ save and load fold state
 function! SaveFold() abort
     try
@@ -71,6 +59,49 @@ augroup ForeverVim
     au QuitPre * call ForeverVim()
 augroup END
 "}}}
+"{{{ ime off at insertmode leave TODO
+if has('windows')
+    augroup cancellIME
+        let myvimrc_path = substitute($MYVIMRC, '\\', '/', 'g')
+        let chime_path = substitute(myvimrc_path, '\v[^/]+$', '', '') . "bin/chime.exe"
+        let chime_cmd = "call system('" . chime_path . " 0')"
+        autocmd!
+        autocmd InsertLeave  * : execute chime_cmd
+        autocmd CmdlineLeave * : execute chime_cmd
+    augroup END
+endif
+"}}}
 "=================================================================================================================================================================}}}
 ]]
+
+--vim.api.nvim_create_augroup('loadFold', {})
+--vim.api.nvim_create_autocmd('insertleave', {
+    --group = 'loadFold'
+    --callback = (function()
+       -- 
+    --end)
+--})
+
+--vim.api.nvim_create_autocmd('insertleave', {
+    --group = 'saveFold'
+    --callback = (function()
+       -- 
+    --end)
+--})
+
+--local cmd_chime = g_vimrcdir .. "/bin/chime.exe 0"
+--
+--vim.api.nvim_create_augroup( "cancellIME", {} )
+--vim.api.nvim_create_autocmd( 'insertleave', {
+    --group = 'cancellIME',
+    --callback = (function()
+        --os.execute(cmd_chime)
+        --os.exit()
+    --end)
+--})
+
+--vim.api.nvim_create_autocmd( 'cmdlineleave', {
+    --group = 'cancellIME',
+    --callback = function () vim.cmd(cmd_chime) end
+--})
 

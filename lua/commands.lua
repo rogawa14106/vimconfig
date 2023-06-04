@@ -65,6 +65,7 @@ end, { nargs='?' })
 
 -- {{{ windows ui
 -- TODO create func that execute external command
+if vim.fn.has('windows') == 1 then
 vim.api.nvim_create_user_command("HSB", function(opts)
     local hidesb_cmd = "!" .. g_vimrcdir .. "/bin/hidesb.exe -b"
     vim.cmd(hidesb_cmd)
@@ -81,6 +82,7 @@ vim.api.nvim_create_user_command("FS", function(opts)
     vim.cmd(hidesb_cmd)
     vim.cmd(hidetb_cmd)
 end, {})
+end
 
 -- }}}
 

@@ -1,17 +1,3 @@
-vim.cmd.packadd "packer.nvim"
-
-require("packer").startup(function()
-    -- package manager
-    use "wbthomason/packer.nvim"
-
-    -- syntax highlighting
-    use "nvim-treesitter/nvim-treesitter"
-
-    -- language server page
-    --use "neovim/nvim-lspconfig"
-    --use "williamboman/mason.nvim"
-    --use "williamboman/mason-lspconfig.nvim"
-end)
 -- === packer ===
 -- :PackerInstall
 --      Install Plugins
@@ -23,16 +9,30 @@ end)
 --      PackerClean & PackerUpdate
 -- :PackerCompile
 --      Compile config files
+vim.cmd.packadd "packer.nvim"
+
+require("packer").startup(function()
+    -- package manager
+    use "wbthomason/packer.nvim"
+
+    -- syntax highlighting
+    --use { "nvim-treesitter/nvim-treesitter", opt = true, cmd={ "VimEnter" } }
+    use {"nvim-treesitter/nvim-treesitter", opt = false}
+
+    -- language server page
+    use "williamboman/mason.nvim"
+    use "williamboman/mason-lspconfig.nvim"
+    use "neovim/nvim-lspconfig"
+end)
+
 
 -- === treesitter ===
-require("plugins.treesitter")
 -- :TSInstall <language>
 --      install LSP server
 -- :TSEnable highlight
 --      enable highlight
+require("plugins.treesitter")
+
 
 -- === lsp ===
-
--- === bildin ===
-require("plugins.netrw")
-
+require("plugins.lsp")
