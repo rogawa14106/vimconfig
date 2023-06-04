@@ -50,7 +50,7 @@ function! BuffCtlFloat() abort
         "set option
         "call nvim_win_set_option(g:bufctl_winid, 'winhl', 'Normal:mModeNormal')
         call matchadd('BufCtlLineTail', '\v[^/]+\.[^\. ]+$')
-        highlight def link BufCtlLineTail DiffAdd
+        highlight def link BufCtlLineTail Sign
         call matchadd('BufCtlCautionMark', '\v\[!\]')
         highlight def link BufCtlCautionMark ErrorMsg
         call matchadd('BufCtlWarningMark', '\v\[[t+]\]')

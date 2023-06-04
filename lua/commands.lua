@@ -1,27 +1,25 @@
--- commands --
-
 -- {{{ vimrc, init.vim
-vim.api.nvim_create_user_command("VIMRC", function(opts)
+vim.api.nvim_create_user_command("VIMRC", function()
     vim.cmd("e " .. vim.env.MYVIMRC)
 end, {})
 
-vim.api.nvim_create_user_command("SP", function(opts)
+vim.api.nvim_create_user_command("SP", function()
     vim.cmd("luafile " .. vim.env.MYVIMRC)
 end, {})
 
-vim.api.nvim_create_user_command("INIVIM", function(opts)
+vim.api.nvim_create_user_command("INIVIM", function()
     vim.cmd("source C:/Users/rogawa/AppData/Local/nvim/bak_init.vim")
 end, {})
 -- }}}
 
 -- {{{ toggle terguicolors
-vim.api.nvim_create_user_command("GUI", function(opts)
+vim.api.nvim_create_user_command("GUI", function()
     vim.cmd("set termguicolors!")
 end, {})
 -- }}}
 
 -- {{{ toggle relative scrool
-vim.api.nvim_create_user_command("RS", function(opts)
+vim.api.nvim_create_user_command("RS", function()
     if (vim.opt.scrolloff:get() == 0) then
         vim.opt.scrolloff = vim.api.nvim_eval("&lines") / 2
     else
@@ -35,11 +33,11 @@ vim.api.nvim_create_user_command("CMD", function(opts)
     --- change key that will send to terminal at first and resize terminal
     local lines = vim.api.nvim_eval("&lines")
     if vim.fn.has('nvim') == 1 then
-        termkey = "a"
-        vim.cmd("horizontal belowright " .. lines/3 .. " split")
+        Termkey = "a"
+        vim.cmd("horizontal belowright " .. lines / 3 .. " split")
     else
-        termkey = ""
-        vim.cmd("set termwinsize=" .. lines/3 .. "x0")
+        Termkey = ""
+        vim.cmd("set termwinsize=" .. lines / 3 .. "x0")
     end
 
     -- open terminal
@@ -47,50 +45,61 @@ vim.api.nvim_create_user_command("CMD", function(opts)
     if vim.fn.has('nvim') == 1 then
         vim.cmd("call nvim_win_set_option(win_getid(), 'winhl', 'Normal:mModeTJob,CursorLine:Folded')")
     end
-    
+
     -- branch the commands to execute depending on the given arguments
     if opts.args == "" then
-        vim.cmd('call feedkeys("' .. termkey .. '")')
+        vim.cmd('call feedkeys("' .. Termkey .. '")')
     elseif opts.args == "time" then
-        vim.cmd('call feedkeys("' .. termkey .. 'prompt $d$s$t$g")')
+        vim.cmd('call feedkeys("' .. Termkey .. 'prompt $d$s$t$g")')
     elseif opts.args == "file" then
-        vim.cmd('call feedkeys("' .. termkey .. 'ssh file")')
+        vim.cmd('call feedkeys("' .. Termkey .. 'ssh file")')
     elseif opts.args == "196" then
-        vim.cmd('call feedkeys("' .. termkey .. 'ssh 196")')
+        vim.cmd('call feedkeys("' .. Termkey .. 'ssh 196")')
     elseif opts.args == "177" then
-        vim.cmd('call feedkeys("' .. termkey .. 'ssh 177")')
+        vim.cmd('call feedkeys("' .. Termkey .. 'ssh 177")')
     end
-end, { nargs='?' })
+end, { nargs = '?' })
 -- }}}
 
 -- {{{ windows ui
 -- TODO create func that execute external command
 if vim.fn.has('windows') == 1 then
-vim.api.nvim_create_user_command("HSB", function(opts)
-    local hidesb_cmd = "!" .. g_vimrcdir .. "/bin/hidesb.exe -b"
-    vim.cmd(hidesb_cmd)
-end, {})
+    vim.api.nvim_create_user_command("HSB", function()
+        local hidesb_cmd = "!" .. Vimrcdir .. "/bin/hidesb.exe -b"
+        vim.cmd(hidesb_cmd)
+        vim.fn.feedkeys('<CR>')
+    end, {})
 
-vim.api.nvim_create_user_command("HTB", function(opts)
-    local hidetb_cmd = "!" .. g_vimrcdir .. "/bin/hidetb.exe"
-    vim.cmd(hidetb_cmd)
-end, {})
+    vim.api.nvim_create_user_command("HTB", function()
+        local hidetb_cmd = "!" .. Vimrcdir .. "/bin/hidetb.exe"
+        vim.cmd(hidetb_cmd)
+        vim.fn.feedkeys('<CR>')
+    end, {})
 
-vim.api.nvim_create_user_command("FS", function(opts)
-    local hidesb_cmd = "!" .. g_vimrcdir .. "/bin/hidesb.exe -b"
-    local hidetb_cmd = "!" .. g_vimrcdir .. "/bin/hidetb.exe"
-    vim.cmd(hidesb_cmd)
-    vim.cmd(hidetb_cmd)
-end, {})
+    vim.api.nvim_create_user_command("FS", function()
+        local hidesb_cmd = "!" .. Vimrcdir .. "/bin/hidesb.exe -b"
+        local hidetb_cmd = "!" .. Vimrcdir .. "/bin/hidetb.exe"
+        vim.cmd(hidesb_cmd)
+        vim.fn.feedkeys('<CR>')
+        vim.cmd(hidetb_cmd)
+        vim.fn.feedkeys('<CR>')
+    end, {})
 end
 
 -- }}}
 
 -- {{{ git push vimconfigfiles
 vim.api.nvim_create_user_command("GPV", function(opts)
-    vim.cmd("cd " .. g_vimrcdir)
+    vim.cmd("cd " .. Vimrcdir)
     vim.cmd("!git add .")
     vim.cmd("!git commit -m " .. opts.args)
     vim.cmd("!git push origin main")
-end, { nargs=1 })
+end, { nargs = 1 })
 --}}}
+
+-- {{{ vimgrep and copen
+vim.api.nvim_create_user_command("Grep", function()
+    vim.cmd("let g:grep_regex = input({'prompt': 'Grep> '})")
+    vim.cmd("vimgrep " .. vim.g.grep_regex .. " ./** | copen")
+end, {})
+-- }}}

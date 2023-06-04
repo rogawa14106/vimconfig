@@ -89,7 +89,7 @@ endif
     --end)
 --})
 
---local cmd_chime = g_vimrcdir .. "/bin/chime.exe 0"
+--local cmd_chime = Vimrcdir .. "/bin/chime.exe 0"
 --
 --vim.api.nvim_create_augroup( "cancellIME", {} )
 --vim.api.nvim_create_autocmd( 'insertleave', {

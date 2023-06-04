@@ -1,11 +1,11 @@
---                                                                         --
---       /##/ /####|  /##/ /##/ /##########/ /##/       /##/  /##/ /####|  --
---      /##/ /##/##| /##/ /##/     /##/     /##/       /##/  /##/ /##|##|  --
---     /##/ /##/|##|/##/ /##/     /##/     /##/       /##/  /##/ /##/|##|  --
---    /##/ /##/ |##|##/ /##/     /##/     /##/       /##/  /##/ /#######|  --
---   /##/ /##/  |####/ /##/     /##/ __  /##/_____  /##/__/##/ /##/  |##|  --
---  /##/ /##/   |###/ /##/     /##/ /#/ /########/ /########/ /##/   |##|  --
---                                                                         --
+---                                                                          ---
+--       /##/ /####|  /##/ /##/ /##########/  /##/       /##/   /##/ /#####|  --
+--      /##/ /##/##| /##/ /##/     /##/      /##/       /##/   /##/ /##/|##|  --
+--     /##/ /##/|##|/##/ /##/     /##/      /##/       /##/   /##/ /##/ |##|  --
+--    /##/ /##/ |##|##/ /##/     /##/      /##/       /##/   /##/ /########|  --
+--   /##/ /##/  |####/ /##/     /##/      /##/_____  /##/___/##/ /##/   |##|  --
+--  /##/ /##/   |###/ /##/     /##/      /########/ /#########/ /##/    |##|  --
+---                                                                          ---
 
 -- NOTE =================================================================================================================={{{
 
@@ -43,11 +43,11 @@
 
 local myvimrc = vim.env.MYVIMRC
 if vim.fn.has('windows') then
-    myvimrc_sub = string.gsub(myvimrc, '\\', '/')
+    local myvimrc_sub = string.gsub(myvimrc, '\\', '/')
+    Vimrcdir = string.gsub(myvimrc_sub, '[^/]+$', '')
 else
-    myvimrc_sub = myvimrc
+    Vimrcdir = string.gsub(myvimrc, '[^/]+$', '')
 end
-g_vimrcdir = string.gsub(myvimrc_sub, '[^/]+$', '')
 
 --========================================================================================================================}}}
 
@@ -85,7 +85,7 @@ require("plugins.netrw")
 
 -- plugins (packer.nvim managed)
 if vim.fn.isdirectory("~/AppData/Local/nvim-data/pack/packer/opt/packer.nvim") then
-    --$ git clone https://github.com/wbthomason/packer.nvim AppData/Local/nvim-data/pack/packer/opt/packer.nvim
+    --$ git clone https://github.com/wbthomason/packer.nvim ~/AppData/Local/nvim-data/pack/packer/opt/packer.nvim
     require("plugins")
 end
 --require("lsp")
