@@ -100,6 +100,9 @@ end, { nargs = 1 })
 -- {{{ vimgrep and copen
 vim.api.nvim_create_user_command("Grep", function()
     vim.cmd("let g:grep_regex = input({'prompt': 'Grep> '})")
+    if (vim.g.grep_regex == '<C-c>') then
+        return
+    end
     vim.cmd("vimgrep " .. vim.g.grep_regex .. " ./** | copen")
 end, {})
 -- }}}
