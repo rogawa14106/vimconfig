@@ -1,5 +1,6 @@
 --TODO
 --非同期処理でdir_tableを取得する。取得中はメッセージを表示する。
+--Fimで使用したバッファが残っている場合はそれを使用するようにする(BuffCtlとおなじ方法でできるはず)
 --################################## algo ############################################
 --# Split string by delimiter and store in array{{{
 local function split(str, d)
@@ -7,7 +8,7 @@ local function split(str, d)
     local i = 1
     for s in string.gmatch(str, "([^" .. d .. "]+)") do
         s = string.gsub(s, "[\\]", '/')
-        t[i] = "." .. s
+        t[i] = s
         i = i + 1
     end
 
@@ -96,6 +97,7 @@ local function fuzzyFind(findstr, dir_table)
     local index = 1
     for i = 1, #dir_table do
         local filepath = string.gsub(dir_table[i], pwd, "")
+        filepath = filepath:sub(2, #filepath)
         local ffResult = fuzzyFindAlgo(filepath, findstr)
         if ffResult.score > 0 then
             ffResults[index] = ffResult
@@ -112,7 +114,7 @@ end
 -- }}}
 
 --################################### ui #############################################
---# write the result of ff to the file selector{{{
+--# write the result of search to the file selector{{{
 local function showFoundFiles(dir_table)
     local inputstr = vim.api.nvim_buf_get_lines(vim.g.fim_input_bufnr, 0, 1, false)
     local fnames = {}
@@ -123,9 +125,13 @@ local function showFoundFiles(dir_table)
     end
 
     if #fnames == 0 then
-        fnames[1] = '# file not found ...'
+        fnames[1] = '< file not found ... >'
     end
+    vim.api.nvim_buf_set_option(vim.g.fim_selector_bufnr, 'modifiable', true)
+    vim.api.nvim_buf_set_option(vim.g.fim_selector_bufnr, 'readonly', false)
     vim.api.nvim_buf_set_lines(vim.g.fim_selector_bufnr, 0, -1, true, fnames)
+    vim.api.nvim_buf_set_option(vim.g.fim_selector_bufnr, 'modifiable', false)
+    vim.api.nvim_buf_set_option(vim.g.fim_selector_bufnr, 'readonly', true)
 
     vim.fn.win_gotoid(vim.g.fim_selector_winid)
     vim.fn.execute(vim.fn.line('$'))
@@ -154,32 +160,33 @@ end
 --# create infomation box (info) {{{
 local function create_infobox(config)
     vim.g.fim_info_bufnr = vim.api.nvim_create_buf(false, true)
-    vim.g.fim_info_winid = vim.api.nvim_open_win(vim.g.fim_info_bufnr, false, config)
-    vim.api.nvim_win_set_option(vim.g.fim_info_winid, 'winhl', 'Normal:LineNr')
+    vim.g.fim_info_winid = vim.api.nvim_open_win(vim.g.fim_info_bufnr, true, config)
     local pwd = string.gsub(vim.fn.getcwd(), '[\\]', '/')
     vim.api.nvim_buf_set_lines(vim.g.fim_info_bufnr, 0, -1, true, {
-        "pwd: " .. pwd,
-        "search box   : move to file select window - <Enter>",
-        'select window: open file under cursor     - <Enter>',
-        '               move to search box         - "/"or"InsertEnter"',
+        "< " .. pwd .. " >",
+        "search box : move to file selector  - <Enter>",
+        'selector   : open file under cursor - <Enter>',
+        '             move to search box     - /',
     })
-    vim.api.nvim_buf_set_keymap(0, "n", '<leader>q', '', {
-        noremap = true,
-        callback = function()
-            close_Fim()
-        end,
-    })
+    vim.fn.matchadd("FimMsg", '<\\s.\\+\\s>')
+
+    vim.api.nvim_win_set_option(vim.g.fim_info_winid, 'winhl', 'Normal:LineNr')
+    vim.api.nvim_buf_set_option(0, 'modifiable', false)
+    vim.api.nvim_buf_set_option(0, 'readonly', true)
 end
 -- }}}
 --# create file select window (selector) {{{
 local function create_selector(config, pre_winid)
     vim.g.fim_selector_bufnr = vim.api.nvim_create_buf(false, true)
     vim.g.fim_selector_winid = vim.api.nvim_open_win(vim.g.fim_selector_bufnr, true, config)
-    vim.api.nvim_win_set_option(vim.g.fim_selector_winid, 'winhl', 'Normal:LineNr')
     vim.api.nvim_buf_set_lines(vim.g.fim_selector_bufnr, 0, -1, true, {
-        "# Welcome to Fim.",
-        "# Find your files by typing in the search box"
+        "< Welcome to Fim >",
+        "< Find your files by typing in the search box >"
     })
+    if vim.fn.exists('b:fimMsg') == 1 then
+        vim.fn.matchdelete(vim.b.fimMsg)
+    end
+    vim.b.fimMsg = vim.fn.matchadd("FimMsg", '<\\s.\\+\\s>')
 
     vim.api.nvim_buf_set_keymap(0, "n", '<leader>q', '', {
         noremap = true,
@@ -192,6 +199,12 @@ local function create_selector(config, pre_winid)
         noremap = true,
         callback = function()
             local selected_file = vim.fn.getline(vim.fn.line("."))
+            if string.match(selected_file, "^<") ~= nil then
+                vim.cmd("echohl WarningMsg")
+                vim.cmd("echo 'no such file or directory'")
+                vim.cmd("echohl End")
+                return
+            end
             close_Fim()
             vim.fn.win_gotoid(pre_winid)
             print('e ' .. selected_file)
@@ -203,26 +216,22 @@ local function create_selector(config, pre_winid)
         noremap = true,
         callback = function()
             vim.fn.win_gotoid(vim.g.fim_input_winid)
-            vim.fn.setpos('.', { 0, 0, vim.fn.col('$') - 1, 0 })
+            if vim.opt.lines:get() > 1 then
+                vim.cmd("noautocmd normal! ggjdG")
+            end
+            vim.fn.setpos('.', { 0, 0, vim.fn.col('$'), 0 })
         end,
     })
 
-    vim.api.nvim_create_augroup('fimSelector', {})
-    vim.api.nvim_create_autocmd('InsertEnter', {
-        group = 'fimSelector',
-        callback = function()
-            vim.fn.win_gotoid(vim.g.fim_input_winid)
-            vim.fn.setpos('.', { 0, 0, vim.fn.col('$') - 1, 0 })
-        end,
-        buffer = vim.g.fim_selector_bufnr,
-    })
+    vim.api.nvim_win_set_option(vim.g.fim_selector_winid, 'winhl', 'Normal:LineNr')
+    vim.api.nvim_buf_set_option(0, 'modifiable', false)
+    vim.api.nvim_buf_set_option(0, 'readonly', true)
 end
 -- }}}
 --# create inputbox (input) {{{
 local function create_inputbox(config, dir_table)
     vim.g.fim_input_bufnr = vim.api.nvim_create_buf(false, true)
     vim.g.fim_input_winid = vim.api.nvim_open_win(vim.g.fim_input_bufnr, true, config)
-    vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'winhl', 'Normal:NormalFloat')
     vim.fn.feedkeys('a')
 
     vim.api.nvim_buf_set_keymap(0, "i", '<Enter>', '<Esc><Cmd>call win_gotoid(g:fim_selector_winid)<CR>', {
@@ -250,15 +259,17 @@ local function create_inputbox(config, dir_table)
         end,
         buffer = vim.g.fim_input_bufnr,
     })
+
+    vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'winhl', 'Normal:NormalFloat')
 end
 -- }}}
 --# create inputbox prompt (prompt){{{
 local function create_prompt(config, prompt)
     vim.g.fim_prompt_bufnr = vim.api.nvim_create_buf(false, true)
     vim.g.fim_prompt_winid = vim.api.nvim_open_win(vim.g.fim_prompt_bufnr, false, config)
-    vim.api.nvim_win_set_option(vim.g.fim_prompt_winid, 'winhl', 'Normal:NormalFloat')
     vim.api.nvim_buf_set_lines(vim.g.fim_prompt_bufnr, 0, -1, true, { prompt })
-    
+
+    vim.api.nvim_win_set_option(vim.g.fim_prompt_winid, 'winhl', 'Normal:NormalFloat')
     vim.fn.win_gotoid(vim.g.fim_input_winid)
 end
 -- }}}
@@ -272,7 +283,7 @@ local function create_ffwin(pre_winid, dir_table)
     local input_height = 1
     local flame_height = 2
     local fim_width = math.floor(columns/2)
-    local prompt = [[ > ]]
+    local prompt = [[>> ]]
     local prompt_width = string.len(prompt)
     local offset = 1
 
@@ -294,7 +305,7 @@ local function create_ffwin(pre_winid, dir_table)
         height = input_height,
         row = lines - info_height - input_height - (flame_height * 2) - offset + 1,
         border = {
-            "", "~", ".", "|",
+            "", "-", ".", "|",
             "'", "", "", "",
         },
         focusable = true,
@@ -305,7 +316,7 @@ local function create_ffwin(pre_winid, dir_table)
         height = input_height,
         row = lines - info_height - input_height - (flame_height * 2) - offset + 1,
         border = {
-            ".", "~", "", "",
+            ".", "-", "", "",
             "", "-", "`", "|",
         },
         focusable = false,
@@ -350,6 +361,7 @@ vim.api.nvim_create_user_command("Fim",
         --vim.cmd("hi! def link FimMatch Function")
         vim.cmd("hi! def link FimMatch CursorLineNr")
         vim.cmd("hi! def link FimMatchAll Title")
+        vim.cmd("hi! def link FimMsg Statement")
         create_ffwin(pre_winid, dir_table)
     end,
     { bang = true }
