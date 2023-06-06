@@ -80,6 +80,9 @@ require("myplugin.buffctl")
 -- floatScrool
 require("myplugin.floatscroll")
 
+-- floatScrool
+require("myplugin.fim")
+
 -- bulidin plugins
 require("plugins.netrw")
 

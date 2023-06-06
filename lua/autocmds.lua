@@ -11,7 +11,7 @@ endfunction
 function! LoadFold() abort
     try
         loadview
-        call HighlightEcho("info", "load fold view")
+        "call HighlightEcho("info", "load fold view")
     catch
     endtry
 endfunction

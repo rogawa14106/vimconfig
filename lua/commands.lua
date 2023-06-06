@@ -77,8 +77,8 @@ if vim.fn.has('windows') == 1 then
     end, {})
 
     vim.api.nvim_create_user_command("FS", function()
-        local hidesb_cmd = "!" .. Vimrcdir .. "/bin/hidesb.exe -b"
         local hidetb_cmd = "!" .. Vimrcdir .. "/bin/hidetb.exe"
+        local hidesb_cmd = "!" .. Vimrcdir .. "/bin/hidesb.exe -b"
         vim.cmd(hidesb_cmd)
         vim.fn.feedkeys('<CR>')
         vim.cmd(hidetb_cmd)
@@ -90,6 +90,12 @@ end
 
 -- {{{ git push vimconfigfiles
 vim.api.nvim_create_user_command("GPV", function(opts)
+    if string.match(opts.args, "^'") then
+        vim.cmd("echohl ErrorMsg")
+        vim.cmd("echo '[Error] single quote is invalid'")
+        vim.cmd("echohl End")
+        return
+    end
     vim.cmd("cd " .. Vimrcdir)
     vim.cmd("!git add .")
     vim.cmd("!git commit -m " .. opts.args)
@@ -99,10 +105,20 @@ end, { nargs = 1 })
 
 -- {{{ vimgrep and copen
 vim.api.nvim_create_user_command("Grep", function()
-    vim.cmd("let g:grep_regex = input({'prompt': 'Grep> '})")
-    if (vim.g.grep_regex == '<C-c>') then
+
+    local pwd = string.gsub(vim.fn.getcwd(), '\\', '/')
+    vim.cmd("echohl DiffAdd")
+    vim.cmd("echo '[Info] grep target >>> " .. pwd .. "/** <<<'")
+    vim.cmd("echo '[Info] Type " .. '"exit"' .. " to quit. '")
+    vim.cmd("echohl End")
+
+    local regex = vim.fn.input("RegEx> ")
+
+    if (regex == 'exit') then
+        print(' [command quit]')
         return
     end
-    vim.cmd("vimgrep " .. vim.g.grep_regex .. " ./** | copen")
+
+    vim.cmd("vimgrep " .. regex .. " ./** | copen")
 end, {})
 -- }}}

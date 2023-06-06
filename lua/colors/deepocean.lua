@@ -120,7 +120,7 @@ setHi("Todo", hl_mono9, hl_warn0, "none")
 ----- highlight-group ------"
 setHi("Normal", hl_mono9, hl_mono1, "none")
 setHi("NormalFloat", hl_mono9, hl_mono5, "none")
-setHi("NormalNC", hl_mono9, hl_mono1, "none")
+setHi("NormalNC", hl_mono7, hl_mono1, "none")
 
 setHi("NonText", hl_mono3, unspec, "none")
 setHi("Whitespace", hl_mono3, unspec, "none")
@@ -160,15 +160,15 @@ setHi("Substitute", unspec, hl_emph1, "none")
 
 setHi("CursorLine", unspec, hl_mono2, "none")
 setHi("CursorColumn", hl_mono8, hl_mono2, "none")
-setHi("CursorLineNr", hl_mono8, hl_mono2, "none")
+setHi("CursorLineNr", hl_mono9, hl_mono2, "none")
 setHi("CursorLineFold", hl_mono8, hl_mono2, "none")
 setHi("CursorLineSign", unspec, hl_mono2, "none")
 
-setHi("LineNr", hl_mono6, hl_mono2, "none")
-setHi("LineNrAbove", hl_mono6, hl_mono2, "none")
-setHi("LineNrBelow", hl_mono6, hl_mono2, "none")
+setHi("LineNr", hl_mono7, hl_mono2, "none")
+setHi("LineNrAbove", hl_mono7, hl_mono2, "none")
+setHi("LineNrBelow", hl_mono7, hl_mono2, "none")
 
-setHi("FoldColumn", hl_mono6, hl_mono2, "none")
+setHi("FoldColumn", hl_mono7, hl_mono2, "none")
 
 setHi("SignColumn", unspec, hl_mono2, "none")
 setHi("Sign", hl_emph0, unspec, "none")

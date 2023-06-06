@@ -157,11 +157,12 @@ vim.keymap.set("n", "<leader>F", "F<C-k>")
 --end))
 
 -- visual
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv")
+vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv")
 
 -- insert
 vim.keymap.set("i", "<C-c>", "<Esc>")
+--vim.keymap.set("i", "<C-[>", "<Esc>")
 
 -- insert & command
 vim.keymap.set({"i", "c"}, '""', '""<Left>')

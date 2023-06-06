@@ -46,7 +46,7 @@ set.listchars:append({tab='^-', space='_', eol='$'})
 set.matchpairs:append({'<:>'})
 
 -- path
-set.path = '**'
+set.path:append('**')
 
 -- gui
 set.mouse = ''

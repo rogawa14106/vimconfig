@@ -1,6 +1,6 @@
 require('mason').setup()
 require('mason-lspconfig').setup_handlers({ function(server)
-    --ensure_insatlled = { "lua_ls", "vimls", "pyright" }
+    local ensure_insatlled = { "lua_ls", "vimls", "pyright" }
     local lspconfig = require('lspconfig')
     local lua_ls_opt = {
         settings = {
@@ -43,13 +43,14 @@ vim.cmd("highlight LspReferenceText  cterm=underline ctermfg=1 ctermbg=8 gui=und
 vim.cmd("highlight LspReferenceRead  cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
 vim.cmd("highlight LspReferenceWrite cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
 
+-- TODO
 vim.api.nvim_create_augroup('lsp_document_highlight', {})
-vim.api.nvim_create_autocmd('CursorHold,CursorHoldI', {
-    group = 'lsp_document_highlight',
-    callback = (function()
-        vim.lsp.buf.document_highlight()
-    end)
-})
+--vim.api.nvim_create_autocmd('CursorHold,CursorHoldI', {
+--group = 'lsp_document_highlight',
+--callback = (function()
+--vim.lsp.buf.document_highlight()
+--end)
+--})
 vim.api.nvim_create_autocmd('CursorMoved,CursorMovedI', {
     group = 'lsp_document_highlight',
     callback = (function()

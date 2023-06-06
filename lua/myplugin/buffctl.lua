@@ -1,5 +1,5 @@
+if vim.fn.has('nvim') then
 vim.cmd [[
-if has('nvim')
 "{{{ FloatingBuffCtl (buffer operation window)
 "{{{ Main(Floating Window)
 function! BuffCtlFloat() abort
@@ -134,7 +134,7 @@ function! MakeBuffCtlLineInfo() abort
         let l:bufmod = l:bufmod == 1 ? "+" : "-" 
 
         "definge buff line
-        let l:bufline = printf('[%s][%s][%3d] %s', l:bufmod, l:bufstat, l:bufnr, l:bufname)
+        let l:bufline = printf('[%02d][%s][%s] %s', l:bufnr, l:bufmod, l:bufstat, l:bufname)
 
         let l:line_length = len(l:bufline)
         if l:line_length > l:longest_line
@@ -248,5 +248,5 @@ endfunction
 "}}}
 nnoremap <silent> <Leader><Leader> :call BuffCtlFloat()<CR>
 "}}}
-endif
 ]]
+end
