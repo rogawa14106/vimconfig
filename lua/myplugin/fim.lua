@@ -22,6 +22,7 @@ local function get_dir_table()
     local cmd = "chcp 65001 | dir /s /b"
     local dir = vim.fn.system(cmd)
     local dir_table = split(dir, '\n')
+    --vim.g.stop_timer = true
     return dir_table
 end
 -- }}}
@@ -231,7 +232,7 @@ local function create_selector(config, pre_winid)
 end
 -- }}}
 --# create inputbox (input) {{{
-local function create_inputbox(config, dir_table)
+local function create_inputbox(config)
     vim.g.fim_input_bufnr = vim.api.nvim_create_buf(false, true)
     vim.g.fim_input_winid = vim.api.nvim_open_win(vim.g.fim_input_bufnr, true, config)
     vim.fn.feedkeys('a')
@@ -253,6 +254,29 @@ local function create_inputbox(config, dir_table)
         end,
     })
 
+    --local uv = vim.loop
+    --local timer = uv.new_timer()
+    --local i = 0
+    --vim.g.stop_timer = false
+    --timer:start(1000, 250, vim.schedule_wrap(function()
+    --if i % 4 == 0 then
+    --print('fetch filelist -')
+    --elseif i % 4 == 1 then
+    --print('fetch filelist /')
+    --elseif i % 4 == 2 then
+    --print('fetch filelist |')
+    --else
+    --print('fetch filelist \\')
+    --end
+    --if vim.g.stop_timer == true then
+    ---- このタイミングでマップなどの機能をつける？
+    --timer:close()
+    --end
+    --i = i + 1
+    --end))
+    print('[Fim] get file lists..')
+    local dir_table = get_dir_table()
+    print('[Fim] end')
     vim.api.nvim_create_augroup('fimInput', {})
     vim.api.nvim_create_autocmd('CursorMovedI', {
         group = 'fimInput',
@@ -276,24 +300,25 @@ local function create_prompt(config, prompt)
 end
 -- }}}
 --# create all windows {{{
-local function create_ffwin(pre_winid, dir_table)
+local function create_ffwin(pre_winid)
+    local lines             = vim.opt.lines:get()
+    local columns           = vim.opt.columns:get()
+    local fim_height        = math.floor(lines / 2)
+    local info_height       = 4
+    local input_height      = 1
+    local flame_height      = 2
+    local fim_width         = math.floor(columns / 2)
+    local prompt            = [[>> ]]
+    local prompt_width      = string.len(prompt)
+    local statusline_height = 1
+    local offset_col        = 0
+    local offset_row        = 0
 
-    local lines = vim.opt.lines:get()
-    local columns = vim.opt.columns:get()
-    local fim_height = math.floor(lines/2)
-    local info_height = 4
-    local input_height = 1
-    local flame_height = 2
-    local fim_width = math.floor(columns/2)
-    local prompt = [[>> ]]
-    local prompt_width = string.len(prompt)
-    local offset = 1
-
-    local config_selector = {
-        width = math.floor(columns/2),
-        col = columns - fim_width - offset,
+    local config_selector   = {
+        width = math.floor(columns / 2),
+        col = columns - fim_width - offset_col - 2,
         height = fim_height - info_height - input_height,
-        row = lines - fim_height - (flame_height * 3) - offset + 2,
+        row = lines - fim_height - (flame_height * 3) - offset_row + statusline_height,
         border = {
             ".", "-", ".", "|",
             "", "", "", "|",
@@ -301,22 +326,22 @@ local function create_ffwin(pre_winid, dir_table)
         focusable = true,
     }
 
-    local config_inputbox = {
-        width = math.floor(columns/2) - prompt_width,
-        col = columns - fim_width - offset + prompt_width,
+    local config_inputbox   = {
+        width = math.floor(columns / 2) - prompt_width,
+        col = columns - fim_width - offset_col + prompt_width - 1,
         height = input_height,
-        row = lines - info_height - input_height - (flame_height * 2) - offset + 1,
+        row = lines - info_height - input_height - (flame_height * 2) + statusline_height - offset_row - 1,
         border = {
             "", "-", ".", "|",
             "'", "", "", "",
         },
         focusable = true,
     }
-    local config_prompt = {
+    local config_prompt     = {
         width = prompt_width,
-        col = columns - fim_width - offset - 1,
+        col = columns - fim_width - offset_col - 2,
         height = input_height,
-        row = lines - info_height - input_height - (flame_height * 2) - offset + 1,
+        row = lines - info_height - input_height - (flame_height * 2) + statusline_height - offset_row - 1,
         border = {
             ".", "-", "", "",
             "", "-", "`", "|",
@@ -324,20 +349,20 @@ local function create_ffwin(pre_winid, dir_table)
         focusable = false,
     }
 
-    local config_infobox  = {
-        width = math.floor(columns/2),
-        col = columns - fim_width - offset,
+    local config_infobox    = {
+        width = math.floor(columns / 2),
+        col = columns - fim_width - offset_col - 2,
         height = info_height,
-        row = lines - info_height - flame_height - offset,
+        row = lines - info_height - flame_height - statusline_height - offset_row,
         border = {
             "|", "", "|", "|",
             "'", "-", "`", "|",
         },
         focusable = false,
     }
-    local commonconfig = {
-        style     = 'minimal',
-        relative  = 'editor',
+    local commonconfig      = {
+        style    = 'minimal',
+        relative = 'editor',
     }
     for k, v in pairs(commonconfig) do
         --TODO
@@ -350,7 +375,7 @@ local function create_ffwin(pre_winid, dir_table)
     create_selector(config_selector, pre_winid)
     create_infobox(config_infobox)
     create_prompt(config_prompt, prompt)
-    create_inputbox(config_inputbox, dir_table)
+    create_inputbox(config_inputbox)
 end
 -- }}}
 
@@ -358,13 +383,12 @@ end
 --# create Fim command{{{
 vim.api.nvim_create_user_command("Fim",
     function()
-        local dir_table = get_dir_table()
         local pre_winid = vim.fn.win_getid()
         --vim.cmd("hi! def link FimMatch Function")
         vim.cmd("hi! def link FimMatch CursorLineNr")
         vim.cmd("hi! def link FimMatchAll Title")
         vim.cmd("hi! def link FimMsg Statement")
-        create_ffwin(pre_winid, dir_table)
+        create_ffwin(pre_winid)
     end,
     { bang = true }
-)-- }}}
+) -- }}}
