@@ -1,0 +1,9 @@
+--翻訳API
+
+デプロイID
+AKfycbzvtTGWaVgvnlW-n2lzfhjjD7yypSKs4P794mcedKDKE9QhN-yc6wkdK0Cege61Nos
+
+URL
+https://script.google.com/macros/s/AKfycbzvtTGWaVgvnlW-n2lzfhjjD7yypSKs4P794mcedKDKE9QhN-yc6wkdK0Cege61Nos/exec
+
+?text=<翻訳するテキスト>&source=en&target=ja
