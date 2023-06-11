@@ -319,7 +319,7 @@ local function create_inputbox(config)
             else
                 vim.fn.win_gotoid(vim.g.fim_selector_winid)
                 writeLine(vim.g.fim_selector_bufnr, 0, -1, {
-                    '< The file list is larger than 8982 >',
+                    '< The file list length is larger than 8982 >',
                     '< So, no file search on input >',
                     '< if you want to search files, press <Enter> on normal mode >',
                 })

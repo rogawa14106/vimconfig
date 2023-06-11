@@ -80,8 +80,12 @@ require("myplugin.buffctl")
 -- floatScrool
 require("myplugin.floatscroll")
 
--- floatScrool
+-- fuzzy finder
 require("myplugin.fim")
+
+-- clock
+require("myplugin.clock")
+vim.cmd("Clock")
 
 -- bulidin plugins
 require("plugins.netrw")

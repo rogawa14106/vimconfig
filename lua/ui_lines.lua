@@ -1,5 +1,4 @@
 vim.cmd[[
-"{{{ utility
 "{{{ foldtext
 function! MyFoldtext() abort
     let l:line = substitute(getline(v:foldstart), '{', "", "g")
@@ -68,6 +67,7 @@ function! MyStatusline() abort
     let l:mystatusline .= "\ [%{&buftype!=''?&buftype:&filetype}]"
     let l:mystatusline .= "\ [%{&fileencoding!=''?&fileencoding:&encoding},"
     let l:mystatusline .= "%{&fileformat}]\ "
+    let l:mystatusline .= "%#statusline#"
     return l:mystatusline
 endfunction
 
@@ -119,6 +119,7 @@ function! MyTabLine() abort
 
     let l:pwd = getcwd()
     let l:tabstring .= '%#TabLineSel# pwd: ' . l:pwd . ' '
+    let l:tabstring .= '%#TabLineFill#'
 
     return l:tabstring 
 endfunction
@@ -367,6 +368,5 @@ endfunction
 command! -nargs=? HT :call HiTest(<f-args>)
 
 "}}}
-"=================================================================================================================================================================}}}
 ]]
 
