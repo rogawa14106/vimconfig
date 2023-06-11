@@ -1,32 +1,13 @@
 --TODO
---Fimで使用したスクラッチバッファが残っている場合はそれを使用するようにする(BuffCtlとおなじ方法でできるはず)
 --除外するディレクトリ名、文字列をオプションで渡せるようにする。
---カレントディレクトリを変更できるようにする。
 --オブジェクト指向風に書き換える
---スペースを含むファイルを許容する
+local helper = require("../helper")
 local Path_table = {}
---################################## algo ############################################
---# Split string by delimiter and store in array{{{
-local function split(str, d)
-    local t = {}
-    local i = 1
-    for s in string.gmatch(str, "([^" .. d .. "]+)") do
-        s = string.gsub(s, "[\\]", '/')
-        t[i] = s
-        i = i + 1
-    end
-
-    return t
+--################################## functions ############################################
+--# get pwd
+local get_pwd = function()
+    return string.gsub(vim.fn.getcwd(), '\\', '/')
 end
--- }}}
---# Get dir_table (repeal) {{{
---local function get_dir_table()
---local cmd = "chcp 65001 | dir /s /b"
---local dir = vim.fn.system(cmd)
---local dir_table = split(dir, '\n')
---return dir_table
---end
--- }}}
 --# scandir recurcive{{{
 ScandirRecursive = function(path, pwd)
     local uv = vim.loop
@@ -50,12 +31,13 @@ ScandirRecursive = function(path, pwd)
                 end
             end
         end
+        print("[Fim] path_table length: " .. #Path_table)
     end
 
     local fs = uv.fs_scandir(path, cb)
-    print("[Fim] path_table length:", #Path_table)
 end
 -- }}}
+--
 --# An algorithm that scores string matching{{{
 local function get_score(str, findstr, weight)
     local find_index = 1
@@ -126,7 +108,7 @@ local function fuzzyFind(findstr, path_table)
     if path_table == nil then
         return
     end
-    local pwd = string.gsub(vim.fn.getcwd(), '[\\]', '/')
+    local pwd = get_pwd()
 
     local ffResults = {}
 
@@ -177,18 +159,14 @@ local function showFoundFiles()
         local notfound_msg = '< file not found ... >'
         writeLine(vim.g.fim_selector_bufnr, 0, -1, { notfound_msg })
         vim.fn.clearmatches(vim.g.fim_selector_winid)
-        vim.fn.win_gotoid(vim.g.fim_input_winid)
-        return
+        vim.fn.matchadd("FimMsg", '<\\s.\\+\\s>')
     else
         writeLine(vim.g.fim_selector_bufnr, 0, -1, fnames)
-    end
-
-    vim.fn.execute(vim.fn.line('$'))
-    if #inputstr > 0 then
-        local inputstr_sub = string.gsub(inputstr, "([%.%\\%[%]%(%)%*])", "%1")
         vim.fn.clearmatches(vim.g.fim_selector_winid)
+        local inputstr_sub = string.gsub(inputstr, "([%.%\\%[%]%(%)%*])", "%1")
         vim.fn.matchadd("FimMatch", '[' .. inputstr_sub .. ']')
         vim.fn.matchadd("FimMatchAll", inputstr)
+        vim.fn.execute(vim.fn.line('$'))
     end
 
     vim.fn.win_gotoid(vim.g.fim_input_winid)
@@ -249,16 +227,14 @@ local function create_selector(config, pre_winid)
         callback = function()
             local selected_line = vim.fn.getline(vim.fn.line("."))
             if string.match(selected_line, "^<") ~= nil then
-                vim.cmd("echohl WarningMsg")
-                vim.cmd("echo 'no such file or directory'")
-                vim.cmd("echohl End")
+                helper.highlightEcho("warning", "no such file or directory")
                 return
             end
             local selected_file = string.gsub(vim.fn.getcwd(), '\\', '/') .. "/" .. selected_line
             close_Fim()
             vim.fn.win_gotoid(pre_winid)
-            print('e ' .. selected_file)
             vim.cmd(':e ' .. selected_file)
+            helper.highlightEcho("info", 'open file >>> ' .. selected_file)
         end,
     })
 
@@ -276,7 +252,7 @@ local function create_selector(config, pre_winid)
     vim.api.nvim_create_autocmd('DirChanged', {
         group = 'fimSelector',
         callback = function()
-            local pwd = string.gsub(vim.fn.getcwd(), '\\', '/')
+            local pwd = get_pwd()
             vim.api.nvim_buf_call(
                 vim.g.fim_input_bufnr,
                 function()
@@ -288,6 +264,11 @@ local function create_selector(config, pre_winid)
             ScandirRecursive(pwd, pwd)
         end,
         buffer = vim.g.fim_selector_bufnr,
+    })
+
+    writeLine(vim.g.fim_selector_bufnr, 0, -1, {
+        "< Welcome to Fim >",
+        "< Find your files by typing in the search box >"
     })
 
     -- set options
@@ -328,10 +309,48 @@ local function create_inputbox(config)
     -- quit Fim
     create_keymap_quitfim(vim.g.fim_input_bufnr)
 
+    -- autocmd
+    vim.api.nvim_create_augroup('fimInput', {})
+    vim.api.nvim_create_autocmd('CursorMovedI', {
+        group = 'fimInput',
+        callback = function()
+            if #Path_table < 8982 then
+                showFoundFiles()
+            else
+                vim.fn.win_gotoid(vim.g.fim_selector_winid)
+                writeLine(vim.g.fim_selector_bufnr, 0, -1, {
+                    '< The file list is larger than 8982 >',
+                    '< So, no file search on input >',
+                    '< if you want to search files, press <Enter> on normal mode >',
+                })
+                vim.fn.clearmatches(vim.g.fim_selector_winid)
+                vim.fn.matchadd("FimMsg", '<\\s.\\+\\s>')
+                vim.fn.win_gotoid(vim.g.fim_input_winid)
+            end
+        end,
+        buffer = vim.g.fim_input_bufnr,
+    })
+    vim.api.nvim_create_autocmd('DirChanged', {
+        group = 'fimInput',
+        callback = function()
+            local pwd = get_pwd()
+            vim.api.nvim_buf_call(
+                vim.g.fim_selector_bufnr,
+                function()
+                    vim.cmd("cd " .. string.gsub(vim.fn.getcwd(), '\\', '/'))
+                end)
+            Path_table = {}
+            writeLine(vim.g.fim_info_bufnr, 0, 1, { "< pwd - " .. pwd .. " >" })
+            writeLine(vim.g.fim_selector_bufnr, 0, -1, { "< Fim Reloaded >" })
+            ScandirRecursive(pwd, pwd)
+        end,
+        buffer = vim.g.fim_input_bufnr,
+    })
+
     -- set options
     vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'winhl', 'Normal:NormalFloat')
-    vim.api.nvim_buf_set_option(0, 'modifiable', false)
-    vim.api.nvim_buf_set_option(0, 'readonly', true)
+    vim.api.nvim_buf_set_option(0, 'modifiable', true)
+    vim.api.nvim_buf_set_option(0, 'readonly', false)
 end
 -- }}}
 --# create inputbox prompt (prompt){{{
@@ -341,6 +360,8 @@ local function create_prompt(config, prompt)
     writeLine(vim.g.fim_prompt_bufnr, 0, -1, { prompt })
 
     vim.api.nvim_win_set_option(vim.g.fim_prompt_winid, 'winhl', 'Normal:NormalFloat')
+    vim.api.nvim_buf_set_option(vim.g.fim_prompt_bufnr, 'modifiable', true)
+    vim.api.nvim_buf_set_option(vim.g.fim_prompt_bufnr, 'readonly', false)
 end
 -- }}}
 --
@@ -348,12 +369,21 @@ end
 local function create_ffwin(pre_winid)
     local lines             = vim.opt.lines:get()
     local columns           = vim.opt.columns:get()
-    local fim_height        = math.floor(lines / 2)
-    local input_height      = 1
     local flame_height      = 2
+
+    -- fim window size
+    local fim_height        = math.floor(lines / 2)
     local fim_width         = math.floor(columns / 2)
+
+    -- input
+    local input_height      = 1
+
+    -- prompt
     local prompt            = [[>> ]]
-    local pwd               = string.gsub(vim.fn.getcwd(), '[\\]', '/')
+    local prompt_width      = string.len(prompt)
+
+    -- info
+    local pwd               = get_pwd()
     local information       = {
         "< pwd - " .. pwd .. " >",
         "=== mapping =========================================================================",
@@ -363,7 +393,8 @@ local function create_ffwin(pre_winid)
         "both     : quit Fim               - <leader>q",
     }
     local info_height       = #information
-    local prompt_width      = string.len(prompt)
+
+    -- offset
     local statusline_height = 1
     local offset_col        = 0
     local offset_row        = 0
@@ -433,48 +464,7 @@ end
 --
 --# enable mappings{{{
 local function enable_mappings()
-    writeLine(vim.g.fim_selector_bufnr, 0, -1, {
-        "< Welcome to Fim >",
-        "< Find your files by typing in the search box >"
-    })
 
-    vim.api.nvim_create_augroup('fimInput', {})
-    vim.api.nvim_create_autocmd('CursorMovedI', {
-        group = 'fimInput',
-        callback = function()
-            if #Path_table < 8982 then
-                showFoundFiles()
-            else
-                vim.fn.win_gotoid(vim.g.fim_selector_winid)
-                writeLine(vim.g.fim_selector_bufnr, 0, -1, {
-                    '< The file list is larger than 8982 >',
-                    '< So, no file search on input >',
-                    '< if you want to search files, press <Enter> on normal mode >',
-                })
-                vim.fn.win_gotoid(vim.g.fim_input_winid)
-            end
-        end,
-        buffer = vim.g.fim_input_bufnr,
-    })
-    vim.api.nvim_create_autocmd('DirChanged', {
-        group = 'fimInput',
-        callback = function()
-            local pwd = string.gsub(vim.fn.getcwd(), '\\', '/')
-            vim.api.nvim_buf_call(
-                vim.g.fim_selector_bufnr,
-                function()
-                    vim.cmd("cd " .. string.gsub(vim.fn.getcwd(), '\\', '/'))
-                end)
-            Path_table = {}
-            writeLine(vim.g.fim_info_bufnr, 0, 1, { "< pwd - " .. pwd .. " >" })
-            writeLine(vim.g.fim_selector_bufnr, 0, -1, { "< Fim Reloaded >" })
-            ScandirRecursive(pwd, pwd)
-        end,
-        buffer = vim.g.fim_input_bufnr,
-    })
-
-    vim.api.nvim_buf_set_option(vim.g.fim_input_bufnr, 'modifiable', true)
-    vim.api.nvim_buf_set_option(vim.g.fim_input_bufnr, 'readonly', false)
 end
 -- }}}
 
@@ -487,13 +477,14 @@ vim.api.nvim_create_user_command("Fim",
             vim.fn.win_gotoid(vim.g.fim_input_winid)
             return
         end
-        local pre_winid = vim.fn.win_getid()
+
         -- define highlight
         vim.cmd("hi! def link FimMatch CursorLineNr")
         vim.cmd("hi! def link FimMatchAll Title")
         vim.cmd("hi! def link FimMsg Statement")
 
         -- create ui (At this time, Mappings are not valid)
+        local pre_winid = vim.fn.win_getid()
         create_ffwin(pre_winid)
         enable_mappings()
 
@@ -502,8 +493,8 @@ vim.api.nvim_create_user_command("Fim",
         local pwd = vim.fn.getcwd()
         ScandirRecursive(pwd, pwd)
 
-        -- init matches
-        --vim.g.fimmatchs = {}
+        -- goto inputbox
+        vim.fn.win_gotoid(vim.g.fim_input_winid)
     end,
     { bang = true }
 ) -- }}}
@@ -513,104 +504,3 @@ vim.api.nvim_set_keymap("n", '<leader>ff', '<Cmd>Fim<CR>', {
 })
 -- }}}
 
---[[ bk{{{
-vim.api.nvim_create_user_command("Fim",
-    function()
-        -- if fim has opened, goto fim window.
-        if vim.fn.exists('g:fim_input_bufnr') and (#vim.fn.win_findbuf(vim.g.fim_input_bufnr) > 0) then
-            vim.fn.win_gotoid(vim.g.fim_input_winid)
-            return
-        end
-        local pre_winid = vim.fn.win_getid()
-        -- define highlight
-        vim.cmd("hi! def link FimMatch CursorLineNr")
-        vim.cmd("hi! def link FimMatchAll Title")
-        vim.cmd("hi! def link FimMsg Statement")
-
-        -- create ui (At this time, Mappings are not valid)
-        create_ffwin(pre_winid)
-
-        -- get file path list asynchronously
-        Path_table = {}
-        local uv = vim.loop
-        local stop_timer = false
-
-        local taskend = uv.new_async(function(result)
-            if result ~= nil then
-                Path_table = split(result, '\n')
-            end
-            stop_timer = true
-            print("[Fim] File list Acquisition is complete. length=" .. #Path_table)
-            if #Path_table > 8191 then
-            end
-        end)
-
-        local task = function(cb)
-            local luv = vim.loop
-            --vim.schedule_wrap(function() end)
-            local handle = io.popen('cmd.exe /c chcp 65001 | dir /s /b', "r")
-            if handle == nil then
-                print('fail')
-                luv.async_send(cb, '< failed to get file list >')
-            else
-                local result = handle:read('*a')
-                --handle:close()
-                luv.async_send(cb, result)
-            end
-        end
-
-        local timerstop
-        local timer = uv.new_timer()
-        local cnt = 0
-        local sec = 0
-        local load_msg = ' Getting file list '
-        local timeout = 180
-        local timercb = vim.schedule_wrap(function()
-            if cnt > timeout * 4 then
-                writeLine(vim.g.fim_selector_bufnr, 0, 1, { '<' .. load_msg .. ' timeout!>' })
-                uv.async_send(timerstop, cnt/4, false)
-                timer:close()
-            elseif stop_timer == true then
-                uv.async_send(timerstop, cnt/4, true)
-                timer:close()
-            end
-
-            if cnt % 4 == 0 then
-                sec = math.floor(cnt / 4)
-                writeLine(vim.g.fim_selector_bufnr, 0, 1, { '<' .. load_msg .. "| (" .. sec .. 'sec) >' })
-            elseif cnt % 4 == 1 then
-                if cnt < 4 then
-                    -- redraw screen
-                    local key = vim.api.nvim_replace_termcodes("<C-l>", true, false, true)
-                    vim.api.nvim_feedkeys(key, 'n', false)
-                    vim.cmd('redraw')
-                    writeLine(vim.g.fim_selector_bufnr, 0, 1, { '<' .. load_msg .. "/ (" .. sec .. 'sec) >' })
-                end
-            elseif cnt % 4 == 2 then
-                writeLine(vim.g.fim_selector_bufnr, 0, 1, { '<' .. load_msg .. "- (" .. sec .. 'sec) >' })
-            else
-                writeLine(vim.g.fim_selector_bufnr, 0, 1, { '<' .. load_msg .. "\\ (" .. sec .. 'sec) >' })
-            end
-            cnt = cnt + 1
-        end)
-
-        uv.new_thread(task, taskend)
-        uv.timer_start(timer, 0, 250, timercb)
-
-        -- Callback function called when stop_timer(global var) becomes true)
-        -- Enable mappings, goto search box, enter insert mode
-        timerstop = uv.new_async(vim.schedule_wrap(function(time, status)
-            if status and (#vim.fn.win_findbuf(vim.g.fim_input_bufnr) > 0) then
-                enable_mappings()
-                vim.fn.win_gotoid(vim.g.fim_input_winid)
-                vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'winhl', 'Normal:NormalFloat')
-                vim.api.nvim_win_set_option(vim.g.fim_prompt_winid, 'winhl', 'Normal:NormalFloat')
-            else
-                print('[Fim] timeout in ' .. time .. 'sec')
-            end
-        end))
-    end,
-    { bang = true }
-)
-]]
--- }}}

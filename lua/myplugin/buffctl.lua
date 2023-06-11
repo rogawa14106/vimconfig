@@ -9,10 +9,15 @@ function! BuffCtlFloat() abort
     let l:buflineinfo =  MakeBuffCtlLineInfo()
     let l:buflines =  l:buflineinfo.buflines
     let l:longest_line =  l:buflineinfo.longest_line
-    let l:welcomemsg = "* * * Welcome to BuffCtl! Scroll down for help. * * *"
+    let l:welcomemsg = "< Welcome to BuffCtl! Scroll down for help >"
 
-    if !exists("g:bufctl_bufnr")
-        "at thae first time
+    if exists("g:bufctl_bufnr")
+        if (bufnr() == g:bufctl_bufnr)
+            :bd
+            call win_gotoid(g:winid)
+            return
+        endif
+    else
         let g:bufctl_bufnr = nvim_create_buf(v:false, v:true)
     endif
 
@@ -48,13 +53,15 @@ function! BuffCtlFloat() abort
         "open new window
         let g:bufctl_winid = nvim_open_win(g:bufctl_bufnr, l:enter, l:winconf)
         "set option
-        "call nvim_win_set_option(g:bufctl_winid, 'winhl', 'Normal:mModeNormal')
+        call nvim_win_set_option(g:bufctl_winid, 'winhl', 'Normal:CursorLineNr')
         call matchadd('BufCtlLineTail', '\v[^/]+\.[^\. ]+$')
-        highlight def link BufCtlLineTail Sign
+        highlight! def link BufCtlLineTail Title
         call matchadd('BufCtlCautionMark', '\v\[!\]')
-        highlight def link BufCtlCautionMark ErrorMsg
+        highlight! def link BufCtlCautionMark ErrorMsg
         call matchadd('BufCtlWarningMark', '\v\[[t+]\]')
-        highlight def link BufCtlWarningMark WarningMsg 
+        highlight! def link BufCtlWarningMark WarningMsg
+        call matchadd('BufCtlMsg', '\v\<\s.+\s\>')
+        highlight! def link BufCtlMsg Statement
         setlocal matchpairs=
         "add mapping
         nnoremap <buffer> <silent> <Enter> :call SelectBuffFloat("F") <CR>
@@ -102,12 +109,12 @@ function! MakeBuffCtlLineInfo() abort
         let l:bufhidden  = l:bufinfo.hidden
 
         "buf status
-        if(len(l:bufwin) > 0) && (g:winid == l:bufwin[0]) 
+        if(len(l:bufwin) > 0) && (g:winid == l:bufwin[0])
             let l:bufstat = "!"
         endif
 
         let l:buf_win = l:bufinfo.windows
-        if(len(l:buf_win) > 0) && (g:winid == l:buf_win[0]) 
+        if(len(l:buf_win) > 0) && (g:winid == l:buf_win[0])
             let l:bufstat = "!"
         elseif  l:bufhidden == 0
             let l:bufstat = "a"
@@ -131,7 +138,7 @@ function! MakeBuffCtlLineInfo() abort
         endif
 
         "is modified
-        let l:bufmod = l:bufmod == 1 ? "+" : "-" 
+        let l:bufmod = l:bufmod == 1 ? "+" : "-"
 
         "definge buff line
         let l:bufline = printf('[%02d][%s][%s] %s', l:bufnr, l:bufmod, l:bufstat, l:bufname)
@@ -153,7 +160,7 @@ function! GetBufNrFromBufLine()
     if len(l:selected_bufnrs) == 0
         return 0
     else
-        return l:selected_bufnrs[0] 
+        return l:selected_bufnrs[0]
     endif
 endfunction
 "}}}
@@ -196,7 +203,7 @@ function! DeleteBuffFloat() abort
     let l:is_buff_changed = l:bufinfo.changed
     let l:is_buff_current = 0
     let l:buf_win = l:bufinfo.windows
-    if(len(l:buf_win) > 0) && (g:winid == l:buf_win[0]) 
+    if(len(l:buf_win) > 0) && (g:winid == l:buf_win[0])
         let l:is_buff_current = 1
     endif
 
@@ -246,7 +253,7 @@ function! ConfirmDeleteBuff(confirm_msg, selected_bufnr) abort
     endif
 endfunction
 "}}}
-nnoremap <silent> <Leader><Leader> :call BuffCtlFloat()<CR>
+nnoremap <silent> <Leader>bb :call BuffCtlFloat()<CR>
 "}}}
 ]]
 end
