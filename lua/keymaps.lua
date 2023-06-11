@@ -1,7 +1,7 @@
 -- leader
 vim.g.mapleader = " "
 
-vim.cmd[[
+vim.cmd [[
 "{{{ mapping
 "{{{ override default key bind
 map K k
@@ -92,7 +92,7 @@ nnoremap <silent> <Leader>l :call SwitchBuff(1)<CR>
 "}}}
 "}}}
 "{{{ visual mode
-"{{{ sorround ---"    
+"{{{ sorround ---"
 vnoremap <silent> <Leader>" :call SurroundStr('"', '"')<CR>
 vnoremap <silent> <Leader>' :call SurroundStr("'", "'")<CR>
 vnoremap <silent> <Leader>( :call SurroundStr('(', ')')<CR>
@@ -105,7 +105,7 @@ function! SurroundStr(surround_char1, surround_char2) abort
     exec "noautocmd normal! `<i" . a:surround_char1
     exec "noautocmd normal! `>la" . a:surround_char2
 endfunction
-"}}}    
+"}}}
 "{{{ comment ---"
 
 let g:comment_char_dict = {
@@ -132,46 +132,46 @@ vnoremap <silent> <Leader>/ :call CommentSelectedLine()<CR>
 ]]
 
 -- normal
-vim.keymap.set("n", "<C-c>", ":nohl<CR>") 
-vim.keymap.set("n", "<leader>f", "f<C-k>")
-vim.keymap.set("n", "<leader>F", "F<C-k>")
+--vim.keymap.set("n", "<C-c>", ":nohl<CR>")
+vim.keymap.set("n", "<leader>k", "f<C-k>", { noremap = true })
+vim.keymap.set("n", "<leader>k", "F<C-k>", { noremap = true })
 
 --vim.keymap.set("n", "<C-d>", "<C-d>zz")
 --vim.keymap.set("n", "<C-u>", "<C-u>zz")
 
 --local comment_char_dict = {
-    --vim = '"',
-    --c   = '//',
-    --cs  = '//',
-    --py  = '#',
-    --ttl = ';',
-    --lua = '--',
+--vim = '"',
+--c   = '//',
+--cs  = '//',
+--py  = '#',
+--ttl = ';',
+--lua = '--',
 --}
 --vim.keymap.set("v", "<leader>/", (function()
-    --local extension = vim.fn.expand("%:e")
-    --if (vim.fn.expand("%:t") == '.vimrc') then
-        --vim.cmd(":noautocmd normal! I" .. comment_char_dict['vim'])
-    --elseif comment_char_dict[extension] ~= nil then
-        --vim.cmd("execute ':noautocmd normal! ^I" .. comment_char_dict[extension] .. "'")
-    --end
+--local extension = vim.fn.expand("%:e")
+--if (vim.fn.expand("%:t") == '.vimrc') then
+--vim.cmd(":noautocmd normal! I" .. comment_char_dict['vim'])
+--elseif comment_char_dict[extension] ~= nil then
+--vim.cmd("execute ':noautocmd normal! ^I" .. comment_char_dict[extension] .. "'")
+--end
 --end))
 
 -- visual
-vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv")
-vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv")
+vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv", { noremap = true })
+vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv", { noremap = true })
 
 -- insert
-vim.keymap.set("i", "<C-c>", "<Esc>")
+vim.keymap.set("i", "<C-c>", "<Esc>", { noremap = true })
 --vim.keymap.set("i", "<C-[>", "<Esc>")
 
 -- insert & command
-vim.keymap.set({"i", "c"}, '""', '""<Left>')
-vim.keymap.set({"i", "c"}, "''", "''<Left>")
-vim.keymap.set({"i", "c"}, "()", "()<Left>")
-vim.keymap.set({"i", "c"}, "[]", "[]<Left>")
-vim.keymap.set({"i", "c"}, "{}", "{}<Left>")
-vim.keymap.set({"i", "c"}, "<>", "<><Left>")
-vim.keymap.set({"i", "c"}, "%%", "%%<Left>")
+vim.keymap.set({ "i", "c" }, '""', '""<Left>', { noremap = true })
+vim.keymap.set({ "i", "c" }, "''", "''<Left>", { noremap = true })
+vim.keymap.set({ "i", "c" }, "()", "()<Left>", { noremap = true })
+vim.keymap.set({ "i", "c" }, "[]", "[]<Left>", { noremap = true })
+vim.keymap.set({ "i", "c" }, "{}", "{}<Left>", { noremap = true })
+vim.keymap.set({ "i", "c" }, "<>", "<><Left>", { noremap = true })
+vim.keymap.set({ "i", "c" }, "%%", "%%<Left>", { noremap = true })
 
 -- terminal
-vim.keymap.set("t", "<C-\\>", "<C-\\><C-N>")
+vim.keymap.set("t", "<C-\\>", "<C-\\><C-N>", { noremap = true })
