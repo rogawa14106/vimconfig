@@ -1,3 +1,4 @@
+--# write current date time to clock buffer.{{{
 local write_time = function()
     local datetime = os.date("*t")
     local lines = {
@@ -18,7 +19,8 @@ local write_time = function()
     vim.api.nvim_buf_set_option(vim.g.floatClock_bufnr, 'modifiable', false)
     vim.api.nvim_buf_set_option(vim.g.floatClock_bufnr, 'readonly', true)
 end
-
+-- }}}
+--# start timer{{{
 local clock_start = function(delay)
     local uv = vim.loop
     local timer = uv.new_timer()
@@ -30,7 +32,8 @@ local clock_start = function(delay)
     end)
     uv.timer_start(timer, delay, 60000, cb)
 end
-
+-- }}}
+--# create clock buffer & window{{{
 local create_clock_win = function(win_config)
     if vim.fn.exists('floatClock_bufnr') == 0 then
         vim.g.floatClock_bufnr = vim.api.nvim_create_buf(false, true)
@@ -48,8 +51,8 @@ local create_clock_win = function(win_config)
     local delay = (59 - os.date("*t").sec) * 1000 + 500
     clock_start(delay)
 end
-
-
+-- }}}
+--# main{{{
 local floatClock = function()
     local win_width = 16
     local win_height = 1
@@ -70,5 +73,7 @@ local floatClock = function()
 
     create_clock_win(win_config)
 end
-
+-- }}}
+--# create command{{{
 vim.api.nvim_create_user_command("Clock", floatClock, { bang = true })
+-- }}}

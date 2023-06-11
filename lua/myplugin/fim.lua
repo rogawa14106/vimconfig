@@ -4,10 +4,11 @@
 local helper = require("../helper")
 local Path_table = {}
 --################################## functions ############################################
---# get pwd
+--# get env independent pwd{{{
 local get_pwd = function()
     return string.gsub(vim.fn.getcwd(), '\\', '/')
 end
+-- }}}
 --# scandir recurcive{{{
 ScandirRecursive = function(path, pwd)
     local uv = vim.loop
@@ -24,16 +25,16 @@ ScandirRecursive = function(path, pwd)
             else
                 local filename = path .. "/" .. name
                 if type == 'directory' then
-                    --print('directory! ' .. name)
                     ScandirRecursive(filename, pwd)
                 else
                     Path_table[#Path_table + 1] = string.gsub(filename, pwd, '')
                 end
             end
         end
-        print("[Fim] path_table length: " .. #Path_table)
+        --print("[Fim] path_table length: " .. #Path_table)
     end
 
+    -- async scan
     local fs = uv.fs_scandir(path, cb)
 end
 -- }}}
@@ -284,7 +285,7 @@ local function create_inputbox(config)
     end
     --vim.g.fim_input_bufnr = vim.api.nvim_create_buf(false, true)
     vim.g.fim_input_winid = vim.api.nvim_open_win(vim.g.fim_input_bufnr, true, config)
-    writeLine(vim.g.fim_input_bufnr, 0, -1, {''})
+    writeLine(vim.g.fim_input_bufnr, 0, -1, { '' })
 
     -- move to selector
     vim.api.nvim_buf_set_keymap(0, "i", '<Enter>', '', {
@@ -400,58 +401,58 @@ local function create_ffwin(pre_winid)
     local offset_row        = 0
 
     local config_selector   = {
-        width = math.floor(columns / 2),
-        col = columns - fim_width - offset_col - 2,
-        height = fim_height - info_height - input_height,
-        row = lines - fim_height - (flame_height * 3) - offset_row + statusline_height,
-        border = {
+        width     = math.floor(columns / 2),
+        col       = columns - fim_width - offset_col - 2,
+        height    = fim_height - info_height - input_height,
+        row       = lines - fim_height - (flame_height * 3) - offset_row + statusline_height,
+        border    = {
             ".", "-", ".", "|",
             "", "", "", "|",
         },
         focusable = true,
-        style    = 'minimal',
-        relative = 'editor',
+        style     = 'minimal',
+        relative  = 'editor',
     }
 
     local config_inputbox   = {
-        width = math.floor(columns / 2) - prompt_width,
-        col = columns - fim_width - offset_col + prompt_width - 1,
-        height = input_height,
-        row = lines - info_height - input_height - (flame_height * 2) + statusline_height - offset_row - 1,
-        border = {
+        width     = math.floor(columns / 2) - prompt_width,
+        col       = columns - fim_width - offset_col + prompt_width - 1,
+        height    = input_height,
+        row       = lines - info_height - input_height - (flame_height * 2) + statusline_height - offset_row - 1,
+        border    = {
             "", "-", ".", "|",
             "'", "", "", "",
         },
         focusable = true,
-        style    = 'minimal',
-        relative = 'editor',
+        style     = 'minimal',
+        relative  = 'editor',
     }
     local config_prompt     = {
-        width = prompt_width,
-        col = columns - fim_width - offset_col - 2,
-        height = input_height,
-        row = lines - info_height - input_height - (flame_height * 2) + statusline_height - offset_row - 1,
-        border = {
+        width     = prompt_width,
+        col       = columns - fim_width - offset_col - 2,
+        height    = input_height,
+        row       = lines - info_height - input_height - (flame_height * 2) + statusline_height - offset_row - 1,
+        border    = {
             ".", "-", "", "",
             "", "-", "`", "|",
         },
         focusable = false,
-        style    = 'minimal',
-        relative = 'editor',
+        style     = 'minimal',
+        relative  = 'editor',
     }
 
     local config_infobox    = {
-        width = math.floor(columns / 2),
-        col = columns - fim_width - offset_col - 2,
-        height = info_height,
-        row = lines - info_height - flame_height - statusline_height - offset_row,
-        border = {
+        width     = math.floor(columns / 2),
+        col       = columns - fim_width - offset_col - 2,
+        height    = info_height,
+        row       = lines - info_height - flame_height - statusline_height - offset_row,
+        border    = {
             "|", "", "|", "|",
             "'", "-", "`", "|",
         },
         focusable = false,
-        style    = 'minimal',
-        relative = 'editor',
+        style     = 'minimal',
+        relative  = 'editor',
     }
 
     create_selector(config_selector, pre_winid)
@@ -461,46 +462,39 @@ local function create_ffwin(pre_winid)
     --vim.fn.win_gotoid(vim.g.fim_input_winid)
 end
 -- }}}
---
---# enable mappings{{{
-local function enable_mappings()
 
+--################################ main ##########################################
+--# main func{{{
+local fim = function()
+    -- if fim has opened, goto fim window.
+    if vim.fn.exists('g:fim_input_bufnr') and (#vim.fn.win_findbuf(vim.g.fim_input_bufnr) > 0) then
+        vim.fn.win_gotoid(vim.g.fim_input_winid)
+        return
+    end
+
+    -- define highlight
+    vim.cmd("hi! def link FimMatch CursorLineNr")
+    vim.cmd("hi! def link FimMatchAll Title")
+    vim.cmd("hi! def link FimMsg Statement")
+
+    -- create ui (At this time, Mappings are not valid)
+    local pre_winid = vim.fn.win_getid()
+    create_ffwin(pre_winid)
+
+    -- get file path list asynchronously
+    Path_table = {}
+    local pwd = vim.fn.getcwd()
+    ScandirRecursive(pwd, pwd)
+
+    -- goto inputbox
+    vim.fn.win_gotoid(vim.g.fim_input_winid)
 end
 -- }}}
 
---################################ commands ##########################################
---# create Fim command{{{
-vim.api.nvim_create_user_command("Fim",
-    function()
-        -- if fim has opened, goto fim window.
-        if vim.fn.exists('g:fim_input_bufnr') and (#vim.fn.win_findbuf(vim.g.fim_input_bufnr) > 0) then
-            vim.fn.win_gotoid(vim.g.fim_input_winid)
-            return
-        end
+--# create Fim command
+vim.api.nvim_create_user_command("Fim", fim, { bang = true })
 
-        -- define highlight
-        vim.cmd("hi! def link FimMatch CursorLineNr")
-        vim.cmd("hi! def link FimMatchAll Title")
-        vim.cmd("hi! def link FimMsg Statement")
-
-        -- create ui (At this time, Mappings are not valid)
-        local pre_winid = vim.fn.win_getid()
-        create_ffwin(pre_winid)
-        enable_mappings()
-
-        -- get file path list asynchronously
-        Path_table = {}
-        local pwd = vim.fn.getcwd()
-        ScandirRecursive(pwd, pwd)
-
-        -- goto inputbox
-        vim.fn.win_gotoid(vim.g.fim_input_winid)
-    end,
-    { bang = true }
-) -- }}}
---# create keymap that launch Fim{{{
+--# create keymap that launch Fim
 vim.api.nvim_set_keymap("n", '<leader>ff', '<Cmd>Fim<CR>', {
     noremap = true,
 })
--- }}}
-
