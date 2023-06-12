@@ -174,6 +174,10 @@ new_Eim = function()
                 if name == nil then
                     break
                 else
+                    print(name .. "------------------------------")
+                    for k, v in pairs(luv.fs_lstat(self.cwd .. "/" .. name)) do
+                        print(k, v)
+                    end
                     if type == 'directory' then
                         self.ls.dirs[#self.ls.dirs + 1] = name
                         write_lines("main",
@@ -181,7 +185,7 @@ new_Eim = function()
                             #self.ls.dirs - 1,
                             { name .. "/" }
                         )
-                    else
+                    elseif type == 'file' then
                         self.ls.files[#self.ls.files + 1] = name
                         write_lines(
                             "main",
@@ -189,6 +193,8 @@ new_Eim = function()
                             #self.ls.dirs + #self.ls.files - 1,
                             { name }
                         )
+                    --elseif type == 'link' then
+                    -- synbolic links
                     end
                 end
             end

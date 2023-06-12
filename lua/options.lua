@@ -8,7 +8,7 @@ set.incsearch = true
 set.hlsearch = true
 set.showmode = false
 set.wrap = false
-set.compatible = false
+--set.compatible = false
 set.hidden = true
 set.laststatus = 3
 

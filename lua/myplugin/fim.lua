@@ -10,7 +10,8 @@ local get_pwd = function()
 end
 -- }}}
 --# scandir recurcive{{{
-ScandirRecursive = function(path, pwd)
+local scandirRecursive
+scandirRecursive = function(path, pwd)
     local uv = vim.loop
     local cb = function(err, fs)
         if err ~= nil then
@@ -25,7 +26,7 @@ ScandirRecursive = function(path, pwd)
             else
                 local filename = path .. "/" .. name
                 if type == 'directory' then
-                    ScandirRecursive(filename, pwd)
+                    scandirRecursive(filename, pwd)
                 else
                     Path_table[#Path_table + 1] = string.gsub(filename, pwd, '')
                 end
@@ -280,7 +281,7 @@ local function create_selector(config, pre_winid)
             vim.fn.clearmatches(vim.g.fim_selector_winid)
             vim.fn.matchadd("FimMsg", '<\\s.\\+\\s>')
             vim.fn.win_gotoid(vim.g.fim_input_winid)
-            ScandirRecursive(pwd, pwd)
+            scandirRecursive(pwd, pwd)
         end,
         buffer = vim.g.fim_selector_bufnr,
     })
@@ -362,7 +363,7 @@ local function create_inputbox(config)
             Path_table = {}
             writeLine(vim.g.fim_info_bufnr, 0, 1, { "< pwd - " .. pwd .. " >" })
             writeLine(vim.g.fim_selector_bufnr, 0, -1, { "< Fim Reloaded >" })
-            ScandirRecursive(pwd, pwd)
+            scandirRecursive(pwd, pwd)
         end,
         buffer = vim.g.fim_input_bufnr,
     })
@@ -503,7 +504,7 @@ local fim = function()
     -- get file path list asynchronously
     Path_table = {}
     local pwd = vim.fn.getcwd()
-    ScandirRecursive(pwd, pwd)
+    scandirRecursive(pwd, pwd)
 
     -- goto inputbox
     vim.fn.win_gotoid(vim.g.fim_input_winid)
