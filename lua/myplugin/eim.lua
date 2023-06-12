@@ -36,11 +36,15 @@ new_Eim = function()
 
     -- initialize
     init = function(config_main, config_info)
+        -- create ui
         self.winids.main = vim.g.eim_main_winid
         self.bufnrs.main = vim.g.eim_main_bufnr
         self.winids.info = vim.g.eim_info_winid
         self.bufnrs.info = vim.g.eim_info_bufnr
         create_ui(config_main, config_info)
+
+        -- set keymap
+        create_keymap()
     end
 
     -- ui related
@@ -72,10 +76,8 @@ new_Eim = function()
         vim.api.nvim_win_set_option(self.winids.main, 'winhl', 'Normal:' .. config_main.color)
         vim.api.nvim_win_set_option(self.winids.info, 'winhl', 'Normal:' .. config_info.color)
         vim.cmd("hi! def link EimDirectory Title")
+        vim.fn.clearmatches(self.winids.main)
         vim.fn.matchadd("EimDirectory", '\\v.+/$', 10, 5, { window = self.winids.main })
-
-        -- set keymap
-        create_keymap()
 
         -- write information
         self.cwd = get_cwd()
