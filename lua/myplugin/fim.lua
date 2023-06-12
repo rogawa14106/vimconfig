@@ -191,6 +191,23 @@ local function create_keymap_quitfim(bufnr)
     })
 end
 -- }}}
+--# common autocmd {{{
+--local function au_win_leave(bufnr, prewinid)
+    --vim.api.nvim_create_augroup('fimCommon', {})
+    --vim.api.nvim_create_autocmd('BufWinLeave', {
+        --group = 'fimCommon',
+        --callback = function(e)
+            --vim.fn.win_gotoid(prewinid)
+            --vim.api.nvim_win_close(vim.g.fim_info_winid, true)
+            --vim.api.nvim_win_close(vim.g.fim_selector_winid, true)
+            --vim.api.nvim_win_close(vim.g.fim_input_winid, true)
+            --vim.api.nvim_win_close(vim.g.fim_prompt_winid, true)
+            ----vim.cmd("b " .. vim.g.fim_input_bufnr)
+        --end,
+        --buffer = bufnr,
+    --})
+--end
+-- }}}
 --
 --# create infomation box (info) {{{
 local function create_infobox(config, information)
@@ -212,11 +229,8 @@ local function create_selector(config, pre_winid)
     if (vim.fn.exists('fim_selector_bufnr') ~= 1) or (vim.fn.bufnr(vim.g.fim_selector_bufnr) == -1) then
         vim.g.fim_selector_bufnr = vim.api.nvim_create_buf(false, true)
     end
-    --if vim.fn.exists('fim_selector_bufnr') == 0 then
-    --end
+
     vim.g.fim_selector_winid = vim.api.nvim_open_win(vim.g.fim_selector_bufnr, true, config)
-    --if vim.fn.exists('b:fimMsg') == 1 then
-    --vim.fn.matchdelete(vim.b.fimMsg)
     --end
     vim.b.fimMsg = vim.fn.matchadd("FimMsg", '<\\s.\\+\\s>')
 
@@ -261,14 +275,18 @@ local function create_selector(config, pre_winid)
                 end)
             Path_table = {}
             writeLine(vim.g.fim_info_bufnr, 0, 1, { "< pwd - " .. pwd .. " >" })
+            vim.fn.win_gotoid(vim.g.fim_selector_winid)
             writeLine(vim.g.fim_selector_bufnr, 0, -1, { "< Fim Reloaded >" })
+            vim.fn.clearmatches(vim.g.fim_selector_winid)
+            vim.fn.matchadd("FimMsg", '<\\s.\\+\\s>')
+            vim.fn.win_gotoid(vim.g.fim_input_winid)
             ScandirRecursive(pwd, pwd)
         end,
         buffer = vim.g.fim_selector_bufnr,
     })
 
     writeLine(vim.g.fim_selector_bufnr, 0, -1, {
-        "< Welcome to Fim >",
+        "< Welcome to Fim! >",
         "< Find your files by typing in the search box >"
     })
 
@@ -311,6 +329,7 @@ local function create_inputbox(config)
     create_keymap_quitfim(vim.g.fim_input_bufnr)
 
     -- autocmd
+    --au_win_leave(vim.g.fim_input_bufnr, pre_winid)
     vim.api.nvim_create_augroup('fimInput', {})
     vim.api.nvim_create_autocmd('CursorMovedI', {
         group = 'fimInput',
@@ -388,10 +407,10 @@ local function create_ffwin(pre_winid)
     local information       = {
         "< pwd - " .. pwd .. " >",
         "=== mapping =========================================================================",
-        "search   : move to file selector  - <Enter>",
-        "selector : open file under cursor - <Enter>",
-        "           move to search box     - /",
-        "both     : quit Fim               - <leader>q",
+        "toggle Fim : <leader>ff",
+        "searchbox  : move to file selector  - <Enter>",
+        "selector   : open file under cursor - <Enter>",
+        "             move to search box     - /",
     }
     local info_height       = #information
 
@@ -495,6 +514,7 @@ end
 vim.api.nvim_create_user_command("Fim", fim, { bang = true })
 
 --# create keymap that launch Fim
-vim.api.nvim_set_keymap("n", '<leader>ff', '<Cmd>Fim<CR>', {
+vim.api.nvim_set_keymap("n", '<leader>ff', '', {
     noremap = true,
+    callback = fim,
 })

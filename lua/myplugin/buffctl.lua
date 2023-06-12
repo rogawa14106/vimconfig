@@ -253,7 +253,7 @@ function! ConfirmDeleteBuff(confirm_msg, selected_bufnr) abort
     endif
 endfunction
 "}}}
-nnoremap <silent> <Leader>bb :call BuffCtlFloat()<CR>
+nnoremap <silent> <Leader>b :call BuffCtlFloat()<CR>
 "}}}
 ]]
 end

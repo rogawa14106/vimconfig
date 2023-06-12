@@ -24,6 +24,10 @@ augroup END
 "}}}
 "{{{ don't close vim when execute :q, 
 function! ForeverVim() abort
+    if &buftype == 'help'
+        bw
+        return
+    endif
     let l:win_info = getwininfo()
     let l:win_cnt = len(l:win_info)
     let l:is_quit = 0

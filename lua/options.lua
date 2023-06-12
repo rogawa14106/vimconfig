@@ -23,7 +23,7 @@ set.smartindent = true
 -- fold
 set.foldcolumn = '0'
 --set.foldmethod = 'manual'
---set.foldmethod = 'marker'
+set.foldmethod = 'marker'
 
 -- backup files
 set.swapfile = false

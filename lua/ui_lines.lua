@@ -191,7 +191,7 @@ function! SignJump(jump_flg) abort
     endif
 
     "init with large int
-    let l:learge_int = 9223372036854775807
+    let l:learge_int = v:numbermax "9223372036854775807
     let l:next_sign_distance_p = l:learge_int
     "distance to the furthest sign in the opposite direction(negative number -> n)
     let l:next_sign_distance_n = 0

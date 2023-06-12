@@ -37,10 +37,10 @@ local hl_blue1 = { cterm = "111", gui = "9ba2f3" }
 local hl_blue2 = { cterm = "117", gui = "95d0f0" }
 local hl_blue3 = { cterm = "75", gui = "439bbc" }
 
-local hl_erro0 = { cterm = "1", gui = "602828" }
+local hl_erro0 = { cterm = "124", gui = "602828" }
 local hl_erro1 = { cterm = "9", gui = "d04848" }
 local hl_warn0 = { cterm = "3", gui = "606028" }
-local hl_safe0 = { cterm = "2", gui = "286028" }
+local hl_safe0 = { cterm = "22", gui = "286028" }
 
 --local hl_emph0 = { cterm="62", gui="74607c" } -- CursorSearch
 local hl_emph0 = { cterm = "85", gui = "95f0d0" } -- Sign, MatchParen, etc

@@ -54,7 +54,7 @@ end
 -- }}}
 --# main{{{
 local floatClock = function()
-    local win_width = 16
+    local win_width = 17
     local win_height = 1
     local row_offset = 2
     local col_offset = 0

@@ -83,6 +83,9 @@ require("myplugin.floatscroll")
 -- fuzzy finder
 require("myplugin.fim")
 
+-- file explorer
+require("myplugin.eim")
+
 -- clock
 require("myplugin.clock")
 vim.cmd("Clock")
