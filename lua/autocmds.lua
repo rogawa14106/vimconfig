@@ -1,5 +1,4 @@
 vim.cmd[[
-"{{{ autocmd
 "{{{ save and load fold state
 function! SaveFold() abort
     try
@@ -75,7 +74,6 @@ if has('windows')
     augroup END
 endif
 "}}}
-"=================================================================================================================================================================}}}
 ]]
 
 --vim.api.nvim_create_augroup('loadFold', {})
@@ -94,7 +92,6 @@ endif
 --})
 
 --local cmd_chime = Vimrcdir .. "/bin/chime.exe 0"
---
 --vim.api.nvim_create_augroup( "cancellIME", {} )
 --vim.api.nvim_create_autocmd( 'insertleave', {
     --group = 'cancellIME',
@@ -108,4 +105,14 @@ endif
     --group = 'cancellIME',
     --callback = function () vim.cmd(cmd_chime) end
 --})
+
+vim.api.nvim_create_augroup( "detectft", {} )
+vim.api.nvim_create_autocmd('bufwinenter', {
+    group = 'detectft',
+    callback = function() 
+        vim.cmd('filetype detect')
+    end,
+})
+
+
 

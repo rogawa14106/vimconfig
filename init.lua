@@ -88,7 +88,6 @@ require("myplugin.eim")
 
 -- clock
 require("myplugin.clock")
-vim.cmd("Clock")
 
 -- bulidin plugins
 require("plugins.netrw")

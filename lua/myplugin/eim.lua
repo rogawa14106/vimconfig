@@ -1,9 +1,14 @@
+--TODO
+--cp
+--mv
+--visual operation
+
 local helper = require("../helper")
 
 -- main class
 local new_Eim
 new_Eim = function()
-    --## plivate
+    --## private
     --# def member variables
     local self = {
         helper = helper,
@@ -33,6 +38,17 @@ new_Eim = function()
     local scan_ls
     local update_info
     local get_cwd
+
+    local mkfile
+    local mkdir
+    local rm
+    local rmfile
+    local rmdir
+    local rmdir_recurcive
+    local rename
+    local cp
+    local mv
+    local chcwd
 
     -- initialize
     init = function(config_main, config_info)
@@ -120,33 +136,196 @@ new_Eim = function()
     end
 
     create_keymap = function()
-        --normal
+        -- n, <Enter>
+        local on_enter = function()
+            local current_line = vim.fn.line(".")
+            local lines = vim.api.nvim_buf_get_lines(self.bufnrs.main, current_line - 1, current_line, false)
+            local line = lines[1]
+            if string.match(line, ".+/") then
+                if line == "../" then
+                    self.cwd = string.gsub(self.cwd, "/[^/]+$", "")
+                    if self.cwd == "C:" then
+                        self.cwd = "C:/"
+                    end
+                else
+                    if self.cwd == "C:/" then
+                        self.cwd = "C:"
+                    end
+                    self.cwd = self.cwd .. "/" .. string.gsub(line, "/", "")
+                end
+                update_info()
+                scan_ls(self.cwd)
+            else
+                delete_win_all()
+                vim.cmd("e " .. self.cwd .. "/" .. line)
+            end
+        end
+
+        -- n, %
+        mkfile = function()
+            local filepath = helper.highlightInput("info", "[Eim] Enter filename > ", self.cwd .. "/")
+            local is_extension = string.match(filepath, "[^/].+%..+$")
+            if is_extension == nil then
+                local confirm_msg = '[Eim] filename has no extension. type "y" to continue > '
+                local confirm = helper.highlightInput("warning", confirm_msg)
+                if confirm ~= "y" then
+                    helper.highlightEcho("info", "[Eim] mkfile was canceled")
+                    return
+                end
+            end
+
+            local fd = vim.loop.fs_open(filepath, "w", 438)
+            if fd == nil then
+                helper.highlightEcho("error", "[Eim] mkfile fail. can't open specified file")
+                return
+            else
+                vim.loop.fs_write(fd, "")
+                vim.loop.fs_close(fd)
+                scan_ls(self.cwd)
+                helper.highlightEcho("info", "[Eim] mkfile success >> " .. filepath)
+            end
+        end
+
+        mkdir = function()
+            local dirpath = helper.highlightInput("info", "[Eim] Enter dirname > ", self.cwd .. "/")
+            vim.fn.mkdir(dirpath)
+
+            scan_ls(self.cwd)
+            helper.highlightEcho("info", "[Eim] mkdir success >> " .. dirpath)
+        end
+
+        -- n, D
+        rm = function()
+            local current_line = vim.fn.line(".")
+            local lines = vim.api.nvim_buf_get_lines(self.bufnrs.main, current_line - 1, current_line, false)
+            local line = lines[1]
+            -- branch type
+            local type
+            if string.match(line, "/$") == nil then
+                type = 'file'
+            elseif string.match(line, "^%.%./$") == nil then
+                type = 'directory'
+            else
+                helper.highlightEcho("warning", "[Eim] no such file or directory")
+                return
+            end
+
+            -- filepath
+            local path = self.cwd .. "/" .. line
+
+            -- delete confirmation
+            local confirm_msg = '[Eim] delete "' .. line .. '". type "y" to continue > '
+            local confirm = helper.highlightInput("info", confirm_msg)
+            if confirm ~= "y" then
+                helper.highlightEcho("warning", "[Eim] rmfile was canceled")
+                return
+            end
+
+            if type == 'file' then
+                rmfile(path)
+            elseif type == 'directory' then
+                rmdir(path)
+            end
+        end
+
+        rmfile = function(path)
+            local result = vim.fn.delete(path)
+            if result == 0 then
+                helper.highlightEcho("info", "[Eim] rmfile success")
+            else
+                helper.highlightEcho("info", "[Eim] rmfile fail")
+            end
+            scan_ls(self.cwd)
+        end
+
+        rmdir = function(path)
+            local luv = vim.loop
+            local result = luv.fs_rmdir(path)
+            if result == true then
+                scan_ls(self.cwd)
+            else
+                if get_cwd() .. "/" == path then
+                    helper.highlightEcho("error", "[Eim] rmdir fail. specified directory is cwd")
+                else
+                    helper.highlightEcho("error", "[Eim] rmdir fail. specified directory is in use or not empty")
+                end
+            end
+        end
+
+        rmdir_recurcive = function(path)
+            local luv = vim.loop
+            local cb = vim.schedule_wrap(function(err, fs)
+                if err ~= nil then
+                    --print(err)
+                    return
+                end
+                while true do
+                    local name, type = luv.fs_scandir_next(fs)
+                    if name == nil then
+                        break
+                    else
+                        if type == 'directory' then
+                            self.ls.dirs[#self.ls.dirs + 1] = name
+                        elseif type == 'file' then
+                            self.ls.files[#self.ls.files + 1] = name
+                        end
+                    end
+                end
+            end)
+
+            -- async scan
+            vim.fn.win_gotoid(self.winids.main)
+            luv.fs_scandir(path, cb)
+        end
+
+        rename = function()
+            local current_line = vim.fn.line(".")
+            local lines = vim.api.nvim_buf_get_lines(self.bufnrs.main, current_line - 1, current_line, false)
+            local line = lines[1]
+            local frompath = self.cwd .. "/" .. line
+            local topath = helper.highlightInput("info", "[Eim] Enter renamed path > ", frompath)
+            local result = vim.fn.rename(frompath, topath)
+            if result == -1 then
+                helper.highlightEcho("error", "[Eim] rename fail")
+            else
+                scan_ls(self.cwd)
+                helper.highlightEcho("info", "[Eim] rename success")
+            end
+        end
+
+        chcwd = function()
+            vim.cmd("cd " .. self.cwd)
+            helper.highlightEcho("info", "[Eim] change current working directory to " .. '"' .. self.cwd .. '"')
+        end
+
         vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", '<Enter>', '', {
             noremap = true,
-            callback = function()
-                local current_line = vim.fn.line(".")
-                local lines = vim.api.nvim_buf_get_lines(self.bufnrs.main, current_line - 1, current_line, false)
-                local line = lines[1]
-                if string.match(line, ".+/") then
-                    print(line)
-                    if line == "../" then
-                        self.cwd = string.gsub(self.cwd, "/[^/]+$", "")
-                        if self.cwd == "C:" then
-                            self.cwd = "C:/"
-                        end
-                    else
-                        if self.cwd == "C:/" then
-                            self.cwd = "C:"
-                        end
-                        self.cwd = self.cwd .. "/" .. string.gsub(line, "/", "")
-                    end
-                    update_info()
-                    scan_ls(self.cwd)
-                else
-                    delete_win_all()
-                    vim.cmd("e " .. self.cwd .. "/" .. line)
-                end
-            end,
+            callback = on_enter,
+        })
+
+        vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "%", '', {
+            noremap = true,
+            callback = mkfile,
+        })
+
+        vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "d", '', {
+            noremap = true,
+            callback = mkdir,
+        })
+
+        vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "D", '', {
+            noremap = true,
+            callback = rm,
+        })
+
+        vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "R", '', {
+            noremap = true,
+            callback = rename,
+        })
+
+        vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "cd", '', {
+            noremap = true,
+            callback = chcwd,
         })
     end
 
@@ -174,10 +353,6 @@ new_Eim = function()
                 if name == nil then
                     break
                 else
-                    print(name .. "------------------------------")
-                    for k, v in pairs(luv.fs_lstat(self.cwd .. "/" .. name)) do
-                        print(k, v)
-                    end
                     if type == 'directory' then
                         self.ls.dirs[#self.ls.dirs + 1] = name
                         write_lines("main",
@@ -193,12 +368,9 @@ new_Eim = function()
                             #self.ls.dirs + #self.ls.files - 1,
                             { name }
                         )
-                    --elseif type == 'link' then
-                    -- synbolic links
                     end
                 end
             end
-            vim.cmd('echo "' .. #self.ls.dirs .. '"')
         end)
 
         -- async scan
@@ -291,7 +463,9 @@ init_eim = function()
 end
 
 --# create Fim command
-vim.api.nvim_create_user_command("Eim", init_eim, { bang = true })
+vim.api.nvim_create_user_command("Eim", init_eim, {
+    bang = true
+})
 
 --# create keymap that launch Fim
 vim.api.nvim_set_keymap("n", '<leader>e', '', {

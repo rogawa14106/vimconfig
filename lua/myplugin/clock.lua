@@ -43,6 +43,7 @@ local create_clock_win = function(win_config)
         vim.g.floatClock_winid = vim.api.nvim_open_win(vim.g.floatClock_bufnr, false, win_config)
     else
         vim.api.nvim_win_close(vim.g.floatClock_winid, true)
+        vim.g.floatClock_winid = vim.api.nvim_open_win(vim.g.floatClock_bufnr, false, win_config)
         return
     end
 
@@ -77,3 +78,14 @@ end
 --# create command{{{
 vim.api.nvim_create_user_command("Clock", floatClock, { bang = true })
 -- }}}
+--# create autocmd{{{
+vim.api.nvim_create_augroup( "placeClock", {} )
+vim.api.nvim_create_autocmd('vimResized', {
+    group = 'placeClock',
+    callback = function() 
+        vim.cmd('Clock')
+    end,
+})
+-- }}}
+--# display clock
+vim.cmd("Clock")

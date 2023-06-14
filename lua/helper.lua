@@ -46,6 +46,27 @@ local highlightEcho = function(type, msg)
     vim.cmd("echohl end")
 end
 
+local highlightInput = function(type, prompt, text)
+    if type == 'error' then
+        vim.cmd("echohl ErrorMsg")
+    elseif type == 'warning' then
+        vim.cmd("echohl WarningMsg")
+    elseif type == 'info' then
+        vim.cmd("echohl DiffAdd")
+    end
+
+    local inputstr = ""
+    if text == nil then
+        inputstr = vim.fn.input(prompt)
+    else
+        inputstr = vim.fn.input(prompt, text)
+    end
+    vim.cmd("echohl end")
+
+    return inputstr
+end
+
 return {
     highlightEcho = highlightEcho,
+    highlightInput = highlightInput,
 }
