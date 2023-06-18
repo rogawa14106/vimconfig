@@ -72,7 +72,7 @@ require("autocmds")
 require("ui_lines")
 
 -- colorscheme
-require("colors.deepocean")
+require("colors.dark")
 
 -- BufCtl
 require("myplugin.buffctl")

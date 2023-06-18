@@ -1,8 +1,12 @@
 --TODO
 --cp
 --mv
---visual operation
 
+--visual operation
+---- delete -> end
+----
+
+-- helper
 local helper = require("../helper")
 
 -- main class
@@ -25,6 +29,27 @@ new_Eim = function()
             dirs = {},
         },
         cwd = '',
+        path_memory = {
+            wd = "",
+            lines = {},
+        },
+        is_help = false,
+        help = {
+            " == [Eim] HELP ===============================================================================================",
+            " KEY  | MODE | DESCRIPTION",
+            "--------------------------------------------------------------------------------------------------------------",
+            " <CR> | n    | Open file or enter directory",
+            " %    | n    | Create file ",
+            " d    | n    | Create directory",
+            " D    | n, v | Delete file or directory",
+            " R    | n    | Rename file of directory",
+            " y    | n, v | Store files to moving and copying",
+            " m    | n    | Move files",
+            " p    | n    | Copy files",
+            " cd   | n    | Change vim cwd",
+            " ?    | n    | show help",
+            " =============================================================================================================",
+        }
     }
 
     --# def methods
@@ -46,9 +71,11 @@ new_Eim = function()
     local rmdir
     local rmdir_recurcive
     local rename
-    local cp
-    local mv
+    local move
+    local copy
     local chcwd
+    local get_selectedlines
+    local register_path
 
     -- initialize
     init = function(config_main, config_info)
@@ -98,7 +125,6 @@ new_Eim = function()
         -- write information
         self.cwd = get_cwd()
         update_info()
-        --update_info()
 
         --show list segments
         self.dir_list = scan_ls(self.cwd)
@@ -138,8 +164,9 @@ new_Eim = function()
     create_keymap = function()
         -- n, <Enter>
         local on_enter = function()
-            local current_line = vim.fn.line(".")
-            local lines = vim.api.nvim_buf_get_lines(self.bufnrs.main, current_line - 1, current_line, false)
+            --local current_line = vim.fn.line(".")
+            --local lines = vim.api.nvim_buf_get_lines(self.bufnrs.main, current_line - 1, current_line, false)
+            local lines = get_selectedlines()
             local line = lines[1]
             if string.match(line, ".+/") then
                 if line == "../" then
@@ -163,17 +190,22 @@ new_Eim = function()
 
         -- n, %
         mkfile = function()
-            local filepath = helper.highlightInput("info", "[Eim] Enter filename > ", self.cwd .. "/")
-            local is_extension = string.match(filepath, "[^/].+%..+$")
+            local filename = helper.highlightInput("info", "[Eim] Enter filename. " .. self.cwd .. " > ")
+            if filename == "" then
+                helper.highlightEcho("warning", "[Eim] mkfile was canceled")
+                return
+            end
+            local is_extension = string.match(filename, "[^/].+%..+$")
             if is_extension == nil then
                 local confirm_msg = '[Eim] filename has no extension. type "y" to continue > '
                 local confirm = helper.highlightInput("warning", confirm_msg)
                 if confirm ~= "y" then
-                    helper.highlightEcho("info", "[Eim] mkfile was canceled")
+                    helper.highlightEcho("warning", "[Eim] mkfile was canceled")
                     return
                 end
             end
 
+            local filepath = self.cwd .. "/" .. filename
             local fd = vim.loop.fs_open(filepath, "w", 438)
             if fd == nil then
                 helper.highlightEcho("error", "[Eim] mkfile fail. can't open specified file")
@@ -187,18 +219,22 @@ new_Eim = function()
         end
 
         mkdir = function()
-            local dirpath = helper.highlightInput("info", "[Eim] Enter dirname > ", self.cwd .. "/")
-            vim.fn.mkdir(dirpath)
+            local dirpath = helper.highlightInput("info", "[Eim] Enter dirname. " .. self.cwd .. " > ")
+            if dirpath == "" then
+                helper.highlightEcho("warning", "[Eim] mkdir was canceled")
+                return
+            end
+            vim.fn.mkdir(self.cwd .. "/" .. dirpath)
 
             scan_ls(self.cwd)
             helper.highlightEcho("info", "[Eim] mkdir success >> " .. dirpath)
         end
 
         -- n, D
-        rm = function()
-            local current_line = vim.fn.line(".")
-            local lines = vim.api.nvim_buf_get_lines(self.bufnrs.main, current_line - 1, current_line, false)
-            local line = lines[1]
+        rm = function(line)
+            --local current_line = vim.fn.line(".")
+            --local lines = vim.api.nvim_buf_get_lines(self.bufnrs.main, current_line - 1, current_line, false)
+            --local line = lines[1]
             -- branch type
             local type
             if string.match(line, "/$") == nil then
@@ -244,65 +280,123 @@ new_Eim = function()
             if result == true then
                 scan_ls(self.cwd)
             else
-                if get_cwd() .. "/" == path then
-                    helper.highlightEcho("error", "[Eim] rmdir fail. specified directory is cwd")
+                if string.match(get_cwd(), path) ~= nil then
+                    helper.highlightEcho("error", "[Eim] rmdir fail. specified directory is in use")
                 else
-                    helper.highlightEcho("error", "[Eim] rmdir fail. specified directory is in use or not empty")
+                    local confirm_msg = '[Eim] Perform recursive deletion? type "y" to continue > '
+                    local confirm = helper.highlightInput("warning", confirm_msg)
+                    if confirm ~= "y" then
+                        helper.highlightEcho("warning", "[Eim] rmdir was canceled")
+                        return
+                    end
+                    rmdir_recurcive(path)
+                    scan_ls(self.cwd)
+                    helper.highlightEcho("info", "[Eim] recurcive rmdir success")
                 end
             end
         end
 
         rmdir_recurcive = function(path)
             local luv = vim.loop
-            local cb = vim.schedule_wrap(function(err, fs)
-                if err ~= nil then
-                    --print(err)
-                    return
-                end
-                while true do
-                    local name, type = luv.fs_scandir_next(fs)
-                    if name == nil then
-                        break
-                    else
-                        if type == 'directory' then
-                            self.ls.dirs[#self.ls.dirs + 1] = name
-                        elseif type == 'file' then
-                            self.ls.files[#self.ls.files + 1] = name
-                        end
+            local fs, fail = luv.fs_scandir(path)
+            if fail ~= nil then
+                print(fail)
+                return
+            end
+            while true do
+                local name, type = luv.fs_scandir_next(fs)
+                if name == nil then
+                    luv.fs_rmdir(path)
+                    break
+                else
+                    if type == 'directory' then
+                        rmdir_recurcive(path .. "/" .. name)
+                    elseif type == 'file' then
+                        vim.fn.delete(path .. "/" .. name)
                     end
                 end
-            end)
-
-            -- async scan
-            vim.fn.win_gotoid(self.winids.main)
-            luv.fs_scandir(path, cb)
+            end
         end
 
         rename = function()
-            local current_line = vim.fn.line(".")
-            local lines = vim.api.nvim_buf_get_lines(self.bufnrs.main, current_line - 1, current_line, false)
+            --local current_line = vim.fn.line(".")
+            --local lines = vim.api.nvim_buf_get_lines(self.bufnrs.main, current_line - 1, current_line, false)
+            local lines = get_selectedlines()
             local line = lines[1]
             local frompath = self.cwd .. "/" .. line
-            local topath = helper.highlightInput("info", "[Eim] Enter renamed path > ", frompath)
+
+            if string.match(get_cwd(), frompath) ~= nil then
+                helper.highlightEcho("error", "[Eim] rmdir fail. specified directory is in use")
+                return
+            end
+            local topath = helper.highlightInput("info", "[Eim] Enter renamed path \n> ", frompath)
             local result = vim.fn.rename(frompath, topath)
             if result == -1 then
                 helper.highlightEcho("error", "[Eim] rename fail")
             else
                 scan_ls(self.cwd)
-                helper.highlightEcho("info", "[Eim] rename success")
+                helper.highlightEcho("info", "[Eim] rename success >> " .. frompath .. " >> " .. topath .. " ")
             end
         end
 
         chcwd = function()
             vim.cmd("cd " .. self.cwd)
-            helper.highlightEcho("info", "[Eim] change current working directory to " .. '"' .. self.cwd .. '"')
+            helper.highlightEcho("info", "[Eim] change current working directory to >> " .. self.cwd)
         end
 
+        get_selectedlines = function()
+            local linenr = { nil, nil }
+            local botline = vim.fn.line(".")
+            local topline = vim.fn.line("v")
+            if topline > botline then
+                linenr = { botline, topline }
+            else
+                linenr = { topline, botline }
+            end
+            local lines = vim.api.nvim_buf_get_lines(self.bufnrs.main, linenr[1] - 1, linenr[2], false)
+            return lines
+        end
+
+        register_path = function()
+            local lines = get_selectedlines()
+            self.path_memory = {
+                wd = self.cwd,
+                lines = lines,
+            }
+            print(vim.inspect(self.path_memory))
+        end
+
+        move = function()
+            local wd = self.path_memory.wd
+            local lines = self.path_memory.lines
+            for i = 1, #lines do
+                local frompath = wd .. "/" .. lines[i]
+                local topath = self.cwd .. "/" .. lines[i]
+                local result = vim.fn.rename(frompath, topath)
+                print(result)
+            end
+            scan_ls(self.cwd)
+        end
+
+        copy = function()
+            local wd = self.path_memory.wd
+            local lines = self.path_memory.lines
+            for i = 1, #lines do
+                local frompath = wd .. "/" .. lines[i]
+                local topath = self.cwd .. "/" .. lines[i]
+                local result = vim.loop.fs_copyfile(frompath, topath)
+                print(result)
+            end
+            scan_ls(self.cwd)
+        end
+
+        -- enter
         vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", '<Enter>', '', {
             noremap = true,
             callback = on_enter,
         })
 
+        -- make
         vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "%", '', {
             noremap = true,
             callback = mkfile,
@@ -313,27 +407,105 @@ new_Eim = function()
             callback = mkdir,
         })
 
+        -- remove
         vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "D", '', {
             noremap = true,
-            callback = rm,
+            callback = function()
+                local lines = get_selectedlines()
+                rm(lines[1])
+            end,
         })
 
+        vim.api.nvim_buf_set_keymap(self.bufnrs.main, "v", "D", '', {
+            noremap = true,
+            callback = function()
+                local lines = get_selectedlines()
+                for i = 1, #lines do
+                    rm(lines[i])
+                end
+            end,
+        })
+
+        -- rename
         vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "R", '', {
             noremap = true,
             callback = rename,
         })
 
+        -- change cwd
         vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "cd", '', {
             noremap = true,
             callback = chcwd,
         })
+
+        -- registr path info to path_memory
+        vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "y", '', {
+            noremap = true,
+            callback = register_path,
+        })
+        vim.api.nvim_buf_set_keymap(self.bufnrs.main, "v", "y", '', {
+            noremap = true,
+            callback = register_path,
+        })
+        vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "m", '', {
+            noremap = true,
+            callback = move,
+        })
+        vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "p", '', {
+            noremap = true,
+            callback = copy,
+        })
+
+        local show_help = function()
+            if self.is_help then
+                self.is_help = false
+                local current_config = vim.api.nvim_win_get_config(self.winids.info)
+                local width = current_config.width
+                local row = current_config.row[false] + #self.help - 1
+                local col = current_config.col[false]
+                local win_conf = {
+                    relative = "editor",
+                    height = 1,
+                    width = width,
+                    row = row,
+                    col = col,
+                }
+                vim.api.nvim_win_set_config(self.winids.info, win_conf)
+                update_info()
+                --vim.api.nvim_buf_set_option(self.bufnrs.info, 'height', true)
+                return
+            end
+            self.is_help = true
+            local current_config = vim.api.nvim_win_get_config(self.winids.info)
+            local width = current_config.width
+            local row = current_config.row[false] - #self.help + 1
+            local col = current_config.col[false]
+            local win_conf = {
+                relative = "editor",
+                height = #self.help,
+                width = width,
+                row = row,
+                col = col,
+            }
+            vim.api.nvim_win_set_config(self.winids.info, win_conf)
+            write_lines("info", 0, -1, self.help)
+            vim.cmd("redraw")
+            vim.fn.win_gotoid(self.winids.main)
+        end
+
+        vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "?", '', {
+            noremap = true,
+            callback = show_help,
+        })
     end
 
     get_cwd = function()
-        return string.gsub(vim.fn.getcwd(), '\\', '/')
+        local cwd = string.gsub(vim.fn.getcwd(), '\\', '/')
+        return cwd
     end
 
     update_info = function()
+        if self.is_help then return end
         write_lines("info", 0, -1, { "cwd: " .. self.cwd })
         vim.fn.win_gotoid(self.winids.main)
     end
@@ -393,7 +565,6 @@ new_Eim = function()
     }
 end
 
---実際の値を入れていく。
 local init_eim
 init_eim = function()
     --## new eim

@@ -18,25 +18,25 @@ map Q :call RemapQ()<CR>
 "}}}"
 "{{{ normal mode
 "{{{ open netrw window
-function! WinExLeft() abort
-    "open directory as root that current file exist
-    "if failed to execute, then open Documents as root dir
-    try
-        if expand('%h') == ""
-            execute "cd ~/Documents"
-            execute "Lexplore ~/Documents/"
-        else
-            cd %:p:h
-            Lexplore %:p:h
-        endif
-    catch
-        execute "cd ~/Documents"
-        execute "Lexplore ~/Documents/"
-        call HighlightEcho("info",  "open ~/Documents as root")
-    endtry
-endfunction
-
-nnoremap <Leader>e :call WinExLeft()<CR>
+"function! WinExLeft() abort
+"    "open directory as root that current file exist
+"    "if failed to execute, then open Documents as root dir
+"    try
+"        if expand('%h') == ""
+"            execute "cd ~/Documents"
+"            execute "Lexplore ~/Documents/"
+"        else
+"            cd %:p:h
+"            Lexplore %:p:h
+"        endif
+"    catch
+"        execute "cd ~/Documents"
+"        execute "Lexplore ~/Documents/"
+"        call HighlightEcho("info",  "open ~/Documents as root")
+"    endtry
+"endfunction
+"
+"nnoremap <Leader>e :call WinExLeft()<CR>
 "}}}
 "{{{ change pwd to current file directory
 function! ChangePWD() abort
@@ -175,3 +175,18 @@ vim.keymap.set({ "i", "c" }, "%%", "%%<Left>", { noremap = true })
 
 -- terminal
 vim.keymap.set("t", "<C-\\>", "<C-\\><C-N>", { noremap = true })
+
+-- web browse
+-- https://test.com
+vim.keymap.set("n", "<C-b>", "", {
+    noremap = true,
+    callback = function()
+        local line = vim.fn.getline(".")
+        local url = string.match(line, "https://.+")
+        print(url)
+
+        vim.cmd('!chcp 65001 | "C:/Program Files/Google/Chrome/Application/chrome.exe" --incognito '.. '"' .. url .. '"')
+        local key = vim.api.nvim_replace_termcodes("<CR>", true, false, true)
+        vim.api.nvim_feedkeys(key, 'n', false)
+    end,
+})

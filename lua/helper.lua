@@ -41,7 +41,7 @@ local highlightEcho = function(type, msg)
         vim.cmd("echohl DiffAdd")
     end
 
-    local echocmd = "echo '" .. head .. msg .. "'"
+    local echocmd = 'echo "' .. head .. msg .. '"'
     vim.cmd(echocmd)
     vim.cmd("echohl end")
 end

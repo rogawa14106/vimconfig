@@ -21,9 +21,10 @@ local write_time = function()
 end
 -- }}}
 --# start timer{{{
+local timer
 local clock_start = function(delay)
     local uv = vim.loop
-    local timer = uv.new_timer()
+    timer = uv.new_timer()
     local cb = vim.schedule_wrap(function()
         if #vim.fn.win_findbuf(vim.g.floatClock_bufnr) < 1 then
             timer:close()
@@ -42,12 +43,24 @@ local create_clock_win = function(win_config)
     if #vim.fn.win_findbuf(vim.g.floatClock_bufnr) < 1 then
         vim.g.floatClock_winid = vim.api.nvim_open_win(vim.g.floatClock_bufnr, false, win_config)
     else
-        vim.api.nvim_win_close(vim.g.floatClock_winid, true)
-        vim.g.floatClock_winid = vim.api.nvim_open_win(vim.g.floatClock_bufnr, false, win_config)
+        --vim.api.nvim_win_close(vim.g.floatClock_winid, true)
+        --vim.g.floatClock_winid = vim.api.nvim_open_win(vim.g.floatClock_bufnr, false, win_config)
+        vim.api.nvim_win_set_config(vim.g.floatClock_winid, win_config)
         return
     end
 
     vim.api.nvim_win_set_option(vim.g.floatClock_winid, 'winhl', 'Normal:Title')
+
+    -- autocmd
+    vim.api.nvim_create_autocmd('bufwinleave', {
+        callback = function()
+            --print('timer auto closed!!')
+            --timer:stop()
+        end,
+        buffer = vim.g.floatClock_bufnr,
+    })
+
+    -- timer
     write_time()
     local delay = (59 - os.date("*t").sec) * 1000 + 500
     clock_start(delay)
