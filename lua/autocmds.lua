@@ -76,36 +76,6 @@ endif
 "}}}
 ]]
 
---vim.api.nvim_create_augroup('loadFold', {})
---vim.api.nvim_create_autocmd('insertleave', {
-    --group = 'loadFold'
-    --callback = (function()
-       -- 
-    --end)
---})
-
---vim.api.nvim_create_autocmd('insertleave', {
-    --group = 'saveFold'
-    --callback = (function()
-       -- 
-    --end)
---})
-
---local cmd_chime = Vimrcdir .. "/bin/chime.exe 0"
---vim.api.nvim_create_augroup( "cancellIME", {} )
---vim.api.nvim_create_autocmd( 'insertleave', {
-    --group = 'cancellIME',
-    --callback = (function()
-        --os.execute(cmd_chime)
-        --os.exit()
-    --end)
---})
-
---vim.api.nvim_create_autocmd( 'cmdlineleave', {
-    --group = 'cancellIME',
-    --callback = function () vim.cmd(cmd_chime) end
---})
-
 vim.api.nvim_create_augroup( "detectft", {} )
 vim.api.nvim_create_autocmd('bufwinenter', {
     group = 'detectft',
@@ -113,6 +83,3 @@ vim.api.nvim_create_autocmd('bufwinenter', {
         vim.cmd('filetype detect')
     end,
 })
-
-
-

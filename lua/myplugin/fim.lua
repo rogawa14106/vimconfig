@@ -6,7 +6,7 @@ local Path_table = {}
 --################################## functions ############################################
 --# get env independent pwd{{{
 local get_pwd = function()
-    return string.gsub(vim.fn.getcwd(), '\\', '/')
+    return vim.fs.normalize(vim.fn.getcwd())
 end
 -- }}}
 --# scandir recurcive{{{
@@ -246,7 +246,7 @@ local function create_selector(config, pre_winid)
                 helper.highlightEcho("warning", "no such file or directory")
                 return
             end
-            local selected_file = string.gsub(vim.fn.getcwd(), '\\', '/') .. "/" .. selected_line
+            local selected_file = vim.fs.normalize(vim.fn.getcwd()) .. "/" .. selected_line
             close_Fim()
             vim.fn.win_gotoid(pre_winid)
             vim.cmd(':e ' .. selected_file)
@@ -272,7 +272,7 @@ local function create_selector(config, pre_winid)
             vim.api.nvim_buf_call(
                 vim.g.fim_input_bufnr,
                 function()
-                    vim.cmd("cd " .. string.gsub(vim.fn.getcwd(), '\\', '/'))
+                    vim.cmd("cd " .. vim.fs.normalize(vim.fn.getcwd()))
                 end)
             Path_table = {}
             writeLine(vim.g.fim_info_bufnr, 0, 1, { "< pwd - " .. pwd .. " >" })
@@ -358,7 +358,7 @@ local function create_inputbox(config)
             vim.api.nvim_buf_call(
                 vim.g.fim_selector_bufnr,
                 function()
-                    vim.cmd("cd " .. string.gsub(vim.fn.getcwd(), '\\', '/'))
+                    vim.cmd("cd " .. vim.fs.normalize(vim.fn.getcwd()))
                 end)
             Path_table = {}
             writeLine(vim.g.fim_info_bufnr, 0, 1, { "< pwd - " .. pwd .. " >" })

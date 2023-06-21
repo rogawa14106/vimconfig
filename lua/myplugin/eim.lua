@@ -1,19 +1,13 @@
---TODO
---cp
---mv
-
---visual operation
----- delete -> end
-----
-
--- helper
+--TODO{{{
+-- }}}
+-- helper{{{
 local helper = require("../helper")
-
--- main class
+-- }}}
+-- main class{{{
 local new_Eim
 new_Eim = function()
     --## private
-    --# def member variables
+    --# def member variables{{{
     local self = {
         helper = helper,
         winids = {
@@ -51,8 +45,8 @@ new_Eim = function()
             " =============================================================================================================",
         }
     }
-
-    --# def methods
+-- }}}
+    --# def methods{{{
     local init
     local create_ui
     local create_win
@@ -76,8 +70,8 @@ new_Eim = function()
     local chcwd
     local get_selectedlines
     local register_path
-
-    -- initialize
+-- }}}
+    -- initialize{{{
     init = function(config_main, config_info)
         -- create ui
         self.winids.main = vim.g.eim_main_winid
@@ -89,8 +83,8 @@ new_Eim = function()
         -- set keymap
         create_keymap()
     end
-
-    -- ui related
+-- }}}
+    -- ui related{{{
     create_ui = function(config_main, config_info)
         -- create eim window
         local is_shown = (#vim.fn.win_findbuf(self.bufnrs.main) > 0) and (#vim.fn.win_findbuf(self.bufnrs.info) > 0)
@@ -160,7 +154,8 @@ new_Eim = function()
             return { bufnr = bufnr, winid = g_winid }
         end
     end
-
+-- }}}
+    -- keymap{{{
     create_keymap = function()
         -- n, <Enter>
         local on_enter = function()
@@ -170,7 +165,7 @@ new_Eim = function()
             local line = lines[1]
             if string.match(line, ".+/") then
                 if line == "../" then
-                    self.cwd = string.gsub(self.cwd, "/[^/]+$", "")
+                    self.cwd = vim.fs.dirname(self.cwd)
                     if self.cwd == "C:" then
                         self.cwd = "C:/"
                     end
@@ -498,15 +493,16 @@ new_Eim = function()
             callback = show_help,
         })
     end
-
+-- }}}
+    -- functions{{{
     get_cwd = function()
-        local cwd = string.gsub(vim.fn.getcwd(), '\\', '/')
+        local cwd = vim.fs.normalize(vim.fn.getcwd())
         return cwd
     end
 
     update_info = function()
         if self.is_help then return end
-        write_lines("info", 0, -1, { "cwd: " .. self.cwd })
+        write_lines("info", 0, -1, { "[EIM] cwd: " .. self.cwd })
         vim.fn.win_gotoid(self.winids.main)
     end
 
@@ -558,13 +554,15 @@ new_Eim = function()
         vim.api.nvim_buf_set_option(self.bufnrs[target], 'modifiable', false)
         vim.api.nvim_buf_set_option(self.bufnrs[target], 'readonly', true)
     end
-
-    -- ##public
+-- }}}
+    --# publish {{{
     return {
         init = init,
     }
+    -- }}}
 end
-
+-- }}}
+-- new eim {{{
 local init_eim
 init_eim = function()
     --## new eim
@@ -632,14 +630,15 @@ init_eim = function()
     }
     eim.init(config_main, config_info)
 end
-
---# create Fim command
+-- }}}
+--# create command{{{
 vim.api.nvim_create_user_command("Eim", init_eim, {
     bang = true
 })
-
---# create keymap that launch Fim
+-- }}}
+--# create keymap that launch Fim{{{
 vim.api.nvim_set_keymap("n", '<leader>e', '', {
     noremap = true,
     callback = init_eim,
 })
+-- }}}

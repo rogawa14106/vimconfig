@@ -32,29 +32,38 @@ local hl_mono7 = { cterm = "250", gui = "787888" }
 local hl_mono8 = { cterm = "253", gui = "c0c0d8" }
 local hl_mono9 = { cterm = "253", gui = "d8d8e8" }
 
-local hl_blue0 = { cterm = "24", gui = "102038" }
+local hl_blue0 = { cterm = "24",  gui = "102038" }
 local hl_blue1 = { cterm = "111", gui = "9ba2f3" }
 local hl_blue2 = { cterm = "117", gui = "95d0f0" }
-local hl_blue3 = { cterm = "75", gui = "439bbc" }
+local hl_blue3 = { cterm = "75",  gui = "439bbc" }
 
-local hl_erro0 = { cterm = "124", gui = "602828" }
-local hl_erro1 = { cterm = "9", gui = "d04848" }
-local hl_warn0 = { cterm = "3", gui = "606028" }
-local hl_safe0 = { cterm = "22", gui = "286028" }
+local hl_erro0 = { cterm = "124", gui = "481010" }
+local hl_erro1 = { cterm = "9",   gui = "c03838" }
+local hl_warn0 = { cterm = "3",   gui = "505018" }
+local hl_safe0 = { cterm = "22",  gui = "104810" }
 
 --local hl_emph0 = { cterm="62", gui="74607c" } -- CursorSearch
-local hl_emph0 = { cterm = "85", gui = "95f0d0" } -- Sign, MatchParen, etc
-local hl_emph1 = { cterm = "60", gui = "5f5030" } -- Search
+local hl_emph0 = { cterm = "85",  gui = "95f0d0" } -- Sign, MatchParen, etc
+local hl_emph1 = { cterm = "60",  gui = "5f5030" } -- Search
 
-local hl_mnorm = { cterm = "24", gui = "304070" }
-local hl_mcomm = { cterm = "58", gui = "583058" }
+local hl_mnorm = { cterm = "24",  gui = "304070" }
+local hl_mcomm = { cterm = "58",  gui = "583058" }
 --local hl_mvisu = { cterm="23", gui="307040" }
-local hl_minse = { cterm = "95", gui = "803030" }
-local hl_mvisu = { cterm = "23", gui = "15504e" }
-local hl_mterm = { cterm = "0", gui = "304070" }
-local hl_mtjob = { cterm = "0", gui = "080810" }
+local hl_minse = { cterm = "95",  gui = "803030" }
+local hl_mvisu = { cterm = "23",  gui = "15504e" }
+local hl_mterm = { cterm = "0",   gui = "304070" }
+local hl_mtjob = { cterm = "0",   gui = "080810" }
 
 local hl_sep01 = { cterm = "237", gui = "282830" }
+
+local hl_str01 = { cterm = "223", gui = "f3c29b" }
+local hl_num01 = { cterm = "114", gui = "abddb6" }
+local hl_idf02 = { cterm = "229", gui = "f0f0ae" }
+local hl_stm02 = { cterm = "218", gui = "f39bbc" }
+local hl_prp01 = { cterm = "168", gui = "e69bf3" }
+local hl_typ01 = { cterm = "43",  gui = "77c89e" }
+local hl_spe01 = { cterm = "229", gui = "fff9b3" }
+local hl_more0 = { cterm = "140", gui = "c29bf3" }
 ---}}}
 -- {{{ highlight configuration
 -- init highlight --
@@ -66,8 +75,6 @@ vim.cmd("syntax enable")
 ----- highlight ---"
 setHi("Comment", hl_mono6, unspec, "none")
 
-local hl_str01 = { cterm = "223", gui = "f3c29b" }
-local hl_num01 = { cterm = "114", gui = "abddb6" }
 setHi("Constant", hl_str01, unspec, "none")
 setHi("String", hl_str01, unspec, "none")
 setHi("Character", hl_str01, unspec, "none")
@@ -75,11 +82,9 @@ setHi("Number", hl_num01, unspec, "none")
 setHi("Float", hl_num01, unspec, "none")
 setHi("Boolean", hl_blue3, unspec, "none")
 
-local hl_idf02 = { cterm = "229", gui = "f0f0ae" }
 setHi("Identifier", hl_blue2, unspec, "none")
 setHi("Function", hl_idf02, unspec, "none")
 
-local hl_stm02 = { cterm = "218", gui = "f39bbc" }
 setHi("Statement", hl_blue1, unspec, "none")
 setHi("Conditional", hl_stm02, unspec, "none")
 setHi("Repeat", hl_stm02, unspec, "none")
@@ -88,20 +93,17 @@ setHi("Exception", hl_stm02, unspec, "none")
 setHi("Operator", hl_mono8, unspec, "none")
 setHi("Keyword", hl_blue1, unspec, "none")
 
-local hl_prp01 = { cterm = "168", gui = "e69bf3" }
 setHi("PreProc", hl_prp01, unspec, "none")
 setHi("Include", hl_prp01, unspec, "none")
 setHi("Define", hl_prp01, unspec, "none")
 setHi("Macro", hl_prp01, unspec, "none")
 setHi("PreCondit", hl_prp01, unspec, "none")
 
-local hl_typ01 = { cterm = "43", gui = "77c89e" }
 setHi("Type", hl_typ01, unspec, "none")
 --setHi("StorageClass", hl_typ01, unspec, "none")
 --setHi("Structure", hl_typ01, unspec, "none")
 --setHi("Typedef", hl_typ01, unspec, "none")
 
-local hl_spe01 = { cterm = "229", gui = "fff9b3" }
 setHi("Special", hl_spe01, unspec, "none")
 --setHi("SpecialChar", hl_spe01, unspec, "none")
 --setHi("Tag", hl_spe01, unspec, "none")
@@ -119,8 +121,9 @@ setHi("Todo", hl_mono9, hl_warn0, "none")
 
 ----- highlight-group ------"
 setHi("Normal", hl_mono9, hl_mono1, "none")
-setHi("NormalFloat", hl_mono9, hl_mono5, "none")
 setHi("NormalNC", hl_mono8, hl_mono1, "none")
+setHi("NormalFloat", hl_mono9, hl_mono5, "none")
+setHi("FloatBorder", hl_mono7, hl_mono1, "none")
 
 setHi("NonText", hl_mono3, unspec, "none")
 setHi("Whitespace", hl_mono3, unspec, "none")
@@ -129,9 +132,9 @@ setHi("EndOfBuffer", hl_mono3, unspec, "none")
 setHi("Conceal", hl_mono9, hl_mono1, "none")
 
 setHi("Cursor", unspec, unspec, "reverse")
---setHi("lCursor", unspec, unspec, "reverse")
---setHi("CursorIM", unspec, unspec, "reverse")
---setHi("TermCursor", unspec, unspec, "reverse")
+--setHi("lCursor",      unspec, unspec, "reverse")
+--setHi("CursorIM",     unspec, unspec, "reverse")
+--setHi("TermCursor",   unspec, unspec, "reverse")
 --setHi("TermCursorNC", unspec, unspec, "reverse")
 
 setHi("ColorColumn", unspec, hl_mono2, "none")
@@ -147,7 +150,6 @@ setHi("ErrorMsg", hl_mono9, hl_erro0, "none")
 setHi("WarningMsg", hl_mono9, hl_warn0, "none")
 
 setHi("WinSeparator", hl_sep01, hl_sep01, "none")
-setHi("FloatBorder", hl_mono7, hl_mono1, "none")
 setHi("VertSplit", hl_sep01, hl_sep01, "none")
 
 setHi("Folded", hl_mono7, hl_blue0, "none")
@@ -179,7 +181,6 @@ setHi("ModeMsg", hl_mono9, hl_emph1, "none")
 setHi("MsgArea", hl_mono9, hl_mono1, "none")
 setHi("MsgSeparator", hl_mono9, hl_mono5, "none")
 
-local hl_more0 = { cterm = "140", gui = "c29bf3" }
 setHi("MoreMsg", hl_more0, unspec, "none")
 setHi("Question", hl_more0, unspec, "none")
 

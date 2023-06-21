@@ -1,3 +1,5 @@
+local helper = require("helper")
+
 -- {{{ vimrc, init.vim
 vim.api.nvim_create_user_command("VIMRC", function()
     vim.cmd("e " .. vim.env.MYVIMRC)
@@ -7,6 +9,7 @@ vim.api.nvim_create_user_command("SP", function()
     vim.cmd("luafile " .. vim.env.MYVIMRC)
 end, {})
 
+-- use backup
 vim.api.nvim_create_user_command("INIVIM", function()
     vim.cmd("source C:/Users/rogawa/AppData/Local/nvim/bak_init.vim")
 end, {})
@@ -65,20 +68,20 @@ end, { nargs = '?' })
 -- TODO create func that execute external command
 if vim.fn.has('windows') == 1 then
     vim.api.nvim_create_user_command("HSB", function()
-        local hidesb_cmd = "!" .. Vimrcdir .. "/bin/hidesb.exe -b"
+        local hidesb_cmd = "!" .. helper.vimrcdir .. "/bin/hidesb.exe -b"
         vim.cmd(hidesb_cmd)
         vim.fn.feedkeys('<CR>')
     end, {})
 
     vim.api.nvim_create_user_command("HTB", function()
-        local hidetb_cmd = "!" .. Vimrcdir .. "/bin/hidetb.exe"
+        local hidetb_cmd = "!" .. helper.vimrcdir .. "/bin/hidetb.exe"
         vim.cmd(hidetb_cmd)
         vim.fn.feedkeys('<CR>')
     end, {})
 
     vim.api.nvim_create_user_command("FS", function()
-        local hidetb_cmd = "!" .. Vimrcdir .. "/bin/hidetb.exe"
-        local hidesb_cmd = "!" .. Vimrcdir .. "/bin/hidesb.exe -b"
+        local hidetb_cmd = "!" .. helper.vimrcdir .. "/bin/hidetb.exe"
+        local hidesb_cmd = "!" .. helper.vimrcdir .. "/bin/hidesb.exe -b"
         vim.cmd(hidesb_cmd)
         vim.fn.feedkeys('<CR>')
         vim.cmd(hidetb_cmd)
@@ -91,12 +94,10 @@ end
 -- {{{ git push vimconfigfiles
 vim.api.nvim_create_user_command("GPV", function(opts)
     if string.match(opts.args, "^'") then
-        vim.cmd("echohl ErrorMsg")
-        vim.cmd("echo '[Error] single quote is invalid'")
-        vim.cmd("echohl End")
+        helper.highlightEcho("error", "single quote is invalid")
         return
     end
-    vim.cmd("cd " .. Vimrcdir)
+    vim.cmd("cd " .. helper.vimrcdir)
     vim.cmd("!git add .")
     vim.cmd("!git commit -m " .. opts.args)
     vim.cmd("!git push origin main")
@@ -106,12 +107,8 @@ end, { nargs = 1 })
 -- {{{ vimgrep and copen
 vim.api.nvim_create_user_command("Grep", function()
 
-    local pwd = string.gsub(vim.fn.getcwd(), '\\', '/')
-    vim.cmd("echohl DiffAdd")
-    vim.cmd("echo '[Info] grep target >>> " .. pwd .. "/** <<<'")
-    vim.cmd("echo '[Info] Type " .. '"exit"' .. " to quit. '")
-    vim.cmd("echohl End")
-
+    local pwd = vim.fs.normalize(vim.fn.getcwd())
+    helper.highlightEcho("info", "grep target >>> " .. pwd .. "/** <<< Type 'exit' to quit. ")
     local regex = vim.fn.input("RegEx> ")
 
     if (regex == 'exit') then

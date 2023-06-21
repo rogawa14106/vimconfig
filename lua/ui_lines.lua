@@ -1,130 +1,4 @@
-vim.cmd[[
-"{{{ foldtext
-function! MyFoldtext() abort
-    let l:line = substitute(getline(v:foldstart), '{', "", "g")
-    return printf("[%4d lines ] %s", v:foldend - v:foldstart + 1, l:line)
-endfunction
-
-set foldtext=MyFoldtext()
-"}}}
-"{{{ statusline
-function! MyStatusline() abort
-    let l:mode_str = mode()
-    let l:mode_status = ""
-    if (&filetype == "netrw")
-        "netrw"
-        let l:mode_color  = "%1*%#mmodenormal#"
-        let l:mode_status = "\ NETRW\ %*"
-    elseif (l:mode_str == "n")
-        let l:mode_color  = "%1*%#mmodenormal#"
-        let l:mode_status = "\ NORMAL\ %*"
-    elseif (l:mode_str == "i")
-        let l:mode_color  = "%1*%#mmodeinsert#"
-        let l:mode_status = "\ INSERT\ %*"
-    elseif (l:mode_str == "R")
-        let l:mode_color  = "%1*%#mmodeinsert#"
-        let l:mode_status = "\ REPLACE\ %*"
-    elseif (l:mode_str == "c")
-        let l:mode_color  = "%1*%#mmodecommand#"
-        let l:mode_status = "\ COMMAND\ %*"
-    elseif (l:mode_str == "v")
-        let l:mode_color  = "%1*%#mmodevisual#"
-        let l:mode_status = "\ VISUAL\ %*"
-    elseif (l:mode_str == "V")
-        let l:mode_color  = "%1*%#mmodevisual#"
-        let l:mode_status = "\ VLINE\ %*"
-    elseif (l:mode_str == "")
-        let l:mode_color  = "%1*%#mmodevisual#"
-        let l:mode_status = "\ VBLOCK\ %*"
-    else
-        let l:mode_color  = "%1*%#mmodevisual#"
-        let l:mode_status = "\ " . mode() . "\ %*"
-    endif
-
-    if (&buftype == "terminal")
-        "terminal"
-        if (l:mode_str == "n")
-            let l:mode_color  = "%1*%#mmodeterm#"
-            let l:mode_status = "\ TERMINAL-NORMAL\ %*"
-        elseif (l:mode_str == "t")
-            let l:mode_color  = "%1*%#mmodetjob#"
-            let l:mode_status = "\ TERMINAL-JOB\ %*"
-        endif
-    endif
-
-    "left :dig Bd"
-    let l:mystatusline = l:mode_color . l:mode_status
-    let l:mystatusline .= "[%n]%h%m%F"
-
-    "center"
-    let l:mystatusline .= "\ %#statuslinenc#%<"
-
-    "right"
-    let l:mystatusline .= "%="
-    let l:mystatusline .= "%#statusline#"
-    let l:mystatusline .= "[%l/%L]\ "
-    let l:mystatusline .= l:mode_color
-    let l:mystatusline .= "\ [%{&buftype!=''?&buftype:&filetype}]"
-    let l:mystatusline .= "\ [%{&fileencoding!=''?&fileencoding:&encoding},"
-    let l:mystatusline .= "%{&fileformat}]\ "
-    let l:mystatusline .= "%#statusline#"
-    return l:mystatusline
-endfunction
-
-set statusline=%!MyStatusline()
-"}}}
-"{{{ tabline
-set showtabline=2
-
-function! MyTabLine() abort
-    let l:tabstring = ''
-    let t = tabpagenr()
-    let i = 1
-    while i <= tabpagenr('$')
-        let l:buflist = tabpagebuflist(i)
-        let l:winnr = tabpagewinnr(i)
-
-        let l:tabstring .= '%*'
-        let l:tabstring .= (i == t ? '%#TabLineSel#' : '%#TabLine#')
-
-        let l:tabstring .= '['
-
-        let bufnr = l:buflist[l:winnr - 1]
-        let file = bufname(bufnr)
-        let buftype = getbufvar(bufnr, 'buftype')
-
-        if buftype == 'nofile'
-            if file =~ '\/.'
-                let file = substitute(file, '.*\/\ze.', '', '')
-            endif
-        else
-            let file = fnamemodify(file, ':p:t')
-            "let file = expand('%:p:t')
-        endif
-
-        if (i == t) && (&filetype == "netrw")
-            let file = "NETRW"
-        elseif file == ''
-            let file = 'No Name'
-        endif
-
-        let l:tabstring .= file
-
-        let l:tabstring .= ']'
-
-        let i = i + 1
-    endwhile
-
-    let l:tabstring .= '%T%#TabLineFill#%='
-
-    let l:pwd = getcwd()
-    let l:tabstring .= '%#TabLineSel# pwd: ' . l:pwd . ' '
-    let l:tabstring .= '%#TabLineFill#'
-
-    return l:tabstring 
-endfunction
-set tabline=%!MyTabLine()
-"}}}
+vim.cmd [[
 "{{{ Sign
 
 "{{{Init SignID
@@ -209,7 +83,7 @@ function! SignJump(jump_flg) abort
             let l:next_sign_distance = line(".") - sign_dict.lnum
         endif
 
-        "seek the closest sign 
+        "seek the closest sign
         "diverge variable to evaluate depending on whether positive or negative
         if (l:next_sign_distance > 0)
             "positive
@@ -369,4 +243,161 @@ command! -nargs=? HT :call HiTest(<f-args>)
 
 "}}}
 ]]
+
+-- foldtext{{{
+MyFoldtext = function()
+    local line = vim.fn.substitute(vim.fn.getline(vim.v.foldstart), '{', "", "g")
+    return vim.fn.printf("[%4d lines ] %s", vim.v.foldend - vim.v.foldstart + 1, line)
+end
+
+vim.opt.foldtext = "v:lua.MyFoldtext()"
+-- }}}
+-- statualine{{{
+MyStatusLine = function()
+    local mode_str = vim.fn.mode()
+    local mode_color
+    local mode_status = ""
+    if (mode_str == "n") then
+        mode_color  = "%1*%#mmodenormal#"
+        mode_status = " NORMAL %*"
+    elseif (mode_str == "i") then
+        mode_color  = "%1*%#mmodeinsert#"
+        mode_status = " INSERT %*"
+    elseif (mode_str == "R") then
+        mode_color  = "%1*%#mmodeinsert#"
+        mode_status = " REPLACE %*"
+    elseif (mode_str == "c") then
+        mode_color  = "%1*%#mmodecommand#"
+        mode_status = " COMMAND %*"
+    elseif (mode_str == "v") then
+        mode_color  = "%1*%#mmodevisual#"
+        mode_status = " VISUAL %*"
+    elseif (mode_str == "V") then
+        mode_color  = "%1*%#mmodevisual#"
+        mode_status = " VLINE %*"
+    elseif (mode_str == "") then
+        mode_color  = "%1*%#mmodevisual#"
+        mode_status = " VBLOCK %*"
+    else
+        mode_color  = "%1*%#mmodevisual#"
+        mode_status = " " .. vim.fn.mode() .. " %*"
+    end
+
+    if (vim.opt.buftype:get() == "terminal") then
+        --terminal
+        if (mode_str == "n") then
+            mode_color  = "%1*%#mmodeterm#"
+            mode_status = " TERMINAL-NORMAL %*"
+        elseif (mode_str == "t") then
+            mode_color  = "%1*%#mmodetjob#"
+            mode_status = " TERMINAL-JOB %*"
+        end
+    end
+
+    --left :dig Bd
+    local mystatusline = mode_color .. mode_status
+    mystatusline = mystatusline .. "[%n]%h%m%F"
+
+    --center
+    mystatusline = mystatusline .. " %#statuslinenc#%<"
+
+    --right
+    mystatusline = mystatusline .. "%="
+    mystatusline = mystatusline .. "%#statusline#"
+    mystatusline = mystatusline .. "[%l/%L] "
+    mystatusline = mystatusline .. mode_color
+    mystatusline = mystatusline .. " [%{&buftype!=''?&buftype:&filetype}]"
+    mystatusline = mystatusline .. " [%{&fileencoding!=''?&fileencoding:&encoding},"
+    mystatusline = mystatusline .. "%{&fileformat}]"
+    mystatusline = mystatusline .. " %#statusline#"
+    return mystatusline
+end
+-- vim.api.nvim_eval_statusline(myStatusLine(), {use_winbar=true})
+vim.opt.statusline = "%!v:lua.MyStatusLine()"
+-- }}}
+-- tabline{{{
+MyTabLine = function()
+    local tabstring = ''
+    local t = vim.fn.tabpagenr()
+    local i = 1
+    while i <= vim.fn.tabpagenr('$') do
+        local buflist = vim.fn.tabpagebuflist(i)
+        local winnr = vim.fn.tabpagewinnr(i)
+        -- print(vim.inspect(buflist), winnr)
+
+        tabstring = tabstring .. '%*'
+        if (i == t) then
+            tabstring = tabstring .. [[%#TabLineSel#]]
+        else
+            tabstring = tabstring .. [[%#TabLine#]]
+        end
+
+        tabstring = tabstring .. '['
+
+        local bufnr = buflist[winnr - 1 + 1]
+        local file = vim.fn.bufname(bufnr)
+        local buftype = vim.fn.getbufvar(bufnr, 'buftype')
+
+        if buftype == 'nofile' then
+            if file == '\\/.' then
+                file = vim.fn.substitute(file, '.*\\/\ze.', '', '')
+            end
+        else
+            file = vim.fn.fnamemodify(file, ':p:t')
+        end
+
+        if (i == t) and (vim.opt.filetype:get() == "netrw") then
+            file = "NETRW"
+        elseif file == '' then
+            file = 'No Name'
+        end
+
+        tabstring = tabstring .. file
+
+        tabstring = tabstring .. ']'
+
+        i = i + 1
+    end
+
+    tabstring = tabstring .. [[%T%#TabLineFill#%=]]
+
+    local pwd = vim.fn.getcwd()
+    tabstring = tabstring .. [[%#TabLineSel# pwd: ]] .. pwd .. ' '
+    tabstring = tabstring .. [[%#TabLineFill#]]
+
+    return tabstring
+end
+vim.opt.showtabline = 2
+vim.opt.tabline = "%!v:lua.MyTabLine()"
+-- }}}
+
+local hl_color_code = function()
+    local hlns = vim.api.nvim_get_namespaces()['hl_color_code']
+    if hlns ~= nil then
+        vim.api.nvim_buf_clear_namespace(0, vim.api.nvim_get_namespaces()['hl_color_code'], 0, vim.fn.line("$"))
+    end
+    local zreg = vim.fn.getreg("z")
+
+    vim.cmd('noautocmd normal! viw"zy')
+    local cc = vim.fn.getreg("z")
+    if string.match(cc, '%x%x%x%x%x%x') == nil then
+        return
+    end
+
+    print("zreg:", cc)
+    vim.cmd("hi! ColorCodeF guifg=#" .. cc)
+    vim.cmd("hi! ColorCodeB guibg=#" .. cc)
+    local ns = vim.api.nvim_create_namespace('hl_color_code')
+    vim.api.nvim_buf_add_highlight(
+        0, ns, "ColorCodeF", vim.fn.line(".") - 1,
+        math.floor(vim.fn.col("$") / 2), vim.fn.col("$"))
+    vim.api.nvim_buf_add_highlight(
+        0, ns, "ColorCodeB", vim.fn.line(".") - 1,
+        0, math.floor(vim.fn.col("$") / 2) - 1)
+
+    vim.cmd('noautocmd normal! viw"zy')
+    vim.fn.setreg("z", zreg)
+end
+
+vim.api.nvim_set_keymap('n', '<leader>cc', '', { noremap = true, callback = hl_color_code })
 
