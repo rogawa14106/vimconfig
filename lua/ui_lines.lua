@@ -2,7 +2,7 @@ vim.cmd [[
 "{{{ Sign
 
 "{{{Init SignID
-sign define sign1 text=`m texthl=Sign
+sign define sign1 text=◆ texthl=Sign
 "get bigest sigh id to be id as id
 function! InitSignID() abort
     let l:m_placed_sign_list = sign_getplaced("")[0].signs
@@ -119,10 +119,10 @@ endfunction
 
 "}}}
 
-nnoremap <silent> <Leader>mm :call ToggleSign()<CR>
-nnoremap <silent> <Leader>mj :call SignJump(1)<CR>
-nnoremap <silent> <Leader>mk :call SignJump(-1)<CR>
-nnoremap <silent> <Leader>md :call DeleteAllSign()<CR>
+nnoremap <silent> <Leader>st :call ToggleSign()<CR>
+nnoremap <silent> <Leader>sj :call SignJump(1)<CR>
+nnoremap <silent> <Leader>sk :call SignJump(-1)<CR>
+nnoremap <silent> <Leader>sd :call DeleteAllSign()<CR>
 
 "}}}
 "{{{ HiTest (highlight test tool)
@@ -370,34 +370,4 @@ end
 vim.opt.showtabline = 2
 vim.opt.tabline = "%!v:lua.MyTabLine()"
 -- }}}
-
-local hl_color_code = function()
-    local hlns = vim.api.nvim_get_namespaces()['hl_color_code']
-    if hlns ~= nil then
-        vim.api.nvim_buf_clear_namespace(0, vim.api.nvim_get_namespaces()['hl_color_code'], 0, vim.fn.line("$"))
-    end
-    local zreg = vim.fn.getreg("z")
-
-    vim.cmd('noautocmd normal! viw"zy')
-    local cc = vim.fn.getreg("z")
-    if string.match(cc, '%x%x%x%x%x%x') == nil then
-        return
-    end
-
-    print("zreg:", cc)
-    vim.cmd("hi! ColorCodeF guifg=#" .. cc)
-    vim.cmd("hi! ColorCodeB guibg=#" .. cc)
-    local ns = vim.api.nvim_create_namespace('hl_color_code')
-    vim.api.nvim_buf_add_highlight(
-        0, ns, "ColorCodeF", vim.fn.line(".") - 1,
-        math.floor(vim.fn.col("$") / 2), vim.fn.col("$"))
-    vim.api.nvim_buf_add_highlight(
-        0, ns, "ColorCodeB", vim.fn.line(".") - 1,
-        0, math.floor(vim.fn.col("$") / 2) - 1)
-
-    vim.cmd('noautocmd normal! viw"zy')
-    vim.fn.setreg("z", zreg)
-end
-
-vim.api.nvim_set_keymap('n', '<leader>cc', '', { noremap = true, callback = hl_color_code })
 

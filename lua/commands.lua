@@ -1,6 +1,6 @@
 local helper = require("helper")
 
--- {{{ vimrc, init.vim
+-- vimrc, init.vim {{{
 vim.api.nvim_create_user_command("VIMRC", function()
     vim.cmd("e " .. vim.env.MYVIMRC)
 end, {})
@@ -15,13 +15,13 @@ vim.api.nvim_create_user_command("INIVIM", function()
 end, {})
 -- }}}
 
--- {{{ toggle terguicolors
+-- toggle terguicolors {{{
 vim.api.nvim_create_user_command("GUI", function()
     vim.cmd("set termguicolors!")
 end, {})
 -- }}}
 
--- {{{ toggle relative scrool
+-- toggle relative scrool {{{
 vim.api.nvim_create_user_command("RS", function()
     if (vim.opt.scrolloff:get() == 0) then
         vim.opt.scrolloff = vim.api.nvim_eval("&lines") / 2
@@ -31,7 +31,7 @@ vim.api.nvim_create_user_command("RS", function()
 end, {})
 -- }}}
 
--- {{{ open terminal
+-- open terminal {{{
 vim.api.nvim_create_user_command("CMD", function(opts)
     --- change key that will send to terminal at first and resize terminal
     local lines = vim.api.nvim_eval("&lines")
@@ -64,8 +64,7 @@ vim.api.nvim_create_user_command("CMD", function(opts)
 end, { nargs = '?' })
 -- }}}
 
--- {{{ windows ui
--- TODO create func that execute external command
+-- windows ui {{{ TODO create func that execute external command
 if vim.fn.has('windows') == 1 then
     vim.api.nvim_create_user_command("HSB", function()
         local hidesb_cmd = "!" .. helper.vimrcdir .. "/bin/hidesb.exe -b"
@@ -91,7 +90,7 @@ end
 
 -- }}}
 
--- {{{ git push vimconfigfiles
+-- git push vimconfigfiles {{{
 vim.api.nvim_create_user_command("GPV", function(opts)
     if string.match(opts.args, "^'") then
         helper.highlightEcho("error", "single quote is invalid")
@@ -104,9 +103,8 @@ vim.api.nvim_create_user_command("GPV", function(opts)
 end, { nargs = 1 })
 --}}}
 
--- {{{ vimgrep and copen
+-- vimgrep and copen {{{
 vim.api.nvim_create_user_command("Grep", function()
-
     local pwd = vim.fs.normalize(vim.fn.getcwd())
     helper.highlightEcho("info", "grep target >>> " .. pwd .. "/** <<< Type 'exit' to quit. ")
     local regex = vim.fn.input("RegEx> ")
@@ -117,5 +115,6 @@ vim.api.nvim_create_user_command("Grep", function()
     end
 
     vim.cmd("vimgrep " .. regex .. " ./** | copen")
-end, {})
+end, { force = true })
 -- }}}
+

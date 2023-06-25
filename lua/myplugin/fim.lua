@@ -221,6 +221,7 @@ local function create_infobox(config, information)
 
     -- set options
     vim.api.nvim_win_set_option(vim.g.fim_info_winid, 'winhl', 'Normal:LineNr')
+    vim.api.nvim_win_set_option(vim.g.fim_info_winid, 'signcolumn', 'no')
     vim.api.nvim_buf_set_option(0, 'modifiable', false)
     vim.api.nvim_buf_set_option(0, 'readonly', true)
 end
@@ -293,6 +294,7 @@ local function create_selector(config, pre_winid)
 
     -- set options
     vim.api.nvim_win_set_option(vim.g.fim_selector_winid, 'winhl', 'Normal:LineNr')
+    vim.api.nvim_win_set_option(vim.g.fim_selector_winid, 'signcolumn', 'no')
     vim.api.nvim_buf_set_option(0, 'modifiable', false)
     vim.api.nvim_buf_set_option(0, 'readonly', true)
 end
@@ -370,6 +372,7 @@ local function create_inputbox(config)
 
     -- set options
     vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'winhl', 'Normal:NormalFloat')
+    vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'signcolumn', 'no')
     vim.api.nvim_buf_set_option(0, 'modifiable', true)
     vim.api.nvim_buf_set_option(0, 'readonly', false)
 end

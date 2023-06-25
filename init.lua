@@ -59,6 +59,9 @@ require("autocmds")
 -- fold, status, tab lines
 require("ui_lines")
 
+-- mark utility
+require("mark")
+
 -- colorscheme
 require("colors.dark")
 

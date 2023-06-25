@@ -112,6 +112,8 @@ new_Eim = function()
         -- set colors
         vim.api.nvim_win_set_option(self.winids.main, 'winhl', 'Normal:' .. config_main.color)
         vim.api.nvim_win_set_option(self.winids.info, 'winhl', 'Normal:' .. config_info.color)
+        vim.api.nvim_win_set_option(self.winids.main, 'signcolumn', 'no')
+        vim.api.nvim_win_set_option(self.winids.info, 'signcolumn', 'no')
         vim.cmd("hi! def link EimDirectory Title")
         vim.fn.clearmatches(self.winids.main)
         vim.fn.matchadd("EimDirectory", '\\v.+/$', 10, 5, { window = self.winids.main })

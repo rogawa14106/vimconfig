@@ -27,12 +27,12 @@ set.foldcolumn = '0'
 --set.foldmethod = 'manual'
 set.foldmethod = 'marker'
 
--- backup files
+-- no backup files
 set.swapfile = false
 set.backup = false
 set.undofile = false
 
--- enc, format
+-- file enc, format
 set.encoding = 'utf-8'
 set.fileencodings = {'utf-8', 'sjis'}
 set.fileformats = {'dos', 'unix', 'mac'}
@@ -52,17 +52,15 @@ set.path:append('**')
 
 -- gui
 set.mouse = ''
-if string.match(vim.env.USERNAME, 'rogawa') then
-    set.guifont = 'MyricaM M:h12'
-elseif string.match(vim.env.USERNAME, '152440') then
-    set.guifont = 'Myrica M:h12'
-else
-    set.guifont = 'ＭＳ ゴシック:h12'
-end
+-- if string.match(vim.env.USERNAME, 'rogawa') then
+    -- set.guifont = 'MyricaM M:h12'
+-- elseif string.match(vim.env.USERNAME, '152440') then
+    -- set.guifont = 'Myrica M:h12'
+-- else
+    -- set.guifont = 'ＭＳ ゴシック:h12'
+-- end
 
 vim.cmd[[
     language en_US.utf8
 ]]
-
-
 

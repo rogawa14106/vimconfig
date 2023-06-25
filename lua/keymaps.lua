@@ -1,17 +1,17 @@
--- helper
+-- helper{{{
 local helper = require("helper")
-
--- set leader
+-- }}}
+-- set leader{{{
 vim.g.mapleader = " "
-
--- override
+-- }}}
+-- override{{{
 vim.keymap.set("n", "K", "k", { noremap = true })
-
+-- }}}
 -- normal
---vim.keymap.set("n", "<C-c>", ":nohl<CR>")
+--vim.keymap.set("n", "<C-c>", ":nohl<CR>"){{{
 vim.keymap.set("n", "<leader>k", "f<C-k>", { noremap = true })
 vim.keymap.set("n", "<leader>k", "F<C-k>", { noremap = true })
-
+-- }}}
 -- visual
 --vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv", { noremap = true })
 --vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv", { noremap = true })
@@ -20,6 +20,7 @@ vim.keymap.set("n", "<leader>k", "F<C-k>", { noremap = true })
 --vim.keymap.set("i", "<C-c>", "<Esc>", { noremap = true })
 
 -- insert & command
+-- move to inside{{{
 vim.keymap.set({ "i", "c" }, '""', '""<Left>', { noremap = true })
 vim.keymap.set({ "i", "c" }, "''", "''<Left>", { noremap = true })
 vim.keymap.set({ "i", "c" }, "()", "()<Left>", { noremap = true })
@@ -27,11 +28,11 @@ vim.keymap.set({ "i", "c" }, "[]", "[]<Left>", { noremap = true })
 vim.keymap.set({ "i", "c" }, "{}", "{}<Left>", { noremap = true })
 vim.keymap.set({ "i", "c" }, "<>", "<><Left>", { noremap = true })
 vim.keymap.set({ "i", "c" }, "%%", "%%<Left>", { noremap = true })
-
--- terminal
+-- }}}
+-- terminal{{{
 vim.keymap.set("t", "<C-\\>", "<C-\\><C-N>", { noremap = true })
-
--- web browse
+-- }}}
+-- web browse{{{
 -- https://test.com
 vim.keymap.set("n", "<C-b>", "", {
     noremap = true,
@@ -45,8 +46,8 @@ vim.keymap.set("n", "<C-b>", "", {
         vim.api.nvim_feedkeys(key, 'n', false)
     end,
 })
-
--- convert hiragana to katakana
+-- }}}
+-- convert hiragana to katakana{{{
 local hiraTokata = function(str)
     local chars = vim.fn.split(str, '\\zs')
     local newstr = ""
@@ -75,8 +76,8 @@ vim.keymap.set("v", "<F7>", "", {
         vim.fn.setreg("z", pre_zreg)
     end,
 })
-
--- surround_str
+-- }}}
+-- surround_str{{{
 local surround_str = function(lchar, rchar)
     -- leave visual mode
     local zreg = vim.fn.getreg("z")
@@ -109,9 +110,8 @@ create_keymap_surround_str("(", ")")
 create_keymap_surround_str("[", "]")
 create_keymap_surround_str("{", "}")
 create_keymap_surround_str("%", "%")
-
-
--- toggle comment
+-- }}}
+-- toggle comment{{{
 local comment_strs = {
     vim = '"',
     c   = '//',
@@ -170,8 +170,8 @@ vim.keymap.set("v", "<leader>/", "", {
     noremap = true,
     callback = tgl_commentout,
 })
-
--- change current working directory
+-- }}}
+-- change current working directory{{{
 vim.keymap.set("n", "<leader>cd", "", {
     noremap = true,
     callback = function()
@@ -186,8 +186,8 @@ vim.keymap.set("n", "<leader>cd", "", {
         helper.highlightEcho("info", "change cwd >> " .. cwd)
     end,
 })
-
--- switch buffer
+-- }}}
+-- switch buffer{{{
 local switchBuff = function(key)
     local block_table = {
         "bufctl_bufnr",
@@ -225,16 +225,47 @@ end
 vim.keymap.set("n", "<leader>l", "", {
     noremap = true,
     callback = function()
-        switchBuff('1')
+        switchBuff(1)
     end,
 })
 vim.keymap.set("n", "<leader>h", "", {
     noremap = true,
     callback = function()
-        switchBuff('0')
+        switchBuff(0)
     end,
 })
-
--- cnext, cNext
+-- }}}
+-- cnext, cNext{{{
 vim.keymap.set("n", "<leader>n", "<Cmd>cnext<CR>", { noremap = true })
 vim.keymap.set("n", "<leader>N", "<Cmd>cNext<CR>", { noremap = true })
+-- }}}
+-- highlighth color code{{{
+local hl_color_code = function()
+    local hlns = vim.api.nvim_get_namespaces()['hl_color_code']
+    if hlns ~= nil then
+        vim.api.nvim_buf_clear_namespace(0, vim.api.nvim_get_namespaces()['hl_color_code'], 0, vim.fn.line("$"))
+    end
+    local zreg = vim.fn.getreg("z")
+
+    vim.cmd('noautocmd normal! viw"zy')
+    local cc = vim.fn.getreg("z")
+    if string.match(cc, '%x%x%x%x%x%x') == nil then
+        return
+    end
+
+    vim.cmd("hi! ColorCodeF guifg=#" .. cc)
+    vim.cmd("hi! ColorCodeB guibg=#" .. cc)
+    local ns = vim.api.nvim_create_namespace('hl_color_code')
+    vim.api.nvim_buf_add_highlight(
+        0, ns, "ColorCodeF", vim.fn.line(".") - 1,
+        math.floor(vim.fn.col("$") / 2), vim.fn.col("$"))
+    vim.api.nvim_buf_add_highlight(
+        0, ns, "ColorCodeB", vim.fn.line(".") - 1,
+        0, math.floor(vim.fn.col("$") / 2) - 1)
+
+    vim.cmd('noautocmd normal! viw"zy')
+    vim.fn.setreg("z", zreg)
+end
+
+vim.api.nvim_set_keymap('n', '<leader>cc', '', { noremap = true, callback = hl_color_code })
+-- }}}

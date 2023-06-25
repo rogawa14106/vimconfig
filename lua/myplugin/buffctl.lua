@@ -27,7 +27,7 @@ function! BuffCtlFloat() abort
         let l:bufwidth  = l:longest_line + 1
     endif
     let l:bufrow    = &lines - l:bufheight - 5
-    let l:bufcol    = &columns - l:bufwidth - 4
+    let l:bufcol    = &columns - l:bufwidth - 3
     let l:enter = v:true
     let l:border_tr = "."
     let l:border_tl = "."
@@ -54,6 +54,7 @@ function! BuffCtlFloat() abort
         let g:bufctl_winid = nvim_open_win(g:bufctl_bufnr, l:enter, l:winconf)
         "set option
         call nvim_win_set_option(g:bufctl_winid, 'winhl', 'Normal:CursorLineNr')
+        call nvim_win_set_option(g:bufctl_winid, 'signcolumn', 'no')
         call matchadd('BufCtlLineTail', '\v[^/]+\.[^\. ]+$')
         highlight! def link BufCtlLineTail Title
         call matchadd('BufCtlCautionMark', '\v\[!\]')
@@ -74,7 +75,9 @@ function! BuffCtlFloat() abort
     setlocal noreadonly
 
     "delete all line
-    noautocmd normal! ggdG
+    let zreg = @z
+    noautocmd normal! gg"zdG
+    let @z = zreg
     "write bufline
     call appendbufline(g:bufctl_bufnr, 0, l:buflines)
 

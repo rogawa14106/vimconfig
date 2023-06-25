@@ -44,7 +44,7 @@ local hl_safe0 = { cterm = "22",  gui = "104810" }
 
 --local hl_emph0 = { cterm="62", gui="74607c" } -- CursorSearch
 local hl_emph0 = { cterm = "85",  gui = "95f0d0" } -- Sign, MatchParen, etc
-local hl_emph1 = { cterm = "60",  gui = "5f5030" } -- Search
+local hl_search = { cterm = "60",  gui = "5f5030" } -- Search
 
 local hl_mnorm = { cterm = "24",  gui = "304070" }
 local hl_mcomm = { cterm = "58",  gui = "583058" }
@@ -154,11 +154,11 @@ setHi("VertSplit", hl_sep01, hl_sep01, "none")
 
 setHi("Folded", hl_mono7, hl_blue0, "none")
 
-setHi("Search", hl_mono9, hl_emph1, "none")
-setHi("CurSearch", hl_mono9, hl_emph1, "underline")
-setHi("IncSearch", hl_mono9, hl_emph1, "underline")
+setHi("Search", hl_mono9, hl_search, "none")
+setHi("CurSearch", hl_mono9, hl_search, "underline")
+setHi("IncSearch", hl_mono9, hl_search, "underline")
 
-setHi("Substitute", unspec, hl_emph1, "none")
+setHi("Substitute", unspec, hl_search, "none")
 
 setHi("CursorLine", unspec, hl_mono2, "none")
 setHi("CursorColumn", hl_mono8, hl_mono2, "none")
@@ -172,12 +172,12 @@ setHi("LineNrBelow", hl_mono7, hl_mono2, "none")
 
 setHi("FoldColumn", hl_mono7, hl_mono2, "none")
 
-setHi("SignColumn", unspec, hl_mono2, "none")
+setHi("SignColumn", unspec, hl_mono1, "none")
 setHi("Sign", hl_emph0, unspec, "none")
 
 setHi("MatchParen", hl_emph0, hl_mono3, "none")
 
-setHi("ModeMsg", hl_mono9, hl_emph1, "none")
+setHi("ModeMsg", hl_mono9, hl_search, "none")
 setHi("MsgArea", hl_mono9, hl_mono1, "none")
 setHi("MsgSeparator", hl_mono9, hl_mono5, "none")
 
@@ -187,7 +187,7 @@ setHi("Question", hl_more0, unspec, "none")
 setHi("Pmenu", hl_mono9, hl_mono5, "none")
 setHi("PmenuSel", hl_mono9, hl_mono6, "none")
 setHi("PmenuSbar", hl_mono9, hl_mono3, "none")
-setHi("PmenuThumb", hl_mono9, hl_emph1, "none")
+setHi("PmenuThumb", hl_mono9, hl_search, "none")
 
 setHi("QuickFixLine", hl_mono9, hl_mono5, "none")
 
