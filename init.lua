@@ -66,7 +66,7 @@ require("mark")
 require("colors.dark")
 
 -- BufCtl
-require("myplugin.buffctl")
+require("myplugin.bufctl")
 
 -- floatScrool
 require("myplugin.floatscroll")

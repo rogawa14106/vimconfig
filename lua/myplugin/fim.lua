@@ -371,7 +371,7 @@ local function create_inputbox(config)
     })
 
     -- set options
-    vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'winhl', 'Normal:NormalFloat')
+    vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'winhl', 'Normal:Visual')
     vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'signcolumn', 'no')
     vim.api.nvim_buf_set_option(0, 'modifiable', true)
     vim.api.nvim_buf_set_option(0, 'readonly', false)
@@ -383,7 +383,7 @@ local function create_prompt(config, prompt)
     vim.g.fim_prompt_winid = vim.api.nvim_open_win(vim.g.fim_prompt_bufnr, false, config)
     writeLine(vim.g.fim_prompt_bufnr, 0, -1, { prompt })
 
-    vim.api.nvim_win_set_option(vim.g.fim_prompt_winid, 'winhl', 'Normal:NormalFloat')
+    vim.api.nvim_win_set_option(vim.g.fim_prompt_winid, 'winhl', 'Normal:Visual')
     vim.api.nvim_buf_set_option(vim.g.fim_prompt_bufnr, 'modifiable', true)
     vim.api.nvim_buf_set_option(vim.g.fim_prompt_bufnr, 'readonly', false)
 end

@@ -122,7 +122,8 @@ setHi("Todo", hl_mono9, hl_warn0, "none")
 ----- highlight-group ------"
 setHi("Normal", hl_mono9, hl_mono1, "none")
 setHi("NormalNC", hl_mono8, hl_mono1, "none")
-setHi("NormalFloat", hl_mono9, hl_mono5, "none")
+-- setHi("NormalFloat", hl_mono9, hl_mono5, "none")
+setHi("NormalFloat", hl_mono9, hl_mono2, "none")
 setHi("FloatBorder", hl_mono7, hl_mono1, "none")
 
 setHi("NonText", hl_mono3, unspec, "none")

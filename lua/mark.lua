@@ -4,7 +4,6 @@ local visualMark = function()
     local marklist = vim.fn.getmarklist(bufnr)
     local marklist2 = vim.fn.getmarklist()
     for i = 1, #marklist2 do
-        -- print(marklist2[i].pos[1], bufnr, marklist2[i].mark)
         if marklist2[i].pos[1] == bufnr then
             marklist[#marklist + 1] = marklist2[i]
         end
@@ -14,9 +13,13 @@ local visualMark = function()
         local mark = marklist[i].mark
         local markchar = mark:sub(2, 2)
         if vim.fn.sign_getdefined(markchar)[1] == nil then
+            local hl = "Title"
+            if string.match(markchar, '[a-z]') == nil then
+                hl = "MoreMsg"
+            end
             local sign_opt = {
                 text = '›' .. markchar,
-                texthl = "MoreMsg",
+                texthl = hl,
             }
             vim.fn.sign_define(markchar, sign_opt)
         end
@@ -29,11 +32,6 @@ local visualMark = function()
             { lnum = marklist[i].pos[2] }) --line nr
     end
 end
-vim.api.nvim_create_augroup("visualmark", {})
-vim.api.nvim_create_autocmd('CursorMoved', {
-    group = 'visualmark',
-    callback = visualMark,
-})
 
 local delMark = function()
     local bufnr = vim.fn.bufnr()
@@ -55,10 +53,17 @@ local delMark = function()
     end
 end
 
+vim.opt.signcolumn = "auto:2"
+
+vim.api.nvim_create_augroup("visualmark", {})
+vim.api.nvim_create_autocmd('CursorMoved', {
+    group = 'visualmark',
+    callback = visualMark,
+})
+
 vim.api.nvim_set_keymap("n", "<leader>md", "", {
     noremap = true,
     callback = delMark,
 })
 
-vim.opt.signcolumn = "auto:2"
 

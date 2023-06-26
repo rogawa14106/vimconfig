@@ -603,7 +603,7 @@ init_eim = function()
     }
     local config_main       = {
         window = win_config_main,
-        color = "CursorLineNr",
+        color = "NormalFloat",
     }
 
     --# information window config
