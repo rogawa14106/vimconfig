@@ -361,8 +361,8 @@ MyTabLine = function()
 
     tabstring = tabstring .. [[%T%#TabLineFill#%=]]
 
-    local pwd = vim.fn.getcwd()
-    tabstring = tabstring .. [[%#TabLineSel# pwd: ]] .. pwd .. ' '
+    local cwd = vim.fn.getcwd()
+    tabstring = tabstring .. [[%#TabLineSel# cwd: ]] .. cwd .. ' '
     tabstring = tabstring .. [[%#TabLineFill#]]
 
     return tabstring

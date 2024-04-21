@@ -88,8 +88,13 @@ local new_BufCtl = function()
             local bufname = vim.fs.normalize(bufinfo.name)
             -- replace cwd
             bufname = string.gsub(bufname, cwd, ".")
-            -- replace C:/Users/USERNAME
-            local userprofile = vim.fs.normalize(vim.env.USERPROFILE)
+            -- get userprofile
+            local userprofile
+            if vim.fn.has('win32') == 1 then
+                userprofile = vim.fs.normalize(vim.env.USERPROFILE)
+            else
+                userprofile = vim.fs.normalize(vim.env.HOME)
+            end
             bufname = string.gsub(bufname, userprofile, "~")
             if bufinfo.variables.term_title ~= nil then
                 bufname = 'Terminal'

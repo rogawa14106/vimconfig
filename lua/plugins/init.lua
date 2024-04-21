@@ -36,3 +36,7 @@ require("plugins.treesitter")
 
 -- === lsp ===
 require("plugins.lsp")
+
+
+-- === others ===
+require("plugins.netrw")

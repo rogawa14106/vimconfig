@@ -1,7 +1,20 @@
--- :h treesitter-highlight-groups
-require('nvim-treesitter.configs').setup{
-    --ensure_installed = {"lua", "vim"}
+--   ========================= --
+--  //  TREESITTER CONFIG  //  --
+-- =========================   --
 
+-- {{{ IF AN UNEXPECTED ERROR OCCURS, RUN THE FOLLOWING COMMANDS TO UPDATE PARSER.
+-- :TSUPDATE
+-- :TSUninstall <filetype>
+-- :TSinstall <filetype>
+-- }}}
+
+-- :h treesitter-highlight-groups
+require('nvim-treesitter.configs').setup {
+    ensure_installed = {
+        "lua",
+        "vim",
+        "c"
+    },
     highlight = {
         enable = true,
         --additional_vim_regex_highlighting = false
@@ -13,9 +26,9 @@ require('nvim-treesitter.configs').setup{
 
 --[[
 vim.cmd [[
-    "set foldmethod=expr
-    set foldexpr=nvim_treesitter#foldexpr()
-    "set nofoldenable   
+"set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
+"set nofoldenable
 ]]
 
 --[[

@@ -1545,4 +1545,3 @@ command! MW call s:open_mini_currentbuf()
 "stopinsert
 "wincmd
 "}}}
-

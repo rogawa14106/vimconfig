@@ -18,24 +18,26 @@ local comment_strs = {
     lua = '--',
     bat = 'rem',
     ps1 = '#',
+    sh  = '#',
 }
 
-local commentout_line = function(comment_str, linenr)
+local attach_comment = function(comment_str, linenr)
     vim.fn.setpos(".", { 0, linenr, 0, 0 })
-    vim.cmd("noautocmd normal! ^i" .. comment_str .. " ")
+    vim.cmd("noautocmd normal! 0i" .. comment_str .. " ")
 end
 
-local nocommentout = function(top, bot, comment_str)
+local deattach_comment = function(top, bot, comment_str)
     local cmd = top .. "," .. bot .. "s/\\v" .. comment_str .. "(\\s|)//"
     vim.cmd(cmd)
+    vim.cmd("nohl")
 end
 
-local tgl_commentout = function()
+local tgl_comment = function()
     -- def commentout str
     local extension = vim.fn.expand("%:e")
     local comment_str = comment_strs[extension]
     if comment_str == nil then
-        return
+        comment_str = "#"
     end
 
     -- leave visual
@@ -58,16 +60,16 @@ local tgl_commentout = function()
 
     if is_commented == nil then
         for i = pos[1], pos[2] do
-            commentout_line(comment_str, i)
+            attach_comment(comment_str, i)
         end
     else
-        nocommentout(pos[1], pos[2], comment_str)
+        deattach_comment(pos[1], pos[2], comment_str)
     end
 end
 
 vim.keymap.set("v", "<leader>/", "", {
     noremap = true,
-    callback = tgl_commentout,
+    callback = tgl_comment,
 })
 -- }}}
 -- change current working directory{{{

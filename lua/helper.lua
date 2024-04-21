@@ -66,7 +66,8 @@ local highlightInput = function(type, prompt, text)
     return inputstr
 end
 
-local vimrc_path = vim.fs.normalize(vim.env.MYVIMRC)
+-- local vimrc_path = vim.fs.normalize(vim.env.MYVIMRC)
+local vimrc_path = vim.env.MYVIMRC
 local vimrcdir = vim.fs.dirname(vimrc_path)
 
 return {

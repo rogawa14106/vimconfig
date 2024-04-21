@@ -1,3 +1,7 @@
+--   ========================= --
+--  //   HIGHLIGHT CONFIG  //  --
+-- =========================   --
+--
 -- {{{ highlight configrator
 local function setHi(group, fg, bg, attr)
     if (fg['cterm'] ~= nil) then
@@ -32,27 +36,27 @@ local hl_mono7 = { cterm = "250", gui = "787888" }
 local hl_mono8 = { cterm = "253", gui = "c0c0d8" }
 local hl_mono9 = { cterm = "253", gui = "d8d8e8" }
 
-local hl_blue0 = { cterm = "24",  gui = "102038" }
+local hl_blue0 = { cterm = "24", gui = "102038" }
 local hl_blue1 = { cterm = "111", gui = "9ba2f3" }
 local hl_blue2 = { cterm = "117", gui = "95d0f0" }
-local hl_blue3 = { cterm = "75",  gui = "439bbc" }
+local hl_blue3 = { cterm = "75", gui = "439bbc" }
 
 local hl_erro0 = { cterm = "124", gui = "481010" }
-local hl_erro1 = { cterm = "9",   gui = "c03838" }
-local hl_warn0 = { cterm = "3",   gui = "505018" }
-local hl_safe0 = { cterm = "22",  gui = "104810" }
+local hl_erro1 = { cterm = "9", gui = "c03838" }
+local hl_warn0 = { cterm = "3", gui = "505018" }
+local hl_safe0 = { cterm = "22", gui = "104810" }
 
 --local hl_emph0 = { cterm="62", gui="74607c" } -- CursorSearch
-local hl_emph0 = { cterm = "85",  gui = "95f0d0" } -- Sign, MatchParen, etc
-local hl_search = { cterm = "60",  gui = "5f5030" } -- Search
+local hl_emph0 = { cterm = "85", gui = "95f0d0" }   -- Sign, MatchParen, etc
+local hl_search = { cterm = "60", gui = "5f5030" }  -- Search
 
-local hl_mnorm = { cterm = "24",  gui = "304070" }
-local hl_mcomm = { cterm = "58",  gui = "583058" }
+local hl_mnorm = { cterm = "24", gui = "304070" }
+local hl_mcomm = { cterm = "58", gui = "583058" }
 --local hl_mvisu = { cterm="23", gui="307040" }
-local hl_minse = { cterm = "95",  gui = "803030" }
-local hl_mvisu = { cterm = "23",  gui = "15504e" }
-local hl_mterm = { cterm = "0",   gui = "304070" }
-local hl_mtjob = { cterm = "0",   gui = "080810" }
+local hl_minse = { cterm = "95", gui = "803030" }
+local hl_mvisu = { cterm = "23", gui = "15504e" }
+local hl_mterm = { cterm = "0", gui = "304070" }
+local hl_mtjob = { cterm = "0", gui = "080810" }
 
 local hl_sep01 = { cterm = "237", gui = "282830" }
 
@@ -61,7 +65,7 @@ local hl_num01 = { cterm = "114", gui = "abddb6" }
 local hl_idf02 = { cterm = "229", gui = "f0f0ae" }
 local hl_stm02 = { cterm = "218", gui = "f39bbc" }
 local hl_prp01 = { cterm = "168", gui = "e69bf3" }
-local hl_typ01 = { cterm = "43",  gui = "77c89e" }
+local hl_typ01 = { cterm = "43", gui = "77c89e" }
 local hl_spe01 = { cterm = "229", gui = "fff9b3" }
 local hl_more0 = { cterm = "140", gui = "c29bf3" }
 ---}}}
@@ -123,7 +127,7 @@ setHi("Todo", hl_mono9, hl_warn0, "none")
 setHi("Normal", hl_mono9, hl_mono1, "none")
 setHi("NormalNC", hl_mono8, hl_mono1, "none")
 -- setHi("NormalFloat", hl_mono9, hl_mono5, "none")
-setHi("NormalFloat", hl_mono9, hl_mono2, "none")
+setHi("NormalFloat", hl_mono9, hl_mono3, "none")
 setHi("FloatBorder", hl_mono7, hl_mono1, "none")
 
 setHi("NonText", hl_mono3, unspec, "none")
@@ -195,9 +199,9 @@ setHi("QuickFixLine", hl_mono9, hl_mono5, "none")
 setHi("SpecialKey", hl_mono6, unspec, "none")
 
 setHi("SpellBad", hl_mono9, hl_erro1, "none")
-setHi("SpellCap", hl_mono9, hl_mono1, "none")
-setHi("SpellLocal", hl_mono9, hl_mono1, "none")
-setHi("SpellRare", hl_mono9, hl_mono1, "none")
+setHi("SpellCap", hl_mono9, hl_erro1, "none")
+setHi("SpellLocal", hl_mono9, hl_erro1, "none")
+setHi("SpellRare", hl_mono9, hl_erro1, "none")
 
 setHi("StatusLine", hl_mono9, hl_sep01, "none")
 setHi("StatusLineNC", hl_sep01, hl_sep01, "none")
@@ -229,15 +233,9 @@ setHi("mModeTerm", hl_mono9, hl_mterm, "none")
 setHi("mModeTJob", hl_mono9, hl_mtjob, "none")
 
 -- #user defined syntax
--- headline
-setHi("uHead0", { cterm = "49", gui = "95f0d0" }, unspec, "none")
-setHi("uHead1", { cterm = "42", gui = "65c090" }, unspec, "none")
-setHi("uHead2", { cterm = "35", gui = "359060" }, unspec, "none")
--- list
-setHi("uList0", { cterm = "45", gui = "95d0f0" }, unspec, "none")
 -- address
 setHi("uAddress", { cterm = "49", gui = "95f0d0" }, unspec, "none")
--- others
+-- chars
 setHi("uMultiSpace", unspec, hl_mono6, "underline")
 setHi("uParen", hl_mono5, unspec, "none")
 
@@ -245,15 +243,10 @@ vim.api.nvim_create_augroup('highlightUserSyntax', {})
 vim.api.nvim_create_autocmd('BufEnter', {
     group = 'highlightUserSyntax',
     callback = (function()
-        vim.cmd("syntax match uHead0 '\\v^\\s*#'")
-        vim.cmd("syntax match uHead1 '\\v^\\s*##'")
-        vim.cmd("syntax match uHead2 '\\v^\\s*###'")
-        vim.cmd("syntax match uList0 '\\v^\\s*-'")
         vim.cmd("syntax match uParen '\\v[{}]{3}'")
-        vim.cmd("syntax match uAddress '\\v\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}'")
-        vim.cmd("syntax match uAddress '\\v[\\dA-Fa-f]{2}([:-][0-9A-Fa-f]{2}){5}'")
+        vim.cmd("syntax match uAddress '\\v\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}'") -- IP
+        vim.cmd("syntax match uAddress '\\v[0-9A-Fa-f]{2}([:-][0-9A-Fa-f]{2}){5}'")     -- MAC
         vim.cmd("syntax match uMultiSpace '　'")
-        vim.cmd("syntax match uAddress '\\v[/\\|][#/\\|_]+[/\\|_]'")
     end)
 })
 --}}}

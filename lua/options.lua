@@ -35,7 +35,7 @@ set.undofile = false
 -- file enc, format
 set.encoding = 'utf-8'
 set.fileencodings = {'utf-8', 'sjis'}
-set.fileformats = {'dos', 'unix', 'mac'}
+set.fileformats = {'unix', 'mac', 'dos'}
 set.ambiwidth = 'double'
 
 -- clipboard

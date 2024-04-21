@@ -9,12 +9,13 @@
 
 -- NOTE =================================================================================================================={{{
 
--- {{{ must be done in unix env
+-- {{{ About line break codes
 -- run the following command.
 -- :set ff=unix | w
+-- :set ff=dos | w
 -- }}}
 -- {{{ about commands
--- To use the commands below, you need to be in your path.
+-- To use the following command to change the IME, you need to be in your path.(windows only)
 -- chime, hidesb
 -- To get executable file of the above command, run the following command.
 -- > git clone https://github.com/rogawa14106/vimconfig
@@ -42,7 +43,7 @@
 -- requires =============================================================================================================={{{
 
 -- helper functions
-require("helper")
+--require("helper")
 
 -- basic options
 require("options")
@@ -53,7 +54,7 @@ require("commands")
 -- keymapping
 require("keymaps")
 
---autocmds
+-- auto cmds
 require("autocmds")
 
 -- fold, status, tab lines
@@ -62,9 +63,12 @@ require("ui_lines")
 -- mark utility
 require("mark")
 
--- colorscheme
-require("colors.dark")
 
+-- {{{ colorscheme
+require("colors.dark")
+-- }}}
+--
+-- {{{ myplugin
 -- BufCtl
 require("myplugin.bufctl")
 
@@ -80,14 +84,19 @@ require("myplugin.eim")
 -- clock
 require("myplugin.clock")
 
+-- clock
+require("myplugin.translator")
+-- }}}
+--
+-- {{{ plugins
 -- bulidin plugins
 require("plugins.netrw")
 
--- plugins (packer.nvim managed)
-if vim.fn.isdirectory("~/AppData/Local/nvim-data/pack/packer/opt/packer.nvim") then
-    --$ git clone https://github.com/wbthomason/packer.nvim ~/AppData/Local/nvim-data/pack/packer/opt/packer.nvim
-    require("plugins")
-end
---require("lsp")
+-- plugins
+-- ## run following command to use plugins
+-- $ git clone https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+-- :PackerInstall
+-- :PackerSync
+require("plugins")
+-- }}}
 --========================================================================================================================}}}
-
