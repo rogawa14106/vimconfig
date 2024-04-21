@@ -198,8 +198,8 @@ local new_BufCtl = function()
         end
 
         if (g_winid == nil) or (#vim.fn.win_findbuf(bufnr) < 1) then
-            -- target window has not been opend since vim launched
-            -- or not found target buffer on current window
+            -- if target window has not been opend since vim launched
+            -- or if not found target buffer on current window
             winid = vim.api.nvim_open_win(bufnr, win_config.focusable, win_config)
             return { bufnr = bufnr, winid = winid }
         else

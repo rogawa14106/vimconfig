@@ -61,27 +61,28 @@ require("ui_lines")
 require("colors.dark")
 -- }}}
 --
--- {{{ myplugin
+-- {{{ utilitys
 -- BufCtl
-require("myplugin.bufctl")
+require("util.bufctl")
 
 -- floatScrool
-require("myplugin.floatscroll")
+require("util.floatscroll")
 
 -- fuzzy finder
-require("myplugin.fim")
+require("util.fim")
 
 -- file explorer
-require("myplugin.eim")
+require("util.eim")
 
 -- clock
-require("myplugin.clock")
+require("util.clock")
 
--- clock
-require("myplugin.translator")
+-- translator
+require("util.translator")
 
 -- mark utility
-require("myplugin.visualmark")
+require("util.visualmark")
+
 -- }}}
 --
 -- {{{ plugins
