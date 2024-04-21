@@ -53,7 +53,7 @@ require("commands")
 
 -- keymapping
 require("keymaps")
---
+
 -- auto cmds
 require("autocmds")
 
