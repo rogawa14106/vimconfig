@@ -22,13 +22,14 @@ display_result = function(result)
 
     -- define floating window options
     --     local pos = vim.fn.getpos(".")
-    local width = line_longest
-    if width > 80 then
-        width = 80
-    end
     local height = math.floor(#lines * 1.2)
     if #lines > 50 then -- max 50 lines
         height = 50
+    end
+    local width = line_longest
+    if width > 80 then
+        width = 80
+        height = height + 1
     end
     local border_off = 2
     local offset = 1
@@ -44,7 +45,7 @@ display_result = function(result)
         height    = height,
         --         col       = vim.opt.columns:get() - width - border_off - offset,
         --         row       = vim.opt.lines:get() - height - border_off - offset - 1,
-        col       = 0,
+        col       = 1,
         row       = 1,
         --         border    = border,
         --         title     = "vim translation ",
@@ -240,6 +241,15 @@ vim.keymap.set("n", "<Space>?", "", {
 
 
 --[[ translate test
+Open a window and display the help file in read-only
+mode.  If there is a help window open already, use
+that one.  Otherwise, if the current window uses the
+full width of the screen or is at least 80 characters
+wide, the help window will appear just above the
+current window.  Otherwise the new window is put at
+the very top.
+The 'helplang' option is used to select a language, if
+the main help file is available in several languages.
 Open a window and display the help file in read-only
 mode.  If there is a help window open already, use
 that one.  Otherwise, if the current window uses the
