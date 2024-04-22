@@ -18,7 +18,10 @@ local floatwindow = function()
         init = function() end,
         create_buf = function() end,
         open_win = function() end,
+        change_opt = function()end,
         write_lines = function() end,
+        close_win = function() end,
+        send_cmd = function() end,
     }
 
     -- private members
@@ -30,8 +33,10 @@ local floatwindow = function()
         -- member methods
         debug_print = function() end,
         set_keymap = function() end,
-        set_highlight = function() end,
         set_autocmd = function() end,
+        set_bufopt = function() end,
+        set_winopt = function() end,
+        set_highlight = function() end,
     }
 
     self.init = function(opt)
@@ -95,28 +100,34 @@ local floatwindow = function()
         vim.cmd("redraw")
     end
 
-    self.redraw_win = function(opt_win)
-        if self.winid == nil then
-            helper.highlightEcho("error", "floating window has not opened")
-            return
-        end
-        -- self.write_lines(0, -1, self.buflines)
-        --         local winconfig = {
-        --             height = #self.buflines,
-        --             width = self.longest_line + 1,
-        --         }
-        vim.api.nvim_win_set_config(self.winid, opt_win)
-        vim.api.nvim_win_set_option(self.winid, 'signcolumn', 'no')
-    end
+--     self.redraw_win = function(opt_win)
+--         if self.winid == nil then
+--             helper.highlightEcho("error", "floating window has not opened")
+--             return
+--         end
+--         vim.api.nvim_win_set_config(self.winid, opt_win)
+--         vim.api.nvim_win_set_option(self.winid, 'signcolumn', 'no')
+--     end
 
     self.close_win = function()
+        _self.debug_print(0, "close_win")
         if (self.winid ~= nil) and (#vim.fn.win_findbuf(self.bufnr) > 0) then
             vim.api.nvim_win_close(self.winid, true)
         end
         local augroup_id = vim.api.nvim_create_augroup(self.opt.name, { clear = true })
         if augroup_id ~= nil then
+            _self.debug_print(1, "delete all autocmd")
             vim.api.nvim_del_augroup_by_id(augroup_id)
         end
+    end
+
+    self.change_opt = function()
+        _self.debug_print(0, "close_win")
+    end
+
+    self.send_cmd = function(cmd)
+        _self.debug_print(0, "close_win")
+        vim.cmd(cmd)
     end
 
     _self.set_keymap = function()
@@ -177,6 +188,7 @@ local floatwindow = function()
                 _self.debug_print(1, "no autocmd options in index " .. i)
             else
                 if autocmd.is_buf == true then
+                    _self.debug_print(1, "set buf autocmd option " .. i)
                     vim.api.nvim_create_autocmd(autocmd.events, {
                         buffer = self.bufnr,
                         group = self.opt.name,
@@ -184,6 +196,7 @@ local floatwindow = function()
                         --                     once = autocmd.once,
                     })
                 else
+                    _self.debug_print(1, "set autocmd option " .. i)
                     vim.api.nvim_create_autocmd(autocmd.events, {
                         group = self.opt.name,
                         callback = autocmd.callback,

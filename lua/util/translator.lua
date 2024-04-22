@@ -4,13 +4,31 @@ local helper = require('../helper')
 -- display translation result
 local display_result
 display_result = function(result)
+    -- molding text
+    local br_char = "。"
+    local lines = vim.fn.split(result, br_char)
+    local line_longest = 0
+    for i = 1, #lines do
+        lines[i] = lines[i] .. br_char
+        local line_len = #lines[i]
+        if line_longest < line_len then
+            line_longest = line_len
+        end
+    end
+
     -- create instance of floatwindow
     local translate_fw = uilib.floatwindow()
 
     -- define options
-    local pos = vim.fn.getpos(".")
-    local width = 100
-    local height = 30
+    --     local pos = vim.fn.getpos(".")
+    local width = line_longest
+    if width > 80 then
+        width = 80
+    end
+    local height = math.floor(#lines*1.2)
+    if #lines > 50 then -- max 50 lines
+        height = 50
+    end
     local border_off = 2
     local offset = 1
     local border = {
@@ -23,15 +41,16 @@ display_result = function(result)
         --         focusable = false,
         width     = width,
         height    = height,
-        col       = vim.opt.columns:get() - width - border_off - offset,
-        row       = vim.opt.lines:get() - height - border_off - offset - 1,
-        --         col       = 0,
-        --         row       = 1,
-        border    = border,
-        title     = "vim translation ",
+        --         col       = vim.opt.columns:get() - width - border_off - offset,
+        --         row       = vim.opt.lines:get() - height - border_off - offset - 1,
+        col       = 0,
+        row       = 1,
+        --         border    = border,
+        --         title     = "vim translation ",
         style     = 'minimal',
-        --         relative  = "cursor",
-        relative  = "editor",
+        relative  = "cursor",
+        anchor    = "NW",
+        --         relative  = "editor",
     }
 
     local opt = {
@@ -66,16 +85,27 @@ display_result = function(result)
             },
         },
         autocmd = {
-            --             {
-            --                 is_buf = false,
-            --                 events = {
-            --                     "CursorMoved"
-            --                 },
-            --                 callback = function()
-            --                     print("uilib autocmd called")
-            --                     translate_fw.close_win()
-            --                 end,
-            --             },
+--             {
+--                 is_buf = false,
+--                 events = {
+--                     "CursorMoved"
+--                 },
+--                 callback = function()
+--                     print("uilib autocmd called")
+--                     translate_fw.close_win()
+--                 end,
+--             },
+--             {
+--                 is_buf = true,
+--                 events = {
+--                     "CompleteDone",
+-- --                     "BufWinEnter",
+--                 },
+--                 callback = function()
+--                     vim.cmd("noautocmd normal! gg")
+--                     print("autocmd bufwinenter called")
+--                 end,
+--             },
         },
         winopt = {
             {
@@ -90,17 +120,8 @@ display_result = function(result)
     }
     translate_fw.init(opt)
 
-    translate_fw.write_lines(0, -1, { result })
-    -- TODO
-    -- 。の置換は、vim側でやる。writelineしてから%sで置換 -> 。がない場合にエラーが出る
-    -- もしくは、write lines する前にVIM側でSplit
-    vim.cmd("set modifiable")
-    vim.cmd("set noreadonly")
-    vim.cmd("%s/。/。\r/g")
-    vim.cmd("set nomodifiable")
-    vim.cmd("set readonly")
-    --     local lines = require('../util/lib').split(result, "。")
-    --     translate_fw.write_lines(0, -1, lines)
+    translate_fw.write_lines(0, -1, lines)
+    translate_fw.send_cmd("noautocmd normal! gg0")
 end
 
 -- get text selected on visual mode
@@ -179,7 +200,8 @@ translate = function(params)
     local res = hit_translation_api(params)
     if res == "" then
         -- if response was empty, print error
-        display_result(res)
+        helper.highlightEcho("error", "failed to translate text")
+        return
     else
         -- print translate result
         display_result(res)
