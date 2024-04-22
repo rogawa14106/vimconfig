@@ -4,12 +4,13 @@ local helper = require('../helper')
 -- display translation result
 local display_result
 display_result = function(result)
-    -- molding text
+    -- text molding
     local br_char = "。"
-    local lines = vim.fn.split(result, br_char)
+    local lines = vim.fn.split(result, br_char .. '\\zs')
+
+    -- count number of char of longest line
     local line_longest = 0
     for i = 1, #lines do
-        lines[i] = lines[i] .. br_char
         local line_len = #lines[i]
         if line_longest < line_len then
             line_longest = line_len
@@ -19,13 +20,13 @@ display_result = function(result)
     -- create instance of floatwindow
     local translate_fw = uilib.floatwindow()
 
-    -- define options
+    -- define floating window options
     --     local pos = vim.fn.getpos(".")
     local width = line_longest
     if width > 80 then
         width = 80
     end
-    local height = math.floor(#lines*1.2)
+    local height = math.floor(#lines * 1.2)
     if #lines > 50 then -- max 50 lines
         height = 50
     end
@@ -85,27 +86,27 @@ display_result = function(result)
             },
         },
         autocmd = {
---             {
---                 is_buf = false,
---                 events = {
---                     "CursorMoved"
---                 },
---                 callback = function()
---                     print("uilib autocmd called")
---                     translate_fw.close_win()
---                 end,
---             },
---             {
---                 is_buf = true,
---                 events = {
---                     "CompleteDone",
--- --                     "BufWinEnter",
---                 },
---                 callback = function()
---                     vim.cmd("noautocmd normal! gg")
---                     print("autocmd bufwinenter called")
---                 end,
---             },
+            --             {
+            --                 is_buf = false,
+            --                 events = {
+            --                     "CursorMoved"
+            --                 },
+            --                 callback = function()
+            --                     print("uilib autocmd called")
+            --                     translate_fw.close_win()
+            --                 end,
+            --             },
+            --             {
+            --                 is_buf = true,
+            --                 events = {
+            --                     "CompleteDone",
+            -- --                     "BufWinEnter",
+            --                 },
+            --                 callback = function()
+            --                     vim.cmd("noautocmd normal! gg")
+            --                     print("autocmd bufwinenter called")
+            --                 end,
+            --             },
         },
         winopt = {
             {
@@ -124,23 +125,27 @@ display_result = function(result)
     translate_fw.send_cmd("noautocmd normal! gg0")
 end
 
--- get text selected on visual mode
+-- get text that selected on visual mode
 local get_selected_txt
 get_selected_txt = function()
+    --     local pos = vim.fn.getpos(".")
     local zreg_bf = vim.fn.getreg("z")
     vim.cmd('noautocmd normal! "zy')
     local zreg_af = vim.fn.getreg("z")
     vim.fn.setreg("z", zreg_bf)
+    --     vim.fn.setpos(".", pos)
     return zreg_af
 end
 
 -- get text that under cursor
 local get_cursor_txt
 get_cursor_txt = function()
+    --     local pos = vim.fn.getpos(".")
     local zreg_bf = vim.fn.getreg("z")
     vim.cmd('noautocmd normal! viw"zy')
     local zreg_af = vim.fn.getreg("z")
     vim.fn.setreg("z", zreg_bf)
+    --     vim.fn.setpos(".", pos)
     return zreg_af
 end
 
@@ -234,7 +239,7 @@ vim.keymap.set("n", "<Space>?", "", {
 })
 
 
---[[
+--[[ translate test
 Open a window and display the help file in read-only
 mode.  If there is a help window open already, use
 that one.  Otherwise, if the current window uses the
