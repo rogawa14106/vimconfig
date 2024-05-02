@@ -1,6 +1,4 @@
 local helper = require('../helper')
--- fw: floatwindow
--- buf: buffer
 
 local floatwindow = function()
     print("########## new floatwindow ##########")
@@ -18,7 +16,7 @@ local floatwindow = function()
         init = function() end,
         create_buf = function() end,
         open_win = function() end,
-        change_opt = function()end,
+        change_opt = function() end,
         write_lines = function() end,
         close_win = function() end,
         send_cmd = function() end,
@@ -43,16 +41,17 @@ local floatwindow = function()
         _self.debug_print(0, "init")
         self.init_opt = opt
         self.opt = opt
-        _self.bufnr_key = self.opt.name .. "_bufnr"
 
-        print(vim.inspect(self.opt))
+        _self.bufnr_key = self.opt.name .. "_bufnr"
 
         self.create_buf()
         self.open_win()
-        _self.set_keymap()
-        _self.set_autocmd()
+        self.write_lines(0, -1, self.opt.initial_lines)
         _self.set_bufopt()
         _self.set_winopt()
+        _self.set_keymap()
+        _self.set_highlight()
+        _self.set_autocmd()
     end
 
     self.create_buf = function()
@@ -92,6 +91,7 @@ local floatwindow = function()
     end
 
     self.write_lines = function(startl, endl, lines)
+        _self.debug_print(0, "write_lines")
         vim.api.nvim_buf_set_option(self.bufnr, 'modifiable', true)
         vim.api.nvim_buf_set_option(self.bufnr, 'readonly', false)
         vim.api.nvim_buf_set_lines(self.bufnr, startl, endl, false, lines)
@@ -100,14 +100,14 @@ local floatwindow = function()
         vim.cmd("redraw")
     end
 
---     self.redraw_win = function(opt_win)
---         if self.winid == nil then
---             helper.highlightEcho("error", "floating window has not opened")
---             return
---         end
---         vim.api.nvim_win_set_config(self.winid, opt_win)
---         vim.api.nvim_win_set_option(self.winid, 'signcolumn', 'no')
---     end
+    --     self.redraw_win = function(opt_win)
+    --         if self.winid == nil then
+    --             helper.highlightEcho("error", "floating window has not opened")
+    --             return
+    --         end
+    --         vim.api.nvim_win_set_config(self.winid, opt_win)
+    --         vim.api.nvim_win_set_option(self.winid, 'signcolumn', 'no')
+    --     end
 
     self.close_win = function()
         _self.debug_print(0, "close_win")
@@ -126,7 +126,8 @@ local floatwindow = function()
     end
 
     self.send_cmd = function(cmd)
-        _self.debug_print(0, "close_win")
+        _self.debug_print(0, "send_cmd")
+        _self.debug_print(1, "cmd: " .. cmd)
         vim.cmd(cmd)
     end
 
@@ -146,21 +147,20 @@ local floatwindow = function()
         -- TODO too nested
         for i = 1, #keymap_table do
             local keymap = keymap_table[i]
-            if keymap == {} then
-                _self.debug_print(1, "no keymap options in index " .. i)
-            else
-                if keymap.is_buf == true then
-                    vim.api.nvim_buf_set_keymap(self.bufnr, keymap.mode, keymap.lhs, keymap.rhs, {
-                        noremap = keymap.noremap,
-                        callback = keymap.callback,
-                    })
-                else
-                    vim.api.nvim_set_keymap(keymap.mode, keymap.lhs, keymap.rhs, {
-                        noremap = keymap.noremap,
-                        callback = keymap.callback,
-                    })
-                end
+            local require_opts = { "is_buf", "mode", "lhs", "rhs" }
+            if _self.validate_table(keymap, require_opts) == false then
+                helper.highlightEcho("error",
+                    "invalid keymap options. require following keys" .. vim.inspect(require_opts))
+                goto continue
             end
+
+            _self.debug_print(1, "keymap opt: " .. vim.inspect(keymap))
+            if keymap.is_buf == true then
+                vim.api.nvim_buf_set_keymap(self.bufnr, keymap.mode, keymap.lhs, keymap.rhs, keymap.opts)
+            else
+                vim.api.nvim_set_keymap(keymap.mode, keymap.lhs, keymap.rhs, keymap.opts)
+            end
+            ::continue::
         end
     end
 
@@ -181,29 +181,26 @@ local floatwindow = function()
         vim.api.nvim_create_augroup(self.opt.name, { clear = true })
 
         -- create autocmd
-        -- TODO too nested
         for i = 1, #autocmd_table do
             local autocmd = autocmd_table[i]
-            if autocmd == {} then
-                _self.debug_print(1, "no autocmd options in index " .. i)
-            else
-                if autocmd.is_buf == true then
-                    _self.debug_print(1, "set buf autocmd option " .. i)
-                    vim.api.nvim_create_autocmd(autocmd.events, {
-                        buffer = self.bufnr,
-                        group = self.opt.name,
-                        callback = autocmd.callback,
-                        --                     once = autocmd.once,
-                    })
-                else
-                    _self.debug_print(1, "set autocmd option " .. i)
-                    vim.api.nvim_create_autocmd(autocmd.events, {
-                        group = self.opt.name,
-                        callback = autocmd.callback,
-                        --                     once = autocmd.once,
-                    })
-                end
+            local require_opts = { "is_buf", "event", "opts" }
+            if _self.validate_table(autocmd, require_opts) == false then
+                helper.highlightEcho("error",
+                    "invalid autocmd options. require following keys" .. vim.inspect(require_opts))
+                goto continue
             end
+
+            -- add group to autocmd option
+            autocmd.opts.group = self.opt.name
+            _self.debug_print(1, "autocmd opt: " .. vim.inspect(autocmd))
+            if autocmd.is_buf == true then
+                -- add buffer to autocmd option
+                autocmd.opts.buffer = self.bufnr
+                vim.api.nvim_create_autocmd(autocmd.event, autocmd.opts)
+            else
+                vim.api.nvim_create_autocmd(autocmd.event, autocmd.opts)
+            end
+            ::continue::
         end
     end
 
@@ -222,11 +219,17 @@ local floatwindow = function()
 
         for i = 1, #bufopt_table do
             local bufopt = bufopt_table[i]
-            if bufopt == {} then
-                _self.debug_print(1, "no bufopt options in index " .. i)
-            else
-                vim.api.nvim_buf_set_option(self.bufnr, bufopt.name, bufopt.value)
+            local require_opts = { "name", "value" }
+            if _self.validate_table(bufopt, require_opts) == false then
+                helper.highlightEcho(
+                    "error",
+                    "invalid buffer options. require following keys" .. vim.inspect(require_opts)
+                )
+                goto continue
             end
+            _self.debug_print(1, "buf opt: " .. vim.inspect(bufopt))
+            vim.api.nvim_buf_set_option(self.bufnr, bufopt.name, bufopt.value)
+            ::continue::
         end
     end
 
@@ -245,18 +248,58 @@ local floatwindow = function()
 
         for i = 1, #winopt_table do
             local winopt = winopt_table[i]
-            if winopt == {} then
-                _self.debug_print(1, "no winopt options in index " .. i)
-            else
-                vim.api.nvim_win_set_option(self.winid, winopt.name, winopt.value)
+            local require_opts = { "name", "value" }
+            if _self.validate_table(winopt, require_opts) == false then
+                helper.highlightEcho(
+                    "error",
+                    "invalid window options. require following keys" .. vim.inspect(require_opts)
+                )
+                goto continue
             end
+            _self.debug_print(1, "autocmd opt: " .. vim.inspect(winopt))
+            vim.api.nvim_win_set_option(self.winid, winopt.name, winopt.value)
+            ::continue::
         end
     end
 
     _self.set_highlight = function()
         _self.debug_print(0, "set_highlight")
+        local hlopt_table = self.opt.hlopt
+        if (hlopt_table == nil) or (#hlopt_table == 0) then
+            _self.debug_print(1, "no hlopt options")
+            return
+        end
+
+        local ns_id = vim.api.nvim_create_namespace(self.opt.name)
+        --         vim.api.nvim_add_highlight()
+        --         vim.api.nvim_set_hl_ns()
+        for i = 1, #hlopt_table do
+            local hlopt = hlopt_table[i]
+            local require_opts = { "name", "val" }
+            if _self.validate_table(hlopt, require_opts) == false then
+                helper.highlightEcho(
+                    "error",
+                    "invalid highlight options. require following keys" .. vim.inspect(require_opts)
+                )
+                goto continue
+            end
+            _self.debug_print(1, "hl opt: " .. vim.inspect(hlopt))
+            vim.api.nvim_set_hl(ns_id, hlopt.name, hlopt.val)
+            ::continue::
+        end
+
+        vim.api.nvim_win_set_hl_ns(self.winid, ns_id)
     end
 
+    _self.validate_table = function(table, requires)
+        local is_valid = true
+        for i = 1, #requires do
+            if table[requires[i]] == nil then
+                is_valid = false
+            end
+        end
+        return is_valid
+    end
 
     -- DEBUG FUNCTIONS
     _self.debug_print = function(indent_level, msg)

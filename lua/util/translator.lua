@@ -22,20 +22,24 @@ display_result = function(result)
 
     -- define floating window options
     --     local pos = vim.fn.getpos(".")
-    local height = math.floor(#lines * 1.2)
-    if #lines > 50 then -- max 50 lines
-        height = 50
+    local HEIGHT_MAX = 50
+    local WIDTH_MAX = 100
+    local HEIGHT_RATE = 1.2
+
+    local height = math.floor(#lines * HEIGHT_RATE)
+    if #lines > HEIGHT_MAX then -- max 50 lines
+        height = HEIGHT_MAX
     end
     local width = line_longest
-    if width > 80 then
-        width = 80
+    if width > WIDTH_MAX then
+        width = WIDTH_MAX
         height = height + 1
     end
-    local border_off = 2
-    local offset = 1
+    --     local border_off = 2
+    --     local offset = 1
     local border = {
-        ".", "−", ".", "|",
-        "'", "-", "`", "|",
+        '"', ' ', '"', ' ',
+        '"', ' ', '"', ' ',
     }
 
     local opt_win = {
@@ -47,7 +51,7 @@ display_result = function(result)
         --         row       = vim.opt.lines:get() - height - border_off - offset - 1,
         col       = 1,
         row       = 1,
-        --         border    = border,
+        border    = border,
         --         title     = "vim translation ",
         style     = 'minimal',
         relative  = "cursor",
@@ -64,49 +68,45 @@ display_result = function(result)
                 mode = "n",
                 lhs = "q",
                 rhs = "",
-                noremap = true,
-                callback = function()
-                    translate_fw.close_win()
-                end,
+                opts = {
+                    noremap = true,
+                    callback = function()
+                        translate_fw.close_win()
+                    end,
+                },
             },
             {
                 is_buf = true,
                 mode = "n",
                 lhs = "j",
                 rhs = "gj",
-                noremap = true,
-                --                 callback = false,
+                opts = {
+                    noremap = true,
+                    callback = false,
+                },
             },
             {
                 is_buf = true,
                 mode = "n",
                 lhs = "k",
                 rhs = "gk",
-                noremap = true,
-                --                 callback = false,
+                opts = {
+                    noremap = true,
+                    callback = false,
+                },
             },
         },
         autocmd = {
             --             {
             --                 is_buf = false,
-            --                 events = {
+            --                 event = {
             --                     "CursorMoved"
             --                 },
-            --                 callback = function()
-            --                     print("uilib autocmd called")
-            --                     translate_fw.close_win()
-            --                 end,
-            --             },
-            --             {
-            --                 is_buf = true,
-            --                 events = {
-            --                     "CompleteDone",
-            -- --                     "BufWinEnter",
-            --                 },
-            --                 callback = function()
-            --                     vim.cmd("noautocmd normal! gg")
-            --                     print("autocmd bufwinenter called")
-            --                 end,
+            --                 opts = {
+            --                     callback = function()
+            --                         translate_fw.close_win()
+            --                     end,
+            --                 }
             --             },
         },
         winopt = {
@@ -117,12 +117,25 @@ display_result = function(result)
         },
         bufopt = {
         },
-        highlight = {
-        }
+        hlopt = {
+            {
+                name = "NormalFloat",
+                val = {
+                    fg = "#fefefe",
+                    bg = "#382c2c",
+                }
+            },
+            {
+                name = "FloatBorder",
+                val = {
+                    fg = "#fefefe",
+                    bg = "#382c2c",
+                }
+            },
+        },
+        initial_lines = lines
     }
     translate_fw.init(opt)
-
-    translate_fw.write_lines(0, -1, lines)
     translate_fw.send_cmd("noautocmd normal! gg0")
 end
 
@@ -153,7 +166,8 @@ end
 -- create request paramaters to hit the translation API
 local create_req_params
 create_req_params = function(text, source, target)
-    if string.len(text) > 1000 then
+    local strlen_max = 3000
+    if string.len(text) > strlen_max then
         helper.highlightEcho("warning", "the text must be less than 1,000 characters")
         return ""
     end
@@ -162,6 +176,10 @@ create_req_params = function(text, source, target)
     -- remove forbidden char
     req_text = string.gsub(req_text, "%[", "［")
     req_text = string.gsub(req_text, "%]", "］")
+    req_text = string.gsub(req_text, "%{", "｛")
+    req_text = string.gsub(req_text, "%}", "｝")
+    req_text = string.gsub(req_text, "%(", "（")
+    req_text = string.gsub(req_text, "%)", "）")
     -- replace whitespace char that include space, tab, line breaks with "\\s"
     req_text = string.gsub(req_text, "%s+", "\\s")
     -- create reqest paramater
@@ -259,4 +277,10 @@ current window.  Otherwise the new window is put at
 the very top.
 The 'helplang' option is used to select a language, if
 the main help file is available in several languages.
+Namespaces are used for buffer highlights and virtual text, see
+|nvim_buf_add_highlight()| and |nvim_buf_set_extmark()|.
+
+Namespaces can be named or anonymous. If `name` matches an existing
+namespace, the associated id is returned. If `name` is an empty string a
+new, anonymous namespace is created.
 --]]

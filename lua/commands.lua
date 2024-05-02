@@ -93,12 +93,13 @@ end
 -- git push vimconfigfiles {{{
 vim.api.nvim_create_user_command("GPV", function(opts)
     if string.match(opts.args, "^'") then
-        helper.highlightEcho("error", "single quote is invalid")
+        helper.highlightEcho("error", "single quote is invalid. use double quote")
         return
     end
     vim.cmd("cd " .. helper.vimrcdir)
     vim.cmd("!git add .")
     vim.cmd("!git commit -m " .. opts.args)
+    vim.cmd("!git remote -v")
     vim.cmd("!git push origin main")
 end, { nargs = 1 })
 --}}}
