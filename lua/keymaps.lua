@@ -146,11 +146,19 @@ vim.keymap.set("n", "<leader>N", "<Cmd>cNext<CR>", { noremap = true })
 vim.keymap.set("n", "<C-b>", "", {
     noremap = true,
     callback = function()
+        -- get url on cursor line
         local line = vim.fn.getline(".")
         local url = string.match(line, "https://.+")
         print(url)
 
-        vim.cmd('!chcp 65001 | "C:/Program Files/Google/Chrome/Application/chrome.exe" --incognito ' .. '"' .. url .. '"')
+        if vim.fn.has('linux') == 1 then
+            -- launch firefox
+            -- vim.cmd('!/usr/bin/firefox "' .. url .. '" 2> /dev/null')
+            vim.cmd("!$(whereis firefox | awk -F \" \" '{print $2}') " .. '"' .. url .. '"')
+        else
+            -- launch chrome
+            vim.cmd('!chcp 65001 | "C:/Program Files/Google/Chrome/Application/chrome.exe" --incognito ' .. '"' .. url .. '"')
+        end
         local key = vim.api.nvim_replace_termcodes("<CR>", true, false, true)
         vim.api.nvim_feedkeys(key, 'n', false)
     end,

@@ -36,10 +36,12 @@ require('mason-lspconfig').setup_handlers({
     -- clangd handler
     ["clangd"] = function()
         local opt_clangd = {
---             cmd = {
---                 "clang-format",
---                 "--style={ IndentWidth: 4 }"
---             },
+            cmd = {
+                "clangd",
+                "--header-insertion=iwyu",
+                "--function-arg-placeholders",
+                "--clang-tidy"
+            },
         }
         require("lspconfig").clangd.setup(opt_clangd)
     end,
