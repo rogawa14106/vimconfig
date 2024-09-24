@@ -33,9 +33,21 @@
 --  GPV <commit msg: str>
 --  CMD <type: str>
 -- }}}
--- {{{ Difference from buildin
--- install wbthomason/packer.nvim
--- > git clone https://github.com/wbthomason/packer.nvim AppData/Local/nvim-data/site/pack/packer/start/packer.nvim/
+-- {{{ set up
+-- * clone wbthomason/packer.nvim
+--   linux$ git clone https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
+--   windows> git clone https://github.com/wbthomason/packer.nvim AppData/Local/nvim-data/site/pack/packer/start/packer.nvim/
+-- * comment out plugin requires on below file(treesitter ...etc)
+--   ~/.config/nvim/plugins/init.lua
+-- * launch nvim
+--   $ nvim
+-- * execute PackerInstall
+--   :PackerInstall
+-- * uncomment plugin requires on below file(treesitter ...etc)
+--   ~/.config/nvim/plugins/init.lua
+-- * relaunch nvim
+--   :q
+--   $ nvim
 -- }}}
 
 --========================================================================================================================}}}
