@@ -224,7 +224,7 @@ translate = function(params)
     local res = hit_translation_api(params)
     if res == "" then
         -- if response was empty, print error
-        helper.highlightEcho("error", "failed to translate text")
+        helper.highlightEcho("error", 'failed to translate text. "curl" is required for translation')
         return
     else
         -- print translate result
