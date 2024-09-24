@@ -4,7 +4,7 @@ GIT_CMD_FEATCH="git fetch origin main"
 GIT_CMD_RESET="git reset --hard origin/main"
 
 # confirm
-echo -en $CONFIRM_PROMPT" "
+echo -en "\e[33m$CONFIRM_PROMPT \e[0m"
 read is_confirm
 
 if [ $is_confirm == "yes" ]; then
