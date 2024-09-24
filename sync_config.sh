@@ -3,7 +3,7 @@ echo -en $confirm_prompt" "
 read is_confirm
 if [ $is_confirm == "yes" ]; then
     git fetch origin main
-    git reset --hard origin/master
+    git reset --hard origin/main
 else
     echo "aborted."
 fi
