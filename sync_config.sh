@@ -2,7 +2,7 @@ confirm_prompt="Fully sync your current vim configuration with the main reposito
 echo -en $confirm_prompt" "
 read is_confirm
 if [ $is_confirm == "yes" ]; then
-    git fetch orign main
+    git fetch origin main
     git reset --hard origin/master
 else
     echo "aborted."
