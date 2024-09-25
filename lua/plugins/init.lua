@@ -13,18 +13,17 @@ vim.cmd.packadd "packer.nvim"
 
 require("packer").startup(function()
     -- package manager
-    use "wbthomason/packer.nvim"
+    use { "wbthomason/packer.nvim", opt = false }
 
     -- syntax highlighting
     --use { "nvim-treesitter/nvim-treesitter", opt = true, cmd={ "VimEnter" } }
-    use {"nvim-treesitter/nvim-treesitter", opt = false}
+    use { "nvim-treesitter/nvim-treesitter", opt = false }
 
     -- language server page
     use "williamboman/mason.nvim"
-    use "williamboman/mason-lspconfig.nvim"
+    use "williamboman/mason-lspconfig.nvim" -- npm required
     use "neovim/nvim-lspconfig"
 end)
-
 
 -- === treesitter ===
 -- :TSInstall <language>

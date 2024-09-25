@@ -9,7 +9,8 @@ require('mason').setup()
 -- see :h mason-lspconfig.setup()
 require('mason-lspconfig').setup({
     -- A list of servers to automatically install if they're not already installed.
-    ensure_insatlled = { "lua_ls", "vimls", "pyright", "clangd" },
+    ensure_installed = { "lua-language-server", "vimls", "pyright", "clangd" },
+    automatic_installation = true
 })
 
 -- see :h mason-lspconfig.setup_handlers()

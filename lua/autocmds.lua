@@ -1,4 +1,4 @@
-vim.cmd[[
+vim.cmd [[
 "{{{ save and load fold state
 function! SaveFold() abort
     try
@@ -25,8 +25,8 @@ augroup END
 
 -- vim.api.nvim_create_augroup( "detectft", {} )
 -- vim.api.nvim_create_autocmd('bufwinenter', {
-    -- group = 'detectft',
-    -- callback = function() 
-        -- vim.cmd('filetype detect')
-    -- end,
+-- group = 'detectft',
+-- callback = function()
+-- vim.cmd('filetype detect')
+-- end,
 -- })
