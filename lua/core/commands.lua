@@ -1,4 +1,4 @@
-local helper = require("helper")
+local helper = require("util.helper")
 
 -- vimrc, init.vim {{{
 vim.api.nvim_create_user_command("VIMRC", function()

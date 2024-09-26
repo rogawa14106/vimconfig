@@ -1,4 +1,4 @@
-local helper = require('../helper')
+local helper = require('util.helper')
 
 local new_BufCtl = function()
     local self = {

@@ -1,7 +1,7 @@
 --TODO
 --除外するディレクトリ名、文字列をオプションで渡せるようにする。
 --オブジェクト指向風に書き換える
-local helper = require("../helper")
+local helper = require("util.helper")
 local Path_table = {}
 --################################## functions ############################################
 --# get env independent pwd{{{

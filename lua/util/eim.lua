@@ -1,7 +1,7 @@
 --TODO{{{
 -- }}}
 -- helper{{{
-local helper = require("../helper")
+local helper = require("util.helper")
 -- }}}
 -- main class{{{
 local new_Eim

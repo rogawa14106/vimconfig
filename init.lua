@@ -1,3 +1,4 @@
+
 ---                                                                          ---
 --       /##/ /####|  /##/ /##/ /##########/  /##/       /##/   /##/ /#####|  --
 --      /##/ /##/##| /##/ /##/     /##/      /##/       /##/   /##/ /##/|##|  --
@@ -55,22 +56,22 @@
 -- requires ==============================================================================================================
 
 -- basic options
-require("options")
+require("core.options")
 
 -- user defined commands
-require("commands")
+require("core.commands")
 
 -- keymapping
-require("keymaps")
+require("core.keymaps")
 
 -- auto cmds
-require("autocmds")
+require("core.autocmds")
 
 -- fold, status, tab lines
-require("ui_lines")
+require("core.ui_lines")
 
 -- {{{ colorscheme
-require("colors.dark")
+require("colorscheme.dark")
 -- }}}
 --
 -- {{{ utilitys
@@ -98,14 +99,7 @@ require("util.visualmark")
 -- }}}
 --
 -- {{{ plugins
--- bulidin plugins
-require("plugins.netrw")
-
--- plugins
--- ## run following command to use plugins
--- $ git clone https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/start/packer.nvim
--- :PackerInstall
--- :PackerSync
-require("plugins")
+-- lazy
+require("core.lazy")
 -- }}}
 --========================================================================================================================

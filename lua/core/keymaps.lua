@@ -1,5 +1,5 @@
 -- requires
-local helper = require("helper")
+local helper = require("util.helper")
 
 -- set leader
 vim.g.mapleader = " "

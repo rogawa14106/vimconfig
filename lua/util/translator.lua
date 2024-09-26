@@ -1,5 +1,8 @@
-local uilib = require('../util/uilib')
-local helper = require('../helper')
+-- =============================================================
+-- !! "curl" requried !!
+-- =============================================================
+local uilib = require('util.uilib')
+local helper = require('util.helper')
 
 -- display translation result
 local display_result

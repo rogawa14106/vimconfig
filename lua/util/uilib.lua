@@ -1,4 +1,4 @@
-local helper = require('../helper')
+local helper = require('util.helper')
 
 local floatwindow = function()
     print("########## new floatwindow ##########")
