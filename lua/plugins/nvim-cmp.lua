@@ -1,4 +1,4 @@
-local _M =  {
+local _M = {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
     dependencies = {
@@ -12,8 +12,12 @@ local _M =  {
     config = function()
         local cmp = require("cmp")
         local luasnip = require("luasnip")
-        --         local lspkind = require("lspkind")
-        cmp.setup({
+        local lspkind = require("lspkind")
+        -- loads vscode style snippets from installed plugins
+        require("luasnip.loaders.from_vscode").lazy_load()
+
+        -- define nvim_cmp options
+        local cmp_opt = {
             completion = {
                 completeopt = "menu,menuone,preview,noselect",
             },
@@ -23,14 +27,12 @@ local _M =  {
                 end,
             },
             mapping = cmp.mapping.preset.insert({
-                --                 ["<C-Space>"] = cmp.mapping.complete(),
---                 ["<Tab>"] = cmp.mapping.select_next_item(),
---                 ["<S-Tab>"] = cmp.mapping.select_prev_item(),
-                ["<C-n>"] = cmp.mapping.select_next_item(),
-                ["<C-p>"] = cmp.mapping.select_prev_item(),
+                ["<C-p>"] = cmp.mapping.complete(),
+                ["<Tab>"] = cmp.mapping.select_next_item(),
+                ["<S-Tab>"] = cmp.mapping.select_prev_item(),
                 ["<C-k>"] = cmp.mapping.scroll_docs(-1),
                 ["<C-j>"] = cmp.mapping.scroll_docs(1),
-                ["<Tab>"] = cmp.mapping.confirm({ select = false }),
+                ["<CR>"] = cmp.mapping.confirm({ select = false }),
             }),
             -- spec completion source
             sources = cmp.config.sources({
@@ -39,15 +41,14 @@ local _M =  {
                 { name = "buffer" },
                 { name = "path" },
             }),
-            --             formatting = {
-            --                 format = lspkind.cmp_format({
-            --                     maxwidth = 50,
-            --                     ellipsis_char = "...",
-            --                 }),
-            --                 fields = {},
-            --                 expandable_indicator = true,
-            --             },
-        })
+            formatting = {
+                format = lspkind.cmp_format({
+                    maxwidth = 50,
+                    ellipsis_char = "...",
+                }),
+            },
+        }
+        cmp.setup(cmp_opt)
     end,
 }
 

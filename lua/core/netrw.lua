@@ -9,4 +9,4 @@ vim.g.netrw_winsize=math.ceil(vim.opt.columns:get() / 10)
 -- keep pwd
 vim.g.netrw_keepdir=1
 -- change browse style to tree
---vim.g.netrw_liststyle=3
+vim.g.netrw_liststyle=3

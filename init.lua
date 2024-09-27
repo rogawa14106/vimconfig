@@ -14,6 +14,7 @@
 -- * install required applications
 --   curl (util/translator)
 --   npm  (plugins/lsp/mason)
+--   nardfont (lazy etc.)
 -- * complete the git config
 --   $ git config ~~
 --   $ ssh genkey (register public key with github)
@@ -96,6 +97,8 @@ require("util.visualmark")
 --
 -- PLUGINS ==============================================================================================================={{{
 -- plugin manager
-require("core.lazy")
+require("./lazy")
+-- built in
+require("./core/netrw")
 --========================================================================================================================}}}
 --
