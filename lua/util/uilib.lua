@@ -25,8 +25,8 @@ local floatwindow = function()
     -- private members
     local _self = {
         -- member variables
+        debug_flg = false,
         --         debug_flg = true,
-        debug_flg = true,
         bufnr_key = nil,
         -- member methods
         debug_print = function() end,
