@@ -14,12 +14,18 @@ local _M = {
         local luasnip = require("luasnip")
         local lspkind = require("lspkind")
         -- loads vscode style snippets from installed plugins
-        require("luasnip.loaders.from_vscode").lazy_load()
+        --         require("luasnip.loaders.from_vscode").lazy_load()
 
         -- define nvim_cmp options
         local cmp_opt = {
+            window = {
+                completion = cmp.config.window.bordered({ border = 'single' }),
+                documentation = cmp.config.window.bordered({ border = 'single' }),
+            },
             completion = {
                 completeopt = "menu,menuone,preview,noselect",
+--                 col_offset = -3,
+--                 side_padding = 0,
             },
             snippet = {
                 expand = function(args)
@@ -48,8 +54,9 @@ local _M = {
                 }),
             },
         }
+        -- attach option
         cmp.setup(cmp_opt)
     end,
 }
-
 return _M
+-- Is there a way to change the color for the icon without changing the abbr color as well?
