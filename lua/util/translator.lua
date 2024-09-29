@@ -1,10 +1,14 @@
 -- =============================================================
--- !! "curl" requried !!
+-- description:
+--   simple language translator powered by google app script
+-- note:
+--   curl required. if curl is not installed, execute below commamd
+--   $ sudo apt install curl
 -- =============================================================
 local uilib = require('util.uilib')
 local helper = require('util.helper')
 
--- display translation result
+-- display translation result{{{
 local display_result
 display_result = function(result)
     -- text molding
@@ -40,10 +44,11 @@ display_result = function(result)
     end
     --     local border_off = 2
     --     local offset = 1
-    local border = {
-        '"', ' ', '"', ' ',
-        '"', ' ', '"', ' ',
-    }
+    --     local border = {
+    --         '"', ' ', '"', ' ',
+    --         '"', ' ', '"', ' ',
+    --     }
+    local border = 'rounded'
 
     local opt_win = {
         focusable = true,
@@ -141,8 +146,9 @@ display_result = function(result)
     translate_fw.init(opt)
     translate_fw.send_cmd("noautocmd normal! gg0")
 end
+-- }}}
 
--- get text that selected on visual mode
+-- get text that selected on visual mode{{{
 local get_selected_txt
 get_selected_txt = function()
     --     local pos = vim.fn.getpos(".")
@@ -153,8 +159,9 @@ get_selected_txt = function()
     --     vim.fn.setpos(".", pos)
     return zreg_af
 end
+-- }}}
 
--- get text that under cursor
+-- get text that under cursor{{{
 local get_cursor_txt
 get_cursor_txt = function()
     --     local pos = vim.fn.getpos(".")
@@ -165,8 +172,9 @@ get_cursor_txt = function()
     --     vim.fn.setpos(".", pos)
     return zreg_af
 end
+-- }}}
 
--- create request paramaters to hit the translation API
+-- create request paramaters to hit the translation API{{{
 local create_req_params
 create_req_params = function(text, source, target)
     local strlen_max = 3000
@@ -176,21 +184,25 @@ create_req_params = function(text, source, target)
     end
     -- format text used in request parametera
     local req_text = text
-    -- remove forbidden char
+    -- substitute forbidden char
     req_text = string.gsub(req_text, "%[", "［")
     req_text = string.gsub(req_text, "%]", "］")
     req_text = string.gsub(req_text, "%{", "｛")
     req_text = string.gsub(req_text, "%}", "｝")
     req_text = string.gsub(req_text, "%(", "（")
     req_text = string.gsub(req_text, "%)", "）")
+    req_text = string.gsub(req_text, "#", "＃")
+    req_text = string.gsub(req_text, "*", "＊")
+    req_text = string.gsub(req_text, "`", "｀")
     -- replace whitespace char that include space, tab, line breaks with "\\s"
     req_text = string.gsub(req_text, "%s+", "\\s")
     -- create reqest paramater
     local req_params = "?text=" .. req_text .. "&source=" .. source .. "&target=" .. target
     return req_params
 end
+-- }}}
 
--- hit the translation API
+-- hit the translation API{{{
 local hit_translation_api
 hit_translation_api = function(params)
     -- assemble cmd to hit the api
@@ -219,8 +231,9 @@ hit_translation_api = function(params)
         return result
     end
 end
+-- }}}
 
--- translate text
+-- translate text{{{
 local translate
 translate = function(params)
     helper.highlightEcho("info", "transrating...")
@@ -234,8 +247,9 @@ translate = function(params)
         display_result(res)
     end
 end
+-- }}}
 
--- define paramaters to translate english to japanese
+-- define paramaters to translate english to japanese{{{
 local params_en_to_jp = {
     url_api =
     "https://script.google.com/macros/s/AKfycbwazxusB41dZgqxLMuQ1mn6177dGGISodFDv4-yaeKuTr45BaDXqOAupIiceJyBCEs/exec",
@@ -243,8 +257,9 @@ local params_en_to_jp = {
     source = "en",
     target = "ja",
 }
+-- }}}
 
--- set keymaps
+-- set keymaps{{{
 vim.keymap.set("v", "<Space>?", "", {
     noremap = true,
     callback = function()
@@ -259,9 +274,9 @@ vim.keymap.set("n", "<Space>?", "", {
         translate(params_en_to_jp)
     end,
 })
+-- }}}
 
-
---[[ translate test
+--[[ translate test{{{
 Open a window and display the help file in read-only
 mode.  If there is a help window open already, use
 that one.  Otherwise, if the current window uses the
@@ -287,3 +302,4 @@ Namespaces can be named or anonymous. If `name` matches an existing
 namespace, the associated id is returned. If `name` is an empty string a
 new, anonymous namespace is created.
 --]]
+--}}}

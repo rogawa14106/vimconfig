@@ -458,8 +458,10 @@ new_Eim = function()
                 self.is_help = false
                 local current_config = vim.api.nvim_win_get_config(self.winids.info)
                 local width = current_config.width
-                local row = current_config.row[false] + #self.help - 1
-                local col = current_config.col[false]
+                local row = current_config.row + #self.help - 1
+--                 local row = current_config.row[false] + #self.help - 1
+                local col = current_config.col
+--                 local col = current_config.col[false]
                 local win_conf = {
                     relative = "editor",
                     height = 1,
@@ -475,8 +477,11 @@ new_Eim = function()
             self.is_help = true
             local current_config = vim.api.nvim_win_get_config(self.winids.info)
             local width = current_config.width
-            local row = current_config.row[false] - #self.help + 1
-            local col = current_config.col[false]
+            print(vim.inspect(current_config))
+--             local row = current_config.row[false] - #self.help + 1
+            local row = current_config.row - #self.help + 1
+--             local col = current_config.col[false]
+            local col = current_config.col
             local win_conf = {
                 relative = "editor",
                 height = #self.help,
@@ -587,16 +592,17 @@ init_eim = function()
     local main_width        = eim_width
     local main_row          = lines - main_height - offset_border * 2 - offset_statusline - offset_row
     local main_col          = columns - main_width - offset_border * 2 - offset_col
-    local border_chars_main = {
-        "|", "-", "|", "|",
-        "'", "-", "`", "|",
-    }
+--     local main_border = {
+--         "|", "-", "|", "|",
+--         "'", "-", "`", "|",
+--     }
+    local main_border = 'rounded'
     local win_config_main   = {
         width     = main_width,
         height    = main_height,
         col       = main_col,
         row       = main_row,
-        border    = border_chars_main,
+        border    = main_border,
         focusable = true,
         style     = 'minimal',
         relative  = 'editor',
@@ -611,16 +617,17 @@ init_eim = function()
     local info_width        = eim_width
     local info_row          = main_row - info_height - offset_border
     local info_col          = main_col
-    local border_chars_info = {
-        ".", "-", ".", "|",
-        "", "", "", "|",
-    }
+--     local info_border = {
+--         ".", "-", ".", "|",
+--         "", "", "", "|",
+--     }
+    local info_border = 'rounded'
     local win_config_info   = {
         width     = info_width,
         height    = info_height,
         col       = info_col,
         row       = info_row,
-        border    = border_chars_info,
+        border    = info_border,
         focusable = false,
         style     = 'minimal',
         relative  = 'editor',
