@@ -35,10 +35,11 @@ local new_BufCtl = function()
         local height = #self.buflines
         local border_off = 2
         local offset = 1
-        local border = {
-            ".", "-", ".", "|",
-            "'", "-", "`", "|",
-        }
+--         local border = {
+--             ".", "-", ".", "|",
+--             "'", "-", "`", "|",
+--         }
+        local border = 'rounded'
         local config = {
             window = {
                 width     = width,
