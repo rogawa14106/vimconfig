@@ -1,21 +1,29 @@
 # define constants
-CONFIRM_PROMPT="Fully sync your current vim configuration with the main repository.\nLocal changes are permanently discarded.\nDo you want to continue? yes/no:"
-GIT_CMD_FEATCH="git fetch origin main"
-GIT_CMD_RESET="git reset --hard origin/main"
+MSG_CONFIRM="Fully sync your current vim configuration with the main repository.\nLocal changes are permanently discarded.\nDo you want to continue?"
+PROMPT_CONFIRM="yes/no:"
+
+CMD_GIT_FETCH="git fetch origin main"
+CMD_GIT_RESET="git reset --hard origin/main"
+
+MSG_SYNC_SUCCESS="config sync success"
+MSG_SYNC_ABORT="config sync aborted"
 
 # confirm
-echo -en "\e[33m$CONFIRM_PROMPT \e[0m"
+echo -en "\e[33m${MSG_CONFIRM}\e[0m\n"
+echo -en "\e[33m${PROMPT_CONFIRM} \e[0m"
 read is_confirm
 
 if [ $is_confirm == "yes" ]; then
-    # sync force
-    echo -e "\e[32m-- ${GIT_CMD_FEATCH}\e[0m"
-    $GIT_CMD_FEATCH
-    echo -e "\e[32m-- ${GIT_CMD_RESET}\e[0m"
-    $GIT_CMD_RESET
+    # sync config force
+    echo -e "\e[32m-- ${CMD_GIT_FETCH}\e[0m"
+    $CMD_GIT_FETCH
+    echo -e "\e[32m-- ${CMD_GIT_RESET}\e[0m"
+    $CMD_GIT_RESET
+    echo -e "\e[32m-- ${CMD_GIT_RESET}\e[0m"
+    echo ${MSG_SYNC_SUCCESS}
 else
-    # abort
-    echo "aborted."
+    # abort config sync
+    echo ${MSG_SYNC_ABORT}
 fi
 
 exit
