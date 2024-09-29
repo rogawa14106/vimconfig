@@ -10,19 +10,21 @@ return {
         local mason_lspconfig = require('mason-lspconfig')
 
         -- setup mason
-        mason.setup()
+        mason.setup({})
 
         -- setup mason_lspconfig
         mason_lspconfig.setup({
             -- A list of servers to automatically install if they're not already installed.
             ensure_installed = {
                 "lua_ls",
+                "vimls",
+                "bashls",
                 "clangd",
-                "vimls",                  --$ sudo apt install npm
-                "pyright",                --$ sudo apt install npm
+                "pylsp",
+                "terraformls",
+                "yamlls",
             },
             automatic_installation = true
         })
     end,
-    --     "neovim/nvim-lspconfig"
 }

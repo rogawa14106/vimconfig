@@ -18,30 +18,28 @@ local _M = {
         -- vim keymap aliase
         local keymap = vim.keymap
 
-        -- TODO LspAttach autocmd
-        -- see :h lsp-buf
-        keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
-        keymap.set('n', 'gf', '<cmd>lua vim.lsp.buf.format()<CR>')
-        keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
-        keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>')
-        -- keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
-        -- keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>')
-        keymap.set('n', 'gt', '<cmd>lua vim.lsp.buf.type_definition()<CR>')
-        keymap.set('n', 'gn', '<cmd>lua vim.lsp.buf.rename()<CR>')
-        -- keymap.set('n', 'ga', '<cmd>lua vim.lsp.buf.code_action()<CR>')
-        -- see :h vim-diagnostic
-        keymap.set('n', 'ge', '<cmd>lua vim.diagnostic.open_float()<CR>')
-        keymap.set('n', 'g]', '<cmd>lua vim.diagnostic.goto_next()<CR>')
-        keymap.set('n', 'g[', '<cmd>lua vim.diagnostic.goto_prev()<CR>')
-
-        --
-        --         vim.api.nvim_create_autocmd("LspAttach", {
-        --             group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-        --             callback = function(e)
-        --                 -- see :h vim.lsp.*
-        --                 local opts = { buffer = e.buf, silent = true }
-        --             end,
-        --         })
+        vim.api.nvim_create_autocmd("LspAttach", {
+            group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+            callback = function(e)
+                -- print("Lsp attached")
+                -- Buffer local keymapping
+                local opts = { buffer = e.buf, silent = true }
+                -- see :h lsp-buf
+                keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+                keymap.set('n', 'gf', '<cmd>lua vim.lsp.buf.format()<CR>', opts)
+                keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
+                keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+                -- keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+                -- keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+                keymap.set('n', 'gt', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+                keymap.set('n', 'gn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+                -- keymap.set('n', 'ga', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+                -- see :h vim-diagnostic
+                keymap.set('n', 'ge', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
+                keymap.set('n', 'g]', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
+                keymap.set('n', 'g[', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+            end,
+        })
 
         -- disable virtual text
         vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
@@ -62,13 +60,13 @@ local _M = {
             -- default handler
             function(server)
                 local opt_default = {
+                    capabilities = capabilities,
                 }
                 lspconfig[server].setup(opt_default)
             end,
             -- lua_ls handler
             ["lua_ls"] = function()
-                local opt_lua_ls = {
-                    capabilities = capabilities,
+                local opt = {
                     settings = {
                         Lua = {
                             diagnostics = {
@@ -77,12 +75,11 @@ local _M = {
                         },
                     },
                 }
-                lspconfig.lua_ls.setup(opt_lua_ls)
+                lspconfig["lua_ls"].setup(opt)
             end,
             -- clangd handler
             ["clangd"] = function()
-                local opt_clangd = {
-                    capabilities = capabilities,
+                local opt = {
                     cmd = {
                         "clangd",
                         "--header-insertion=iwyu",
@@ -90,7 +87,37 @@ local _M = {
                         "--clang-tidy"
                     },
                 }
-                lspconfig.clangd.setup(opt_clangd)
+                lspconfig["clangd"].setup(opt)
+            end,
+            -- pyright
+            ["pylsp"] = function()
+                local opt = {}
+                lspconfig["pylsp"].setup(opt)
+            end,
+            -- terraformls
+            ["terraformls"] = function()
+                local opt = {
+                    root_dir = lspconfig.util.root_pattern('.terraform', '.git', 'main.tf')
+                }
+                lspconfig["terraformls"].setup(opt)
+            end,
+            -- yamlls
+            ["yamlls"] = function()
+                local opt = {
+                    on_attach = function(client)
+                        client.server_capabilities.documentFormattingProvider = true
+                        vim.lsp.buf.format() -- TODO: Syntax highlights are not applied unless formatting
+                    end,
+                    --                     settings = {
+                    --                         yaml = {
+                    --                             completion = true,
+                    --                             schemaStore = {
+                    --                                 enable = true,
+                    --                             },
+                    --                         },
+                    --                     },
+                }
+                lspconfig["yamlls"].setup(opt)
             end,
         })
     end,
@@ -100,5 +127,5 @@ local _M = {
 -- vim.cmd("highlight LspReferenceText  cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
 -- vim.cmd("highlight LspReferenceRead  cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
 -- vim.cmd("highlight LspReferenceWrite cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
-
+vim.lsp.buf.format()
 return _M

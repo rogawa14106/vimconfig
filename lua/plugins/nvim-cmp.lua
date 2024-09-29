@@ -14,7 +14,7 @@ local _M = {
         local luasnip = require("luasnip")
         local lspkind = require("lspkind")
         -- loads vscode style snippets from installed plugins
-        --         require("luasnip.loaders.from_vscode").lazy_load()
+        require("luasnip.loaders.from_vscode").lazy_load()
 
         -- define nvim_cmp options
         local cmp_opt = {
@@ -24,8 +24,8 @@ local _M = {
             },
             completion = {
                 completeopt = "menu,menuone,preview,noselect",
---                 col_offset = -3,
---                 side_padding = 0,
+                --                 col_offset = -3,
+                --                 side_padding = 0,
             },
             snippet = {
                 expand = function(args)
@@ -33,12 +33,10 @@ local _M = {
                 end,
             },
             mapping = cmp.mapping.preset.insert({
-                ["<C-p>"] = cmp.mapping.complete(),
-                ["<Tab>"] = cmp.mapping.select_next_item(),
-                ["<S-Tab>"] = cmp.mapping.select_prev_item(),
                 ["<C-k>"] = cmp.mapping.scroll_docs(-1),
                 ["<C-j>"] = cmp.mapping.scroll_docs(1),
                 ["<CR>"] = cmp.mapping.confirm({ select = false }),
+                -- ["<Tab>"] = cmp.mapping.select_next_item(),
             }),
             -- spec completion source
             sources = cmp.config.sources({
@@ -48,7 +46,10 @@ local _M = {
                 { name = "path" },
             }),
             formatting = {
+                -- kind: kind of completion text, abbr: completion text, menu: completion menu
+                fields = { cmp.ItemField.Kind, cmp.ItemField.Abbr, cmp.ItemField.Menu },
                 format = lspkind.cmp_format({
+                    -- mode = "synbol",
                     maxwidth = 50,
                     ellipsis_char = "...",
                 }),
@@ -56,7 +57,40 @@ local _M = {
         }
         -- attach option
         cmp.setup(cmp_opt)
+
+        -- customize highlight settings of cmp_kind
+        local kind_highlights = {
+            Text = "White",
+            Method = "Purple",
+            -- Function = "",
+            -- Constructor = "",
+            Field = "SlateBlue",
+            Variable = "LightBlue",
+            -- Class = "",
+            Interface = "LightGreen",
+            -- Module = "",
+            -- Property = "",
+            -- Unit = "",
+            -- Value = "",
+            -- Enum = "",
+            Keyword = "LightGreen",
+            -- Snippet = "",
+            -- Color = "",
+            -- File = "",
+            -- Reference = "",
+            -- Folder = "",
+            -- EnumMember = "",
+            -- Constant = "",
+            -- Struct = "",
+            -- Event = "",
+            -- Operator = "",
+            -- TypeParameter = "Green",
+        }
+        for kind, guifg in pairs(kind_highlights) do
+            vim.cmd("highlight CmpItemKind" .. kind .. " guifg=" .. guifg)
+        end
     end,
 }
+
 return _M
 -- Is there a way to change the color for the icon without changing the abbr color as well?
