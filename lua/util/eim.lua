@@ -45,7 +45,7 @@ new_Eim = function()
             " =============================================================================================================",
         }
     }
--- }}}
+    -- }}}
     --# def methods{{{
     local init
     local create_ui
@@ -70,7 +70,7 @@ new_Eim = function()
     local chcwd
     local get_selectedlines
     local register_path
--- }}}
+    -- }}}
     -- initialize{{{
     init = function(config_main, config_info)
         -- create ui
@@ -83,7 +83,7 @@ new_Eim = function()
         -- set keymap
         create_keymap()
     end
--- }}}
+    -- }}}
     -- ui related{{{
     create_ui = function(config_main, config_info)
         -- create eim window
@@ -156,7 +156,7 @@ new_Eim = function()
             return { bufnr = bufnr, winid = g_winid }
         end
     end
--- }}}
+    -- }}}
     -- keymap{{{
     create_keymap = function()
         -- n, <Enter>
@@ -459,9 +459,9 @@ new_Eim = function()
                 local current_config = vim.api.nvim_win_get_config(self.winids.info)
                 local width = current_config.width
                 local row = current_config.row + #self.help - 1
---                 local row = current_config.row[false] + #self.help - 1
+                --                 local row = current_config.row[false] + #self.help - 1
                 local col = current_config.col
---                 local col = current_config.col[false]
+                --                 local col = current_config.col[false]
                 local win_conf = {
                     relative = "editor",
                     height = 1,
@@ -478,9 +478,9 @@ new_Eim = function()
             local current_config = vim.api.nvim_win_get_config(self.winids.info)
             local width = current_config.width
             print(vim.inspect(current_config))
---             local row = current_config.row[false] - #self.help + 1
+            --             local row = current_config.row[false] - #self.help + 1
             local row = current_config.row - #self.help + 1
---             local col = current_config.col[false]
+            --             local col = current_config.col[false]
             local col = current_config.col
             local win_conf = {
                 relative = "editor",
@@ -500,7 +500,7 @@ new_Eim = function()
             callback = show_help,
         })
     end
--- }}}
+    -- }}}
     -- functions{{{
     get_cwd = function()
         local cwd = vim.fs.normalize(vim.fn.getcwd())
@@ -561,7 +561,7 @@ new_Eim = function()
         vim.api.nvim_buf_set_option(self.bufnrs[target], 'modifiable', false)
         vim.api.nvim_buf_set_option(self.bufnrs[target], 'readonly', true)
     end
--- }}}
+    -- }}}
     --# publish {{{
     return {
         init = init,
@@ -592,12 +592,16 @@ init_eim = function()
     local main_width        = eim_width
     local main_row          = lines - main_height - offset_border * 2 - offset_statusline - offset_row
     local main_col          = columns - main_width - offset_border * 2 - offset_col
---     local main_border = {
---         "|", "-", "|", "|",
---         "'", "-", "`", "|",
---     }
-    local main_border = 'rounded'
-    local win_config_main   = {
+    local main_border
+    if (vim.opt.ambiwidth:get() == 'single') then
+        main_border = {
+            "├", "─", "┤", "│",
+            "╯", "─", "╰", "│"
+        }
+    else
+        main_border = 'rounded'
+    end
+    local win_config_main = {
         width     = main_width,
         height    = main_height,
         col       = main_col,
@@ -607,22 +611,26 @@ init_eim = function()
         style     = 'minimal',
         relative  = 'editor',
     }
-    local config_main       = {
+    local config_main     = {
         window = win_config_main,
         color = "NormalFloat",
     }
 
     --# information window config
-    local info_height       = 1
-    local info_width        = eim_width
-    local info_row          = main_row - info_height - offset_border
-    local info_col          = main_col
---     local info_border = {
---         ".", "-", ".", "|",
---         "", "", "", "|",
---     }
-    local info_border = 'rounded'
-    local win_config_info   = {
+    local info_height     = 1
+    local info_width      = eim_width
+    local info_row        = main_row - info_height - offset_border
+    local info_col        = main_col
+    local info_border
+    if (vim.opt.ambiwidth:get() == 'single') then
+        info_border = {
+            "╭", "─", "╮", "│",
+            "", "", "", "│"
+        }
+    else
+        info_border = 'rounded'
+    end
+    local win_config_info = {
         width     = info_width,
         height    = info_height,
         col       = info_col,
@@ -633,7 +641,7 @@ init_eim = function()
         relative  = 'editor',
     }
 
-    local config_info       = {
+    local config_info     = {
         window = win_config_info,
         color = "TabLineSel",
     }

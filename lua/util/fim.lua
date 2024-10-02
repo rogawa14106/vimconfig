@@ -380,7 +380,8 @@ end
 --# create inputbox prompt (prompt){{{
 local function create_prompt(config, prompt)
     vim.g.fim_prompt_bufnr = vim.api.nvim_create_buf(false, true)
-    vim.g.fim_prompt_winid = vim.api.nvim_open_win(vim.g.fim_prompt_bufnr, false, config)
+--     vim.g.fim_prompt_winid = vim.api.nvim_open_win(vim.g.fim_prompt_bufnr, false, config)
+    vim.g.fim_prompt_winid = vim.api.nvim_open_win(vim.g.fim_prompt_bufnr, true, config)
     writeLine(vim.g.fim_prompt_bufnr, 0, -1, { prompt })
 
     vim.api.nvim_win_set_option(vim.g.fim_prompt_winid, 'winhl', 'Normal:Visual')
@@ -403,7 +404,7 @@ local function create_ffwin(pre_winid)
     local input_height      = 1
 
     -- prompt
-    local prompt            = [[>> ]]
+    local prompt            = [[ $ ]]
     local prompt_width      = string.len(prompt)
 
     -- info
@@ -429,9 +430,13 @@ local function create_ffwin(pre_winid)
         height    = fim_height - info_height - input_height,
         row       = lines - fim_height - (flame_height * 3) - offset_row + statusline_height,
         border    = {
-            ".", "-", ".", "|",
-            "", "", "", "|",
+            "╭", "─", "╮", "│",
+            "┤", "─", "├", "│",
         },
+--         border    = {
+--             ".", "-", ".", "|",
+--             "", "", "", "|",
+--         },
         focusable = true,
         style     = 'minimal',
         relative  = 'editor',
@@ -443,9 +448,13 @@ local function create_ffwin(pre_winid)
         height    = input_height,
         row       = lines - info_height - input_height - (flame_height * 2) + statusline_height - offset_row - 1,
         border    = {
-            "", "-", ".", "|",
+            "", "─", "┤", "│",
             "'", "", "", "",
         },
+--         border    = {
+--             "", "-", ".", "|",
+--             "'", "", "", "",
+--         },
         focusable = true,
         style     = 'minimal',
         relative  = 'editor',
@@ -456,8 +465,8 @@ local function create_ffwin(pre_winid)
         height    = input_height,
         row       = lines - info_height - input_height - (flame_height * 2) + statusline_height - offset_row - 1,
         border    = {
-            ".", "-", "", "",
-            "", "-", "`", "|",
+            ".", ".", "", "",
+            "", "", ".", "│",
         },
         focusable = false,
         style     = 'minimal',
@@ -470,9 +479,13 @@ local function create_ffwin(pre_winid)
         height    = info_height,
         row       = lines - info_height - flame_height - statusline_height - offset_row,
         border    = {
-            "|", "", "|", "|",
-            "'", "-", "`", "|",
+            "├", "─", "┤", "│",
+            "╯", "─", "╰", "│"
         },
+--         border    = {
+--             "|", "", "|", "|",
+--             "'", "-", "`", "|",
+--         },
         focusable = false,
         style     = 'minimal',
         relative  = 'editor',

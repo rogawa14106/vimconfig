@@ -36,7 +36,8 @@ set.undofile = false
 set.encoding = 'utf-8'
 set.fileencodings = {'utf-8', 'sjis'}
 set.fileformats = {'unix', 'mac', 'dos'}
-set.ambiwidth = 'double'
+-- set.ambiwidth = 'double'
+set.ambiwidth = 'single'
 
 -- clipboard
 set.clipboard:append({'unnamedplus'})
