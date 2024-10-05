@@ -2,6 +2,7 @@ local set = vim.opt
 
 -- common
 set.number = true
+set.relativenumber = true
 set.cursorline = true
 set.cursorcolumn = false
 set.incsearch = true
