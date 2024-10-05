@@ -45,21 +45,14 @@ vim.api.nvim_create_user_command("CMD", function(opts)
 
     -- open terminal
     vim.cmd('terminal')
-    if vim.fn.has('nvim') == 1 then
-        vim.cmd("call nvim_win_set_option(win_getid(), 'winhl', 'Normal:mModeTJob,CursorLine:Folded')")
-    end
 
     -- branch the commands to execute depending on the given arguments
     if opts.args == "" then
         vim.cmd('call feedkeys("' .. Termkey .. '")')
     elseif opts.args == "time" then
         vim.cmd('call feedkeys("' .. Termkey .. 'prompt $d$s$t$g")')
-    elseif opts.args == "file" then
-        vim.cmd('call feedkeys("' .. Termkey .. 'ssh file")')
-    elseif opts.args == "196" then
-        vim.cmd('call feedkeys("' .. Termkey .. 'ssh 196")')
-    elseif opts.args == "177" then
-        vim.cmd('call feedkeys("' .. Termkey .. 'ssh 177")')
+    elseif opts.args == "lt01" then
+        vim.cmd('call feedkeys("' .. Termkey .. 'ssh lt01")')
     end
 end, { nargs = '?' })
 -- }}}
@@ -118,4 +111,3 @@ vim.api.nvim_create_user_command("Grep", function()
     vim.cmd("vimgrep " .. regex .. " ./** | copen")
 end, { force = true })
 -- }}}
-

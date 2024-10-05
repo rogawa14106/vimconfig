@@ -1,6 +1,57 @@
 --   ========================= --
---  //   HIGHLIGHT CONFIG  //  --
+--  //  HIGHLIGHT          //  --
 -- =========================   --
+--
+-- {{{ configuration
+local config = {
+    bg_transparent = true, -- enable background transparent
+}
+-- }}}
+--
+-- {{{ color palet
+local unspec = {}
+local hl_mono1 = { cterm = "234", gui = "18181c" }
+local hl_mono2 = { cterm = "235", gui = "1e1e26" }
+local hl_mono3 = { cterm = "236", gui = "303038" }
+local hl_mono5 = { cterm = "236", gui = "3d3d50" }
+local hl_mono6 = { cterm = "243", gui = "5c5c68" }
+local hl_mono7 = { cterm = "250", gui = "787888" }
+local hl_mono8 = { cterm = "253", gui = "c0c0d8" }
+local hl_mono9 = { cterm = "253", gui = "d8d8e8" }
+
+local hl_blue0 = { cterm = "24", gui = "102038" }
+local hl_blue1 = { cterm = "111", gui = "9ba2f3" }
+local hl_blue2 = { cterm = "117", gui = "95d0f0" }
+local hl_blue3 = { cterm = "75", gui = "439bbc" }
+
+local hl_erro0 = { cterm = "124", gui = "481010" }
+local hl_erro1 = { cterm = "9", gui = "c03838" }
+local hl_warn0 = { cterm = "3", gui = "505018" }
+local hl_safe0 = { cterm = "22", gui = "104810" }
+
+--local hl_emph0 = { cterm="62", gui="74607c" } -- CursorSearch
+local hl_emph0 = { cterm = "85", gui = "95f0d0" }  -- Sign, MatchParen, etc
+local hl_search = { cterm = "60", gui = "5f5030" } -- Search
+
+local hl_mnorm = { cterm = "24", gui = "304070" }
+local hl_mcomm = { cterm = "58", gui = "583058" }
+--local hl_mvisu = { cterm="23", gui="307040" }
+local hl_minse = { cterm = "95", gui = "803030" }
+local hl_mvisu = { cterm = "23", gui = "15504e" }
+local hl_mterm = { cterm = "0", gui = "080810" }
+local hl_mtjob = { cterm = "0", gui = "080810" }
+
+local hl_sep01 = { cterm = "237", gui = "282830" }
+
+local hl_str01 = { cterm = "223", gui = "f3c29b" }
+local hl_num01 = { cterm = "114", gui = "abddb6" }
+local hl_idf02 = { cterm = "229", gui = "f0f0ae" }
+local hl_stm02 = { cterm = "218", gui = "f39bbc" }
+local hl_prp01 = { cterm = "168", gui = "e69bf3" }
+local hl_typ01 = { cterm = "43", gui = "77c89e" }
+local hl_spe01 = { cterm = "229", gui = "fff9b3" }
+local hl_more0 = { cterm = "140", gui = "c29bf3" }
+---}}}
 --
 -- {{{ highlight configrator
 local function setHi(group, fg, bg, attr)
@@ -25,50 +76,7 @@ local function setHi(group, fg, bg, attr)
     end
 end
 -- }}}
--- {{{ color palet
-local unspec = {}
-local hl_mono1 = { cterm = "234", gui = "18181c" }
-local hl_mono2 = { cterm = "235", gui = "1e1e26" }
-local hl_mono3 = { cterm = "236", gui = "303038" }
-local hl_mono5 = { cterm = "236", gui = "3d3d50" }
-local hl_mono6 = { cterm = "243", gui = "5c5c68" }
-local hl_mono7 = { cterm = "250", gui = "787888" }
-local hl_mono8 = { cterm = "253", gui = "c0c0d8" }
-local hl_mono9 = { cterm = "253", gui = "d8d8e8" }
-
-local hl_blue0 = { cterm = "24", gui = "102038" }
-local hl_blue1 = { cterm = "111", gui = "9ba2f3" }
-local hl_blue2 = { cterm = "117", gui = "95d0f0" }
-local hl_blue3 = { cterm = "75", gui = "439bbc" }
-
-local hl_erro0 = { cterm = "124", gui = "481010" }
-local hl_erro1 = { cterm = "9", gui = "c03838" }
-local hl_warn0 = { cterm = "3", gui = "505018" }
-local hl_safe0 = { cterm = "22", gui = "104810" }
-
---local hl_emph0 = { cterm="62", gui="74607c" } -- CursorSearch
-local hl_emph0 = { cterm = "85", gui = "95f0d0" }   -- Sign, MatchParen, etc
-local hl_search = { cterm = "60", gui = "5f5030" }  -- Search
-
-local hl_mnorm = { cterm = "24", gui = "304070" }
-local hl_mcomm = { cterm = "58", gui = "583058" }
---local hl_mvisu = { cterm="23", gui="307040" }
-local hl_minse = { cterm = "95", gui = "803030" }
-local hl_mvisu = { cterm = "23", gui = "15504e" }
-local hl_mterm = { cterm = "0", gui = "304070" }
-local hl_mtjob = { cterm = "0", gui = "080810" }
-
-local hl_sep01 = { cterm = "237", gui = "282830" }
-
-local hl_str01 = { cterm = "223", gui = "f3c29b" }
-local hl_num01 = { cterm = "114", gui = "abddb6" }
-local hl_idf02 = { cterm = "229", gui = "f0f0ae" }
-local hl_stm02 = { cterm = "218", gui = "f39bbc" }
-local hl_prp01 = { cterm = "168", gui = "e69bf3" }
-local hl_typ01 = { cterm = "43", gui = "77c89e" }
-local hl_spe01 = { cterm = "229", gui = "fff9b3" }
-local hl_more0 = { cterm = "140", gui = "c29bf3" }
----}}}
+--
 -- {{{ highlight configuration
 -- init highlight --
 vim.cmd("set termguicolors")
@@ -223,6 +231,24 @@ setHi("StatusLineTerm", hl_mono9, hl_sep01, "none")
 setHi("StatusLineTermNC", hl_mono9, hl_sep01, "none")
 
 --}}}
+--
+-- {{{ make background transparent
+local function make_bg_transparent(bg_transparent)
+    if bg_transparent == false then return end
+    local transparent_hl_groups = {
+        "Normal", "NormalNC",
+        "StatusLineNC",
+        "TabLineFill",
+        "SignColumn",
+        "StatusLineTermNC"
+    }
+    for i = 1, #transparent_hl_groups do
+        vim.cmd("hi! " .. transparent_hl_groups[i] .. " guibg=none")
+    end
+end
+make_bg_transparent(config.bg_transparent)
+-- }}}
+--
 -- {{{ user defined highlight
 --each mode
 setHi("mModeNormal", hl_mono9, hl_mnorm, "none")
@@ -233,7 +259,7 @@ setHi("mModeTerm", hl_mono9, hl_mterm, "none")
 setHi("mModeTJob", hl_mono9, hl_mtjob, "none")
 
 -- #user defined syntax
--- address
+-- network addresses
 setHi("uAddress", { cterm = "49", gui = "95f0d0" }, unspec, "none")
 -- chars
 setHi("uMultiSpace", unspec, hl_mono6, "underline")
@@ -243,10 +269,12 @@ vim.api.nvim_create_augroup('highlightUserSyntax', {})
 vim.api.nvim_create_autocmd('BufEnter', {
     group = 'highlightUserSyntax',
     callback = (function()
+        print('autocmd: highlightUserSyntax')
         vim.cmd("syntax match uParen '\\v[{}]{3}'")
+        vim.cmd("syntax match uMultiSpace '　'")
         vim.cmd("syntax match uAddress '\\v\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}'") -- IP
         vim.cmd("syntax match uAddress '\\v[0-9A-Fa-f]{2}([:-][0-9A-Fa-f]{2}){5}'")     -- MAC
-        vim.cmd("syntax match uMultiSpace '　'")
     end)
 })
 --}}}
+--
