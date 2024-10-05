@@ -23,6 +23,7 @@ return {
                 "pylsp",
                 "terraformls",
                 "yamlls",
+                "marksman"
             },
             automatic_installation = true
         })

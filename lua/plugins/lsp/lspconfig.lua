@@ -21,7 +21,6 @@ local _M = {
         vim.api.nvim_create_autocmd("LspAttach", {
             group = vim.api.nvim_create_augroup("UserLspConfig", {}),
             callback = function(e)
-                -- print("Lsp attached")
                 -- Buffer local keymapping
                 local opts = { buffer = e.buf, silent = true }
                 -- see :h lsp-buf
@@ -106,7 +105,6 @@ local _M = {
                 local opt = {
                     on_attach = function(client)
                         client.server_capabilities.documentFormattingProvider = true
-                        vim.lsp.buf.format() -- TODO: Syntax highlights are not applied unless formatting
                     end,
                     --                     settings = {
                     --                         yaml = {
@@ -119,6 +117,13 @@ local _M = {
                 }
                 lspconfig["yamlls"].setup(opt)
             end,
+            -- remark_ls
+            ["marksman"] = function()
+                local opt = {
+                    root_dir = lspconfig.util.root_pattern('README.md', '*.MD')
+                }
+                lspconfig["marksman"].setup(opt)
+            end,
         })
     end,
 }
@@ -127,5 +132,4 @@ local _M = {
 -- vim.cmd("highlight LspReferenceText  cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
 -- vim.cmd("highlight LspReferenceRead  cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
 -- vim.cmd("highlight LspReferenceWrite cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
-vim.lsp.buf.format()
 return _M
