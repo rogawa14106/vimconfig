@@ -56,14 +56,14 @@ local _M = {
         end
 
         mason_lspconfig.setup_handlers({
-            -- default handler
+            -- all
             function(server)
                 local opt_default = {
                     capabilities = capabilities,
                 }
                 lspconfig[server].setup(opt_default)
             end,
-            -- lua_ls handler
+            -- lua
             ["lua_ls"] = function()
                 local opt = {
                     settings = {
@@ -76,7 +76,7 @@ local _M = {
                 }
                 lspconfig["lua_ls"].setup(opt)
             end,
-            -- clangd handler
+            -- clang
             ["clangd"] = function()
                 local opt = {
                     cmd = {
@@ -88,19 +88,20 @@ local _M = {
                 }
                 lspconfig["clangd"].setup(opt)
             end,
-            -- pyright
+            -- python
             ["pylsp"] = function()
                 local opt = {}
                 lspconfig["pylsp"].setup(opt)
             end,
-            -- terraformls
+            -- terraform
             ["terraformls"] = function()
                 local opt = {
                     root_dir = lspconfig.util.root_pattern('.terraform', '.git', 'main.tf')
                 }
                 lspconfig["terraformls"].setup(opt)
+                --                 print(vim.inspect(lspconfig.terraformls))
             end,
-            -- yamlls
+            -- yaml
             ["yamlls"] = function()
                 local opt = {
                     on_attach = function(client)
@@ -117,7 +118,7 @@ local _M = {
                 }
                 lspconfig["yamlls"].setup(opt)
             end,
-            -- remark_ls
+            -- markdown
             ["marksman"] = function()
                 local opt = {
                     root_dir = lspconfig.util.root_pattern('README.md', '*.MD')
@@ -127,6 +128,15 @@ local _M = {
         })
     end,
 }
+
+-- define autocmds to detect filetype
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+    pattern = { "*.tf" },
+    group = vim.api.nvim_create_augroup("DetectFiletype", {}),
+    callback = function()
+        vim.opt.filetype = "terraform"
+    end,
+})
 
 -- vim.opt.updatetime = 300
 -- vim.cmd("highlight LspReferenceText  cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
