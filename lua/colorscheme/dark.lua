@@ -264,17 +264,33 @@ setHi("uAddress", { cterm = "49", gui = "95f0d0" }, unspec, "none")
 -- chars
 setHi("uMultiSpace", unspec, hl_mono6, "underline")
 setHi("uParen", hl_mono5, unspec, "none")
+-- init.lua banner
+setHi("uInitLuaBanner", hl_idf02, hl_blue0, "none")
 
-vim.api.nvim_create_augroup('highlightUserSyntax', {})
+local augroup_hl_user_syntax = vim.api.nvim_create_augroup('highlightUserSyntax', { clear = true })
+
 vim.api.nvim_create_autocmd('BufEnter', {
-    group = 'highlightUserSyntax',
+    group = augroup_hl_user_syntax,
     callback = (function()
-        print('autocmd: highlightUserSyntax')
         vim.cmd("syntax match uParen '\\v[{}]{3}'")
         vim.cmd("syntax match uMultiSpace '　'")
         vim.cmd("syntax match uAddress '\\v\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}'") -- IP
         vim.cmd("syntax match uAddress '\\v[0-9A-Fa-f]{2}([:-][0-9A-Fa-f]{2}){5}'")     -- MAC
     end)
 })
+
+vim.api.nvim_create_autocmd('BufEnter', {
+    pattern = { "init.lua" },
+    group = augroup_hl_user_syntax,
+    callback = function()
+        vim.cmd("syntax match uInitLuaBanner '╭─── rogawa init.lua   ╭─╮              ───╮'")
+        vim.cmd("syntax match uInitLuaBanner '│ ╭─╮    ╭─╮    ╭─────╮│ │          ╭────╮ │'")
+        vim.cmd("syntax match uInitLuaBanner '│ │ │ ╭──│ │ ╭─╮╰─╮ ╭─╯│ │   ╭─╮ ╭─╮│ ╭╮ │ │'")
+        vim.cmd("syntax match uInitLuaBanner '│ │ │ │  │ │ │ │  │ │  │ │   │ │ │ ││ ╰╯ │ │'")
+        vim.cmd("syntax match uInitLuaBanner '│ │ │ │ ╮  │ │ │  │ │  │ ╰──╮│ │ │ ││ ╭╮ │ │'")
+        vim.cmd("syntax match uInitLuaBanner '│ ╰─╯ │ │──╯ │ │  ╰─╯☺ ╰────╯│ ╰─╯ ││ │╰─╯ │'")
+        vim.cmd("syntax match uInitLuaBanner '╰───  ╰─╯    ╰─╯             ╰─────╯╰─╯ ───╯'")
+    end,
+})
 --}}}
---
+--10.10.10.10
