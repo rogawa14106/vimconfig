@@ -11,21 +11,21 @@
     - nardfont  
         lazy.nvim etc.  
     - mdr  
-        (preview-markdown  
+        preview-markdown.nvim  
 
 3. clone nvim settings (it is this repository)  
     ```
-    $ mkdir -p ~/.config/nvim/
-    $ git clone https://github.com/rogawa14106/vimconfig ~/.config/nvim/.
+    mkdir -p ~/.config/nvim/
+    git clone https://github.com/rogawa14106/vimconfig ~/.config/nvim/.
     ```
 
 4. launch nvim  
     ```
-    $ nvim
+    nvim
     ```
 
 # NOTE
-* about /bin
+* about /bin  
     if you use the following command to change the IME, that commands shuoud be in your path. (windows only)  
     `chime` `hidesb`  
 

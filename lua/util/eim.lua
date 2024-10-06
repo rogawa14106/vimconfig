@@ -1,8 +1,10 @@
 --TODO{{{
 -- }}}
+--
 -- helper{{{
 local helper = require("util.helper")
 -- }}}
+--
 -- main class{{{
 local new_Eim
 new_Eim = function()
@@ -21,6 +23,7 @@ new_Eim = function()
         ls = {
             files = {},
             dirs = {},
+            --             links = {},
         },
         cwd = '',
         path_memory = {
@@ -84,7 +87,7 @@ new_Eim = function()
         create_keymap()
     end
     -- }}}
-    -- ui related{{{
+    -- ui {{{
     create_ui = function(config_main, config_info)
         -- create eim window
         local is_shown = (#vim.fn.win_findbuf(self.bufnrs.main) > 0) and (#vim.fn.win_findbuf(self.bufnrs.info) > 0)
@@ -514,8 +517,9 @@ new_Eim = function()
     end
 
     scan_ls = function(cwd)
-        self.ls.files = {}
         self.ls.dirs = { "../" }
+        self.ls.files = {}
+        --         self.ls.links = {}
         write_lines("main", 0, -1, self.ls.dirs)
         local luv = vim.loop
         local cb = vim.schedule_wrap(function(err, fs)
@@ -530,7 +534,8 @@ new_Eim = function()
                 else
                     if type == 'directory' then
                         self.ls.dirs[#self.ls.dirs + 1] = name
-                        write_lines("main",
+                        write_lines(
+                            "main",
                             #self.ls.dirs - 1,
                             #self.ls.dirs - 1,
                             { name .. "/" }
@@ -543,6 +548,14 @@ new_Eim = function()
                             #self.ls.dirs + #self.ls.files - 1,
                             { name }
                         )
+                    elseif type == 'link' then
+                        --                         self.ls.links[#self.ls.links + 1] = name
+                        --                         write_lines(
+                        --                             "main",
+                        --                             #self.ls.dirs + #self.ls.links - 1,
+                        --                             #self.ls.dirs + #self.ls.links - 1,
+                        --                             { name .. " ->" }
+                        --                         )
                     end
                 end
             end
@@ -569,6 +582,7 @@ new_Eim = function()
     -- }}}
 end
 -- }}}
+--
 -- new eim {{{
 local init_eim
 init_eim = function()
@@ -648,14 +662,17 @@ init_eim = function()
     eim.init(config_main, config_info)
 end
 -- }}}
+--
 --# create command{{{
 vim.api.nvim_create_user_command("Eim", init_eim, {
     bang = true
 })
 -- }}}
---# create keymap that launch Fim{{{
+--
+--# create keymap that launch Eim{{{
 vim.api.nvim_set_keymap("n", '<leader>e', '', {
     noremap = true,
     callback = init_eim,
 })
 -- }}}
+
