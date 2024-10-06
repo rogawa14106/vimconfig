@@ -41,7 +41,7 @@ set.fileformats = {'unix', 'mac', 'dos'}
 set.ambiwidth = 'single'
 
 -- clipboard
-set.clipboard:append({'unnamedplus'})
+set.clipboard:append({'unnamed', 'unnamedplus'})
 
 -- chars
 set.list = true
