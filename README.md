@@ -19,6 +19,7 @@
 
 # NOTE
 <div id="note_dependencies"></div>
+
 * dependencies  
     - curl  
         curl is required to use 'util/translator'  
