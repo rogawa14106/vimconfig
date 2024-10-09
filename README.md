@@ -3,7 +3,7 @@
     Install nvim in a way that suits your environment.  
 
 2. Install required applications  
-    See ['Note > dependencies'](#note_dependencies) for required applications  
+    See [dependencies](#note_dependencies) for required applications  
 
 3. Clone nvim settings (it is this repository)  
     ```
