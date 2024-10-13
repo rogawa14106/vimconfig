@@ -1,7 +1,7 @@
 local helper = require('util.helper')
 
 local floatwindow = function()
-    print("########## new floatwindow ##########")
+    --     print("########## new floatwindow ##########")
     -- published members
     local self = {
         init_opt = {},
