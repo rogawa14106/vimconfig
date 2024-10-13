@@ -90,7 +90,7 @@ display_result = function(result)
                 rhs = "gj",
                 opts = {
                     noremap = true,
-                    callback = false,
+                    --                     callback = false,
                 },
             },
             {
@@ -100,7 +100,7 @@ display_result = function(result)
                 rhs = "gk",
                 opts = {
                     noremap = true,
-                    callback = false,
+                    --                     callback = false,
                 },
             },
         },
@@ -236,11 +236,11 @@ end
 -- translate text{{{
 local translate
 translate = function(params)
-    helper.highlightEcho("info", "transrating...")
+    --     helper.highlightEcho("info", "translating...")
     local res = hit_translation_api(params)
     if res == "" then
         -- if response was empty, print error
-        helper.highlightEcho("error", 'failed to translate text. "curl" is required for translation')
+        helper.highlightEcho("error", 'failed to translate text. curl is required for translation')
         return
     else
         -- print translate result
