@@ -363,7 +363,8 @@ new_Eim = function()
                 wd = self.cwd,
                 lines = lines,
             }
-            print(vim.inspect(self.path_memory))
+            -- print(vim.inspect(self.path_memory))
+            helper.highlightEcho("info", "[Eim] filepath copied")
         end
 
         move = function()
@@ -441,11 +442,17 @@ new_Eim = function()
         -- registr path info to path_memory
         vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "y", '', {
             noremap = true,
-            callback = register_path,
+            callback = function()
+                register_path()
+                vim.cmd("noautocmd normal! ")
+            end,
         })
         vim.api.nvim_buf_set_keymap(self.bufnrs.main, "v", "y", '', {
             noremap = true,
-            callback = register_path,
+            callback = function()
+                register_path()
+                vim.cmd("noautocmd normal! ")
+            end,
         })
         vim.api.nvim_buf_set_keymap(self.bufnrs.main, "n", "m", '', {
             noremap = true,
@@ -675,4 +682,3 @@ vim.api.nvim_set_keymap("n", '<leader>e', '', {
     callback = init_eim,
 })
 -- }}}
-

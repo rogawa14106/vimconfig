@@ -36,7 +36,7 @@ I build nvim configuration to work in my own environment, so I can't guarantee t
     mdr is required to use 'preview-markdown.nvim'  
 - wl-clipboard  
     wl-clipboard is required to use the system clipboard with Nvim if you are using wayland as your display system.  
-    See h: clipboard  
+    See :h clipboard  
 
  ## About /bin  
 if you use the following command to change the IME, /bin shuoud be in %PATH%. (windows only)  

@@ -182,7 +182,7 @@ create_req_params = function(text, source, target)
         helper.highlightEcho("warning", "the text must be less than 1,000 characters")
         return ""
     end
-    -- format text used in request parametera
+    -- format text used in request parameter
     local req_text = text
     -- substitute forbidden char
     req_text = string.gsub(req_text, "%[", "［")
@@ -198,6 +198,7 @@ create_req_params = function(text, source, target)
     req_text = string.gsub(req_text, "%s+", "\\s")
     -- create reqest paramater
     local req_params = "?text=" .. req_text .. "&source=" .. source .. "&target=" .. target
+    -- print(req_params)
     return req_params
 end
 -- }}}
