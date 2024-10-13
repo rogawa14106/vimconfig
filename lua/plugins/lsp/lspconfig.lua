@@ -17,7 +17,6 @@ local _M = {
 
         -- vim keymap aliase
         local keymap = vim.keymap
-
         vim.api.nvim_create_autocmd("LspAttach", {
             group = vim.api.nvim_create_augroup("UserLspConfig", {}),
             callback = function(e)
@@ -55,82 +54,101 @@ local _M = {
             vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
         end
 
-        mason_lspconfig.setup_handlers({
-            -- all
-            function(server)
-                local opt_default = {
-                    capabilities = capabilities,
-                }
-                lspconfig[server].setup(opt_default)
-            end,
+        -- setup each lsp
+        local setup_handlers = {
+            -- c lang
+            clangd = {
+                capabilities = capabilities,
+                cmd = {
+                    "clangd",
+                    "--header-insertion=iwyu",
+                    "--function-arg-placeholders",
+                    "--clang-tidy"
+                },
+            },
+            -- python
+            pylsp = {
+                capabilities = capabilities,
+            },
+            -- terraform
+            terraformls = {
+                capabilities = capabilities,
+                -- root_dir = lspconfig.util.root_pattern('.terraform', '.git'),
+                filetypes = { "tf", "terraform", "terraform-vars" }
+            },
+            -- yaml
+            yamlls = {
+                capabilities = capabilities,
+                on_attach = function(client)
+                    client.server_capabilities.documentFormattingProvider = true
+                end,
+            },
+            -- markdown
+            marksman = {
+                capabilities = capabilities,
+                root_dir = require('lspconfig').util.root_pattern('README.md', '*.MD')
+            },
             -- lua
-            ["lua_ls"] = function()
-                local opt = {
-                    settings = {
-                        Lua = {
-                            diagnostics = {
-                                globals = { "vim", "use" },
-                            },
+            lua_ls = {
+                capabilities = capabilities,
+                on_init = function(client)
+                    if client.workspace_folders then
+                        local path = client.workspace_folders[1].name
+                        if vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc') then
+                            return
+                        end
+                    end
+
+                    client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+                        runtime = {
+                            -- Tell the language server which version of Lua you're using
+                            -- (most likely LuaJIT in the case of Neovim) See $nvim -v
+                            version = 'LuaJIT'
+                        },
+                        -- Make the server aware of Neovim runtime files
+                        workspace = {
+                            checkThirdParty = false,
+                            library = {
+                                vim.env.VIMRUNTIME,
+                                -- Depending on the usage, you might want to add additional paths here.
+                                -- "${3rd}/luv/library",
+                                -- "${3rd}/busted/library",
+                            }
+                            -- or pull in all of 'runtimepath'. NOTE: this is a lot slower
+                            -- library = vim.api.nvim_get_runtime_file("", true)
+                        }
+                    })
+                end,
+                settings = {
+                    Lua = {
+                        diagnostics = {
+                            globals = { "vim", "use" },
                         },
                     },
-                }
-                lspconfig["lua_ls"].setup(opt)
-            end,
-            -- clang
-            ["clangd"] = function()
-                local opt = {
-                    cmd = {
-                        "clangd",
-                        "--header-insertion=iwyu",
-                        "--function-arg-placeholders",
-                        "--clang-tidy"
-                    },
-                }
-                lspconfig["clangd"].setup(opt)
-            end,
-            -- python
-            ["pylsp"] = function()
-                local opt = {}
-                lspconfig["pylsp"].setup(opt)
-            end,
-            -- terraform
-            ["terraformls"] = function()
-                local opt = {
-                    root_dir = lspconfig.util.root_pattern('.terraform', '.git', 'main.tf')
-                }
-                lspconfig["terraformls"].setup(opt)
-                --                 print(vim.inspect(lspconfig.terraformls))
-            end,
-            -- yaml
-            ["yamlls"] = function()
-                local opt = {
-                    on_attach = function(client)
-                        client.server_capabilities.documentFormattingProvider = true
-                    end,
-                    --                     settings = {
-                    --                         yaml = {
-                    --                             completion = true,
-                    --                             schemaStore = {
-                    --                                 enable = true,
-                    --                             },
-                    --                         },
-                    --                     },
-                }
-                lspconfig["yamlls"].setup(opt)
-            end,
-            -- markdown
-            ["marksman"] = function()
-                local opt = {
-                    root_dir = lspconfig.util.root_pattern('README.md', '*.MD')
-                }
-                lspconfig["marksman"].setup(opt)
+                },
+            },
+        }
+
+        -- default setup
+        local setup_handler_default = {
+            capabilities = capabilities
+        }
+
+        -- attach lsp setup handlers
+        mason_lspconfig.setup_handlers({
+            function(server)
+                if setup_handlers[server] then
+                    lspconfig[server].setup(setup_handlers[server])
+                else
+                    lspconfig[server].setup(setup_handler_default)
+                end
             end,
         })
     end,
 }
 
--- define autocmds to detect filetype
-vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+-- define autocmd to detect filetype
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
     pattern = { "*.tf" },
     group = vim.api.nvim_create_augroup("DetectFiletype", {}),
     callback = function()
