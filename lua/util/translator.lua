@@ -177,28 +177,43 @@ end
 -- create request paramaters to hit the translation API{{{
 local create_req_params
 create_req_params = function(text, source, target)
+    -- source text must be less than 3000 characters
     local strlen_max = 3000
     if string.len(text) > strlen_max then
-        helper.highlightEcho("warning", "the text must be less than 1,000 characters")
+        helper.highlightEcho("warning", "the text must be less than 3,000 characters")
         return ""
     end
+
     -- format text used in request parameter
     local req_text = text
-    -- substitute forbidden char
-    req_text = string.gsub(req_text, "%[", "［")
-    req_text = string.gsub(req_text, "%]", "］")
-    req_text = string.gsub(req_text, "%{", "｛")
-    req_text = string.gsub(req_text, "%}", "｝")
-    req_text = string.gsub(req_text, "%(", "（")
-    req_text = string.gsub(req_text, "%)", "）")
-    req_text = string.gsub(req_text, "#", "＃")
-    req_text = string.gsub(req_text, "*", "＊")
-    req_text = string.gsub(req_text, "`", "｀")
-    -- replace whitespace char that include space, tab, line breaks with "\\s"
-    req_text = string.gsub(req_text, "%s+", "\\s")
+    -- substitute characters that can't use in url
+    local forbidden_chars = {
+        "%s+", "!", '"', "#", "%$",
+        -- "%",
+        "&", "'", "%(", "%)", "*",
+        "+", ",", "/", ":", ";",
+        "<", "=", ">", "?", "@",
+        "%[", "%]",
+        -- "^",
+        "`", "%{", "%|", "%}", "~",
+    }
+    local url_encodes = {
+        "%%20", "%%21", "%%22", "%%23", "%%24",
+        -- "%%25",
+        "%%26", "%%27", "%%28", "%%29", "%%2A",
+        "%%2B", "%%2C", "%%2F", "%%3A", "%%3B",
+        "%%3C", "%%3D", "%%3E", "%%3F", "%%40",
+        "%%5B", "%%5D",
+        -- "%%5E",
+        "%%60", "%%7B", "%%7C", "%%7D", "%%7E",
+    }
+    for i = 1, #forbidden_chars do
+        print(forbidden_chars[i] .. ", " .. url_encodes[i])
+        req_text = string.gsub(req_text, forbidden_chars[i], url_encodes[i])
+    end
     -- create reqest paramater
     local req_params = "?text=" .. req_text .. "&source=" .. source .. "&target=" .. target
-    -- print(req_params)
+    print(req_params)
     return req_params
 end
 -- }}}
@@ -219,6 +234,7 @@ hit_translation_api = function(params)
         cmd_rm_stderr = '2> /dev/null'
     end
     local cmd = cmd_curl .. ' ' .. cmd_rm_stderr
+    print(cmd)
 
     -- hit the translation api and read translate result(stdout)
     local handle = io.popen(cmd)
