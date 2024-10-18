@@ -1,4 +1,4 @@
-local _M = {
+return {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
     dependencies = {
@@ -17,7 +17,7 @@ local _M = {
         require("luasnip.loaders.from_vscode").lazy_load()
 
         -- define nvim_cmp options
-        local cmp_opt = {
+        cmp.setup({
             window = {
                 completion = cmp.config.window.bordered({ border = 'single' }),
                 documentation = cmp.config.window.bordered({ border = 'single' }),
@@ -55,8 +55,7 @@ local _M = {
                 }),
             },
         }
-        -- attach option
-        cmp.setup(cmp_opt)
+        )
 
         -- customize highlight settings of cmp_kind
         local kind_highlights = {
@@ -91,6 +90,3 @@ local _M = {
         end
     end,
 }
-
-return _M
--- Is there a way to change the color for the icon without changing the abbr color as well?

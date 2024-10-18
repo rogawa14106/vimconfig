@@ -1,4 +1,4 @@
-local _M = {
+return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
@@ -15,7 +15,7 @@ local _M = {
         -- import cmp_nvim_lsp
         local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
-        -- vim keymap aliase
+        -- keymapping
         local keymap = vim.keymap
         vim.api.nvim_create_autocmd("LspAttach", {
             group = vim.api.nvim_create_augroup("UserLspConfig", {}),
@@ -39,125 +39,111 @@ local _M = {
             end,
         })
 
-        -- disable virtual text
-        vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-            vim.lsp.diagnostic.on_publish_diagnostics, { virtual_text = false }
-        )
+        -- diagnostic setup
+        vim.diagnostic.config({
+            -- disable virtual text
+            virtual_text = false,
+            -- change the Diagnostic symbls
+            signs = {
+                text = {
+                    [vim.diagnostic.severity.ERROR] = "",
+                    [vim.diagnostic.severity.WARN] = "",
+                    [vim.diagnostic.severity.HINT] = "",
+                    [vim.diagnostic.severity.INFO] = "󰋼",
+                },
+            },
+        })
 
         -- used to enable autocompletion
         local capabilities = cmp_nvim_lsp.default_capabilities()
 
-        -- change the Diagnostic symbls
-        local signs = { Error = "", Warn = "", Hint = "", Info = "󰋼" }
-        for type, icon in pairs(signs) do
-            local hl = "DiagnosticSign" .. type
-            vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-        end
+        -- define autocmd to detect filetype
+        vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+            pattern = { "*.tf" },
+            group = vim.api.nvim_create_augroup("DetectFiletype", {}),
+            callback = function()
+                vim.opt.filetype = "terraform"
+            end,
+        })
 
         -- setup each lsp
-        local setup_handlers = {
-            -- c lang
-            clangd = {
-                capabilities = capabilities,
-                cmd = {
-                    "clangd",
-                    "--header-insertion=iwyu",
-                    "--function-arg-placeholders",
-                    "--clang-tidy"
-                },
-            },
-            -- python
-            pylsp = {
-                capabilities = capabilities,
-            },
-            -- terraform
-            terraformls = {
-                capabilities = capabilities,
-                -- root_dir = lspconfig.util.root_pattern('.terraform', '.git'),
-                filetypes = { "tf", "terraform", "terraform-vars" }
-            },
-            -- yaml
-            yamlls = {
-                capabilities = capabilities,
-                on_attach = function(client)
-                    client.server_capabilities.documentFormattingProvider = true
-                end,
-            },
-            -- markdown
-            marksman = {
-                capabilities = capabilities,
-                root_dir = require('lspconfig').util.root_pattern('README.md', '*.MD')
-            },
-            -- lua
-            lua_ls = {
-                capabilities = capabilities,
-                on_init = function(client)
-                    if client.workspace_folders then
-                        local path = client.workspace_folders[1].name
-                        if vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc') then
-                            return
-                        end
-                    end
-
-                    client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
-                        runtime = {
-                            -- Tell the language server which version of Lua you're using
-                            -- (most likely LuaJIT in the case of Neovim) See $nvim -v
-                            version = 'LuaJIT'
-                        },
-                        -- Make the server aware of Neovim runtime files
-                        workspace = {
-                            checkThirdParty = false,
-                            library = {
-                                vim.env.VIMRUNTIME,
-                                -- Depending on the usage, you might want to add additional paths here.
-                                -- "${3rd}/luv/library",
-                                -- "${3rd}/busted/library",
-                            }
-                            -- or pull in all of 'runtimepath'. NOTE: this is a lot slower
-                            -- library = vim.api.nvim_get_runtime_file("", true)
-                        }
-                    })
-                end,
-                settings = {
-                    Lua = {
-                        diagnostics = {
-                            globals = { "vim", "use" },
-                        },
-                    },
-                },
-            },
-        }
-
         -- default setup
-        local setup_handler_default = {
+        local default_setup_handler = {
             capabilities = capabilities
         }
-
         -- attach lsp setup handlers
         mason_lspconfig.setup_handlers({
+            -- default
             function(server)
-                if setup_handlers[server] then
-                    lspconfig[server].setup(setup_handlers[server])
-                else
-                    lspconfig[server].setup(setup_handler_default)
-                end
+                lspconfig[server].setup(default_setup_handler)
+            end,
+            -- lua
+            ["lua_ls"] = function()
+                local opt = {
+                    capabilities = capabilities,
+                    settings = {
+                        Lua = {
+                            diagnostics = {
+                                globals = { "vim", "use" },
+                            },
+                        },
+                    },
+                }
+                lspconfig["lua_ls"].setup(opt)
+            end,
+            -- clang
+            ["clangd"] = function()
+                local opt = {
+                    capabilities = capabilities,
+                    cmd = {
+                        "clangd",
+                        "--header-insertion=iwyu",
+                        "--function-arg-placeholders",
+                        "--clang-tidy"
+                    },
+                }
+                lspconfig["clangd"].setup(opt)
+            end,
+            -- python
+            ["pylsp"] = function()
+                local opt = {
+                    capabilities = capabilities,
+                }
+                lspconfig["pylsp"].setup(opt)
+            end,
+            -- terraform
+            ["terraformls"] = function()
+                local opt = {
+                    capabilities = capabilities,
+                    -- root_dir = lspconfig.util.root_pattern('.terraform', '.git'),
+                    -- -- disable highlight by the lsp
+                    -- on_attach = function(client, bufnr)
+                    -- client.server_capabilities.semanticTokensProvider = nil
+                    -- end,
+                }
+                lspconfig["terraformls"].setup(opt)
+                -- print(vim.inspect(lspconfig.terraformls))
+            end,
+            -- yaml
+            ["yamlls"] = function()
+                local opt = {
+                    on_attach = function(client)
+                        client.server_capabilities.documentFormattingProvider = true
+                    end,
+                }
+                lspconfig["yamlls"].setup(opt)
+            end,
+            -- markdown
+            ["marksman"] = function()
+                local opt = {
+                    root_dir = lspconfig.util.root_pattern('README.md', '*.MD')
+                }
+                lspconfig["marksman"].setup(opt)
             end,
         })
     end,
 }
-
--- define autocmd to detect filetype
-vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
-    pattern = { "*.tf" },
-    group = vim.api.nvim_create_augroup("DetectFiletype", {}),
-    callback = function()
-        vim.opt.filetype = "terraform"
-    end,
-})
-
 -- vim.opt.updatetime = 300
 -- vim.cmd("highlight LspReferenceText  cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
 -- vim.cmd("highlight LspReferenceRead  cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
 -- vim.cmd("highlight LspReferenceWrite cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
-return _M
