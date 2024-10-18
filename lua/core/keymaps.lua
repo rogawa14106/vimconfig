@@ -21,12 +21,12 @@ local comment_strs = {
     sh  = '#',
 }
 
-local attach_comment = function(comment_str, linenr)
+local comment_in = function(comment_str, linenr)
     vim.fn.setpos(".", { 0, linenr, 0, 0 })
-    vim.cmd("noautocmd normal! 0i" .. comment_str .. " ")
+    vim.cmd("noautocmd normal! ^i" .. comment_str .. " ")
 end
 
-local deattach_comment = function(top, bot, comment_str)
+local comment_out = function(top, bot, comment_str)
     local cmd = top .. "," .. bot .. "s/\\v" .. comment_str .. "(\\s|)//"
     vim.cmd(cmd)
     vim.cmd("nohl")
@@ -60,10 +60,10 @@ local tgl_comment = function()
 
     if is_commented == nil then
         for i = pos[1], pos[2] do
-            attach_comment(comment_str, i)
+            comment_in(comment_str, i)
         end
     else
-        deattach_comment(pos[1], pos[2], comment_str)
+        comment_out(pos[1], pos[2], comment_str)
     end
 end
 
@@ -89,7 +89,26 @@ vim.keymap.set("n", "<leader>cd", "", {
 })
 -- }}}
 -- switch buffer{{{
-local switchBuff = function(key)
+local switchBuff = function(switching_key)
+    -- define buffer switching cmds
+    local buf_switching_cmds = {
+        next = "bnext",
+        prev = "bprev"
+    }
+    -- validate switching key
+    local is_valid = false
+    for key, value in pairs(buf_switching_cmds) do
+        if key == switching_key then
+            is_valid = true
+            break
+        end
+    end
+    if is_valid == false then
+        helper.highlightEcho("error", "invalid argument. switching key must be next or prev")
+        return
+    end
+
+    -- block buffer switching on specified buffer
     local block_table = {
         "bufctl_bufnr",
         "fim_input_bufnr",
@@ -99,26 +118,17 @@ local switchBuff = function(key)
     for i=1,#block_table do
         local block_bufnr = block_table[i]
         if vim.fn.exists("g:" ..block_bufnr) and (vim.fn.bufnr() == vim.g[block_bufnr]) then
-            helper.highlightEcho("warning", "operation is invalid")
+            helper.highlightEcho("warning", "operation is blocked")
             return
         end
     end
-    if vim.fn.exists("g:bufctl_bufnr") and (vim.fn.bufnr() == vim.g.bufctl_bufnr) then
-        helper.highlightEcho("warning", "operation is invalid at BuffCtl")
-        return
-    end
 
-    local cmd
-    if key == 1 then
-        cmd = "bnext"
-    else
-        cmd = "bprev"
-    end
-
+    -- switch buffer
+    local buf_switching_cmd = buf_switching_cmds[switching_key]
     while true do
-        vim.cmd(cmd)
+        vim.cmd(buf_switching_cmd)
         -- skip "nolisted" or "terminal"
-        if (vim.opt.buflisted:get() ~= 0) and (vim.opt.buftype ~= "terminal") then
+        if (vim.opt.buflisted:get() ~= 0) and (vim.opt.buftype:get() ~= "terminal") then
             helper.highlightEcho("info", "buffer switched to >> " .. vim.fn.escape(vim.fn.bufname(vim.fn.bufnr()), "\\"))
             break
         end
@@ -127,13 +137,13 @@ end
 vim.keymap.set("n", "<leader>l", "", {
     noremap = true,
     callback = function()
-        switchBuff(1)
+        switchBuff("next")
     end,
 })
 vim.keymap.set("n", "<leader>h", "", {
     noremap = true,
     callback = function()
-        switchBuff(0)
+        switchBuff("prev")
     end,
 })
 -- }}}
@@ -141,7 +151,7 @@ vim.keymap.set("n", "<leader>h", "", {
 vim.keymap.set("n", "<leader>n", "<Cmd>cnext<CR>", { noremap = true })
 vim.keymap.set("n", "<leader>N", "<Cmd>cNext<CR>", { noremap = true })
 -- }}}
--- open chrome{{{
+-- open web browser{{{
 -- https://test.com
 vim.keymap.set("n", "<C-b>", "", {
     noremap = true,
@@ -227,7 +237,7 @@ local hl_color_code = function()
     vim.fn.setreg("z", zreg)
 end
 
-vim.api.nvim_set_keymap('n', '<leader>cc', '', { noremap = true, callback = hl_color_code })
+--vim.api.nvim_set_keymap('n', '<leader>cc', '', { noremap = true, callback = hl_color_code })
 -- }}}
 
 -- visual
