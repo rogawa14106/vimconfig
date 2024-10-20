@@ -10,10 +10,10 @@
   "mason-lspconfig.nvim": { "branch": "main", "commit": "25c11854aa25558ee6c03432edfa0df0217324be" },
   "mason.nvim": { "branch": "main", "commit": "e2f7f9044ec30067bc11800a9e266664b88cda22" },
   "neodev.nvim": { "branch": "main", "commit": "46aa467dca16cf3dfe27098042402066d2ae242d" },
-  "nvim-cmp": { "branch": "main", "commit": "ae644feb7b67bf1ce4260c231d1d4300b19c6f30" },
+  "nvim-cmp": { "branch": "main", "commit": "82bd4b59432d44cf5e2a5ce3a40a037a575a6623" },
   "nvim-lsp-file-operations": { "branch": "master", "commit": "92a673de7ecaa157dd230d0128def10beb56d103" },
-  "nvim-lspconfig": { "branch": "master", "commit": "b58d56c0c7b3dfb1c71797013ad7b4aca5e6b898" },
-  "nvim-translator": { "branch": "main", "commit": "237819833861d9927ee42aac63ea510caf9ca5bc" },
+  "nvim-lspconfig": { "branch": "master", "commit": "fd49d5863e873891be37afac79b1f56fb34bb5d3" },
+  "nvim-translator": { "branch": "main", "commit": "dfbb9ebf1bf60d19e1198fd4ec937b5fb6c86459" },
   "nvim-treesitter": { "branch": "master", "commit": "a3ca2e60563064cea008555d0b7d031430305b09" },
   "plenary.nvim": { "branch": "master", "commit": "2d9b06177a975543726ce5c73fca176cedbffe9d" },
   "preview-markdown.vim": { "branch": "master", "commit": "ed472c0c04f0e312df2ffcd4eaafc91a5a8959cf" }

@@ -44,7 +44,7 @@ require("util.eim")
 require("util.clock")
 
 -- translator
-require("util.translator")
+-- require("util.translator")
 
 -- mark utility
 require("util.visualmark")

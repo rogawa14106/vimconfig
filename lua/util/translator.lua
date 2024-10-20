@@ -208,12 +208,10 @@ create_req_params = function(text, source, target)
         "%%60", "%%7B", "%%7C", "%%7D", "%%7E",
     }
     for i = 1, #forbidden_chars do
-        print(forbidden_chars[i] .. ", " .. url_encodes[i])
         req_text = string.gsub(req_text, forbidden_chars[i], url_encodes[i])
     end
     -- create reqest paramater
     local req_params = "?text=" .. req_text .. "&source=" .. source .. "&target=" .. target
-    print(req_params)
     return req_params
 end
 -- }}}
@@ -234,7 +232,6 @@ hit_translation_api = function(params)
         cmd_rm_stderr = '2> /dev/null'
     end
     local cmd = cmd_curl .. ' ' .. cmd_rm_stderr
-    print(cmd)
 
     -- hit the translation api and read translate result(stdout)
     local handle = io.popen(cmd)
