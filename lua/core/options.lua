@@ -35,19 +35,28 @@ set.undofile = false
 
 -- file enc, format
 set.encoding = 'utf-8'
-set.fileencodings = {'utf-8', 'sjis'}
-set.fileformats = {'unix', 'mac', 'dos'}
+set.fileencodings = { 'utf-8', 'sjis' }
+set.fileformats = { 'unix', 'mac', 'dos' }
 -- set.ambiwidth = 'double'
 set.ambiwidth = 'single'
 
 -- clipboard
-set.clipboard:append({'unnamedplus'})
+set.clipboard:append({ 'unnamedplus' })
 
 -- chars
 set.list = true
-set.fillchars:append({fold=' '})
-set.listchars:append({tab='^-', space='_', eol='$'})
-set.matchpairs:append({'<:>'})
+set.fillchars:append({
+    fold = ' ',
+    horiz = '─',
+    horizup = '┴',
+    horizdown = '┬',
+    vert = '│',
+    vertleft = '┤',
+    vertright = '├',
+    verthoriz = '┼',
+})
+set.listchars:append({ tab = '^-', space = '_', eol = '$' })
+set.matchpairs:append({ '<:>' })
 
 -- path
 set.path:append('**')
@@ -55,14 +64,18 @@ set.path:append('**')
 -- gui
 set.mouse = ''
 -- if string.match(vim.env.USERNAME, 'rogawa') then
-    -- set.guifont = 'MyricaM M:h12'
+-- set.guifont = 'MyricaM M:h12'
 -- elseif string.match(vim.env.USERNAME, '152440') then
-    -- set.guifont = 'Myrica M:h12'
+-- set.guifont = 'Myrica M:h12'
 -- else
-    -- set.guifont = 'ＭＳ ゴシック:h12'
+-- set.guifont = 'ＭＳ ゴシック:h12'
 -- end
 
-vim.cmd[[
+-- color
+set.termguicolors = true
+-- set.winblend = 0
+-- set.pumblend = 0
+
+vim.cmd [[
     language en_US.utf8
 ]]
-
