@@ -1,6 +1,11 @@
 return {
     "rogawa14106/nvim-translator",
     config = function()
-        local nvim_translator = require('nvim-translator')
+        require('nvim-translator').setup({
+            keymap = {
+                { src = "en", dst = "ja", key = "<Leader>?", },
+                { src = "ja", dst = "en", key = "<Leader>g?", },
+            }
+        })
     end,
 }

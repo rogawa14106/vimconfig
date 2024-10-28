@@ -1,13 +1,15 @@
+-- manage lsp packages
 return {
     "williamboman/mason.nvim",
     dependencies = {
         "williamboman/mason-lspconfig.nvim", -- npm required
+        "WhoIsSethDaniel/mason-tool-installer.nvim",
     },
     config = function()
-        -- import mason
-        local mason = require('mason')
-        -- import mason-lspconfig
-        local mason_lspconfig = require('mason-lspconfig')
+        -- import plugins
+        local mason = require("mason")
+        local mason_lspconfig = require("mason-lspconfig")
+        local mason_tool_installer = require("mason-tool-installer")
 
         -- setup mason
         mason.setup({})
@@ -23,9 +25,19 @@ return {
                 "pylsp",
                 "terraformls",
                 "yamlls",
-                "marksman"
+                "marksman",
             },
-            automatic_installation = true
+            automatic_installation = true,
+        })
+
+        mason_tool_installer.setup({
+            ensure_installed = {
+                "prettier",
+                -- "stylua",
+                "isort",
+                "black",
+                "clang-format",
+            },
         })
     end,
 }

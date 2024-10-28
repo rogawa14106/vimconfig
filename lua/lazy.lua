@@ -20,18 +20,24 @@ vim.opt.rtp:prepend(lazypath)
 -- ============================================
 -- ============================================
 require("lazy").setup(
-    {
+    { -- spec
+        -- LazyVim
+        {
+            "LazyVim/LazyVim",
+            -- import = "lazyvim.plugins",
+        },
+        -- { import = "lazyvim.plugins.extras.lang.clangd" },
+        -- local
         { import = "plugins" },
         { import = "plugins.lsp" },
     },
-    {
+    { -- opts
         checker = {
             enabled = true,
             notify = false,
         },
         change_detection = {
             notify = false,
-        }
+        },
     }
-
 )

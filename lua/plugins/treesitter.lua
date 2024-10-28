@@ -2,22 +2,14 @@ return {
     "nvim-treesitter/nvim-treesitter",
     event = { "BufReadPre", "BufNewFile" },
     build = ":TSUpdate",
+    dependencies = {
+        "windwp/nvim-ts-autotag",
+    },
     -- main = "nvim-treesitter.configs",
     config = function()
         local treesitter = require("nvim-treesitter.configs")
         -- local opt =
         treesitter.setup({
-            ensure_installed = {
-                "lua",
-                "vim",
-                "c",
-                "python",
-                -- "hcl",
-                "terraform",
-                "markdown",
-                --"yaml",
-                --"bash",
-            },
             highlight = {
                 enable = true,
                 -- list of language that will be disabled
@@ -30,6 +22,22 @@ return {
             },
             indent = {
                 enable = true,
+            },
+            autotag = {
+                enable = true
+            },
+            ensure_installed = {
+                "lua",
+                "vim",
+                "cpp", --clang, cpp
+                "python",
+                -- "hcl",
+                "terraform",
+                "markdown",
+                "yaml",
+                --"bash",
+                "json",
+                "gitignore",
             },
             modules = {},
             -- Install parsers synchronously (only applied to `ensure_installed`)

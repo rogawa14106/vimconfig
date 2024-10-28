@@ -23,19 +23,19 @@ return {
                 -- Buffer local keymapping
                 local opts = { buffer = e.buf, silent = true }
                 -- see :h lsp-buf
-                keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-                keymap.set('n', 'gf', '<cmd>lua vim.lsp.buf.format()<CR>', opts)
-                keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-                keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-                -- keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-                -- keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-                keymap.set('n', 'gt', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-                keymap.set('n', 'gn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-                -- keymap.set('n', 'ga', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+                keymap.set("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+                -- keymap.set("n", "gf", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
+                keymap.set("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+                keymap.set("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
+                keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+                keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+                keymap.set("n", "gt", "<cmd>lua vim.lsp.buf.type_definition()<CR>", opts)
+                keymap.set("n", "gn", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+                keymap.set('n', 'ga', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
                 -- see :h vim-diagnostic
-                keymap.set('n', 'ge', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
-                keymap.set('n', 'g]', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
-                keymap.set('n', 'g[', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+                keymap.set("n", "ge", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
+                keymap.set("n", "g]", "<cmd>lua vim.diagnostic.goto_next()<CR>", opts)
+                keymap.set("n", "g[", "<cmd>lua vim.diagnostic.goto_prev()<CR>", opts)
             end,
         })
 
@@ -69,7 +69,7 @@ return {
         -- setup each lsp
         -- default setup
         local default_setup_handler = {
-            capabilities = capabilities
+            capabilities = capabilities,
         }
         -- attach lsp setup handlers
         mason_lspconfig.setup_handlers({
@@ -92,18 +92,32 @@ return {
                 lspconfig["lua_ls"].setup(opt)
             end,
             -- clang
-            ["clangd"] = function()
-                local opt = {
-                    capabilities = capabilities,
-                    cmd = {
-                        "clangd",
-                        "--header-insertion=iwyu",
-                        "--function-arg-placeholders",
-                        "--clang-tidy"
-                    },
-                }
-                lspconfig["clangd"].setup(opt)
-            end,
+            -- ["clangd"] = function()
+            -- local opt = {
+            -- capabilities = capabilities,
+            -- cmd = {
+            -- "clangd",
+            -- "--background-index",
+            -- "--clang-tidy",
+            -- "--header-insertion=iwyu",
+            -- "--completion-style=detailed",
+            -- "--function-arg-placeholders",
+            -- "--fallback-style=llvm",
+            -- },
+            -- init_options = {
+            -- usePlaceholders = true,
+            -- completeUnimported = true,
+            -- clangdFileStatus = true,
+            -- },
+            -- }
+            -- local opt_ext = vim.tbl_deep_extend(
+            -- "force",
+            -- LazyVim.opts("clangd_extensions.nvim") or {},
+            -- { server = { servers = { clangd = opt } } }
+            -- )
+            -- require("clangd_extentions").setup(opt_ext)
+            -- -- lspconfig["clangd"].setup(opt)
+            -- end,
             -- python
             ["pylsp"] = function()
                 local opt = {
@@ -136,12 +150,62 @@ return {
             -- markdown
             ["marksman"] = function()
                 local opt = {
-                    root_dir = lspconfig.util.root_pattern('README.md', '*.MD')
+                    root_dir = lspconfig.util.root_pattern("README.md", "*.MD"),
                 }
                 lspconfig["marksman"].setup(opt)
             end,
         })
     end,
+    opts = {
+        servers = {
+            -- Ensure mason installs the server
+            clangd = {
+                keys = {
+                    { "<leader>ch", "<cmd>ClangdSwitchSourceHeader<cr>", desc = "Switch Source/Header (C/C++)" },
+                },
+                root_dir = function(fname)
+                    return require("lspconfig.util").root_pattern(
+                        "Makefile",
+                        "configure.ac",
+                        "configure.in",
+                        "config.h.in",
+                        "meson.build",
+                        "meson_options.txt",
+                        "build.ninja"
+                    )(fname) or require("lspconfig.util").root_pattern(
+                        "compile_commands.json",
+                        "compile_flags.txt"
+                    )(fname) or require("lspconfig.util").find_git_ancestor(fname)
+                end,
+                capabilities = {
+                    offsetEncoding = { "utf-16" },
+                },
+                cmd = {
+                    "clangd",
+                    "--background-index",
+                    "--clang-tidy",
+                    "--header-insertion=iwyu",
+                    "--completion-style=detailed",
+                    "--function-arg-placeholders",
+                    "--fallback-style=llvm",
+                },
+                init_options = {
+                    usePlaceholders = true,
+                    completeUnimported = true,
+                    clangdFileStatus = true,
+                },
+            },
+        },
+        setup = {
+            clangd = function(_, opts)
+                local clangd_ext_opts = LazyVim.opts("clangd_extensions.nvim")
+                require("clangd_extensions").setup(
+                    vim.tbl_deep_extend("force", clangd_ext_opts or {}, { server = opts })
+                )
+                return false
+            end,
+        },
+    },
 }
 -- vim.opt.updatetime = 300
 -- vim.cmd("highlight LspReferenceText  cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")

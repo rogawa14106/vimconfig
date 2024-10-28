@@ -2,12 +2,12 @@ return {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
     dependencies = {
-        "hrsh7th/cmp-buffer",
-        "hrsh7th/cmp-path",
+        "hrsh7th/cmp-buffer", -- source for text in buffer
+        "hrsh7th/cmp-path", -- source for file system path
         { "L3MON4D3/LuaSnip", version = "v2.*", ild = "make install_jsregexp" },
-        "saadparwaiz1/cmp_luasnip",
-        "rafamadriz/friendly-snippets",
-        "onsails/lspkind.nvim",
+        "saadparwaiz1/cmp_luasnip", -- for auto completion
+        "rafamadriz/friendly-snippets", -- usefule snippets
+        "onsails/lspkind.nvim", -- vs-code like pictograms
     },
     config = function()
         local cmp = require("cmp")
@@ -89,4 +89,7 @@ return {
             vim.cmd("highlight CmpItemKind" .. kind .. " guifg=" .. guifg)
         end
     end,
+    -- opts = function(_, opts)
+        -- table.insert(opts.sorting.comparators, 1, require("clangd_extensions.cmp_scores"))
+    -- end,
 }
