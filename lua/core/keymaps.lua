@@ -5,7 +5,7 @@ local helper = require("util.helper")
 vim.g.mapleader = " "
 
 -- override default keymap
-vim.keymap.set("n", "K", "k", { noremap = true })
+-- vim.keymap.set("n", "K", "k", { noremap = true })
 
 -- normal
 -- toggle comment{{{
@@ -70,6 +70,7 @@ end
 vim.keymap.set("v", "<leader>/", "", {
     noremap = true,
     callback = tgl_comment,
+    desc = "Toggle comments",
 })
 -- }}}
 -- change current working directory{{{
@@ -86,6 +87,7 @@ vim.keymap.set("n", "<leader>cd", "", {
         local cwd = vim.fs.normalize(vim.fn.getcwd())
         helper.highlightEcho("info", "change cwd >> " .. cwd)
     end,
+    desc = "Change working directory to current file path",
 })
 -- }}}
 -- switch buffer{{{
@@ -115,9 +117,9 @@ local switchBuff = function(switching_key)
         "fim_selector_bufnr",
         "eim_main_bufnr",
     }
-    for i=1,#block_table do
+    for i = 1, #block_table do
         local block_bufnr = block_table[i]
-        if vim.fn.exists("g:" ..block_bufnr) and (vim.fn.bufnr() == vim.g[block_bufnr]) then
+        if vim.fn.exists("g:" .. block_bufnr) and (vim.fn.bufnr() == vim.g[block_bufnr]) then
             helper.highlightEcho("warning", "operation is blocked")
             return
         end
@@ -139,17 +141,19 @@ vim.keymap.set("n", "<leader>l", "", {
     callback = function()
         switchBuff("next")
     end,
+    desc = "Switch buffer to next",
 })
 vim.keymap.set("n", "<leader>h", "", {
     noremap = true,
     callback = function()
         switchBuff("prev")
     end,
+    desc = "Switch buffer to previous"
 })
 -- }}}
 -- cnext, cNext{{{
-vim.keymap.set("n", "<leader>n", "<Cmd>cnext<CR>", { noremap = true })
-vim.keymap.set("n", "<leader>N", "<Cmd>cNext<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>cn", "<Cmd>cnext<CR>", { noremap = true, desc = "Go to next ctag" })
+vim.keymap.set("n", "<leader>cp", "<Cmd>cNext<CR>", { noremap = true, desc = "Go to previous ctag" })
 -- }}}
 -- open web browser{{{
 -- https://test.com
@@ -167,11 +171,13 @@ vim.keymap.set("n", "<C-b>", "", {
             vim.cmd("!$(whereis firefox | awk -F \" \" '{print $2}') " .. '"' .. url .. '"')
         else
             -- launch chrome
-            vim.cmd('!chcp 65001 | "C:/Program Files/Google/Chrome/Application/chrome.exe" --incognito ' .. '"' .. url .. '"')
+            vim.cmd('!chcp 65001 | "C:/Program Files/Google/Chrome/Application/chrome.exe" --incognito ' ..
+                '"' .. url .. '"')
         end
         local key = vim.api.nvim_replace_termcodes("<CR>", true, false, true)
         vim.api.nvim_feedkeys(key, 'n', false)
     end,
+    desc = "Launch web browser",
 })
 -- }}}
 -- convert hiragana to katakana{{{
@@ -242,8 +248,8 @@ end
 
 -- visual
 -- move lines{{{
-vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv", { noremap = true })
-vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv", { noremap = true })
+vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv", { noremap = true, desc = "Move selected lines up" })
+vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv", { noremap = true, desc = "Move selected lines up" })
 -- }}}
 -- surround_str{{{
 local surround_str = function(lchar, rchar)
@@ -268,6 +274,7 @@ local create_keymap_surround_str = function(lchar, rchar)
         callback = function()
             surround_str(lchar, rchar)
         end,
+        desc = "Surround selected characters in " .. lchar .. rchar,
     })
 end
 
@@ -286,17 +293,16 @@ create_keymap_surround_str("%", "%")
 
 -- insert & command
 -- move to inside{{{
-vim.keymap.set({ "i", "c" }, '""', '""<Left>', { noremap = true })
-vim.keymap.set({ "i", "c" }, "''", "''<Left>", { noremap = true })
-vim.keymap.set({ "i", "c" }, "()", "()<Left>", { noremap = true })
-vim.keymap.set({ "i", "c" }, "[]", "[]<Left>", { noremap = true })
-vim.keymap.set({ "i", "c" }, "{}", "{}<Left>", { noremap = true })
-vim.keymap.set({ "i", "c" }, "<>", "<><Left>", { noremap = true })
-vim.keymap.set({ "i", "c" }, "%%", "%%<Left>", { noremap = true })
+-- vim.keymap.set({ "i", "c" }, '""', '""<Left>', { noremap = true })
+-- vim.keymap.set({ "i", "c" }, "''", "''<Left>", { noremap = true })
+-- vim.keymap.set({ "i", "c" }, "()", "()<Left>", { noremap = true })
+-- vim.keymap.set({ "i", "c" }, "[]", "[]<Left>", { noremap = true })
+-- vim.keymap.set({ "i", "c" }, "{}", "{}<Left>", { noremap = true })
+-- vim.keymap.set({ "i", "c" }, "<>", "<><Left>", { noremap = true })
+-- vim.keymap.set({ "i", "c" }, "%%", "%%<Left>", { noremap = true })
 -- }}}
 
 -- terminal
 -- exit job mode{{{
-vim.keymap.set("t", "<C-[>", "<C-\\><C-N>", { noremap = true })
+vim.keymap.set("t", "<C-[>", "<C-\\><C-N>", { noremap = true, desc = "Exit job mode on terminal" })
 -- }}}
-
