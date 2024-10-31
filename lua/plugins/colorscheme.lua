@@ -77,13 +77,19 @@ local M = {
             transparent = true,
             styles = {
                 sidebars = "transparent",
-                -- floats = "transparent",
+                floats = "transparent",
             },
+            dim_inactive = true,
             on_colors = function(colors)
-                -- colors.blue = "#" .. my_colors.hl_blue2.gui
+                -- colors.border = "#" .. my_colors.hl_mnorm.gui
                 colors.border = colors.blue
             end,
             on_highlights = function(highlights, colors)
+                -- tabline
+                highlights.TabLineSel.bg = '#' .. my_colors.hl_mnorm.gui
+                highlights.TabLineSel.fg = '#' .. my_colors.hl_mono9.gui
+
+                -- mode lines
                 set_my_colors("mModeNormal", my_colors.hl_mono9, my_colors.hl_mnorm, "none")
                 set_my_colors("mModeInsert", my_colors.hl_mono9, my_colors.hl_minse, "none")
                 set_my_colors("mModeCommand", my_colors.hl_mono9, my_colors.hl_mcomm, "none")
