@@ -136,14 +136,14 @@ local switchBuff = function(switching_key)
         end
     end
 end
-vim.keymap.set("n", "<leader>l", "", {
+vim.keymap.set("n", "<Leader>n", "", {
     noremap = true,
     callback = function()
         switchBuff("next")
     end,
     desc = "Switch buffer to next",
 })
-vim.keymap.set("n", "<leader>h", "", {
+vim.keymap.set("n", "<Leader>p", "", {
     noremap = true,
     callback = function()
         switchBuff("prev")
@@ -293,13 +293,13 @@ create_keymap_surround_str("%", "%")
 
 -- insert & command
 -- move to inside{{{
--- vim.keymap.set({ "i", "c" }, '""', '""<Left>', { noremap = true })
--- vim.keymap.set({ "i", "c" }, "''", "''<Left>", { noremap = true })
--- vim.keymap.set({ "i", "c" }, "()", "()<Left>", { noremap = true })
--- vim.keymap.set({ "i", "c" }, "[]", "[]<Left>", { noremap = true })
--- vim.keymap.set({ "i", "c" }, "{}", "{}<Left>", { noremap = true })
--- vim.keymap.set({ "i", "c" }, "<>", "<><Left>", { noremap = true })
--- vim.keymap.set({ "i", "c" }, "%%", "%%<Left>", { noremap = true })
+vim.keymap.set({ "i", "c" }, '""', '""<Left>', { noremap = true })
+vim.keymap.set({ "i", "c" }, "''", "''<Left>", { noremap = true })
+vim.keymap.set({ "i", "c" }, "()", "()<Left>", { noremap = true })
+vim.keymap.set({ "i", "c" }, "[]", "[]<Left>", { noremap = true })
+vim.keymap.set({ "i", "c" }, "{}", "{}<Left>", { noremap = true })
+vim.keymap.set({ "i", "c" }, "<>", "<><Left>", { noremap = true })
+vim.keymap.set({ "i", "c" }, "%%", "%%<Left>", { noremap = true })
 -- }}}
 
 -- terminal
