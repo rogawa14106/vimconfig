@@ -37,10 +37,10 @@ vim.api.nvim_create_user_command("CMD", function(opts)
     local lines = vim.api.nvim_eval("&lines")
     if vim.fn.has('nvim') == 1 then
         Termkey = "a"
-        vim.cmd("horizontal belowright " .. lines / 3 .. " split")
+        vim.cmd("horizontal belowright " .. lines / 5 .. " split")
     else
         Termkey = ""
-        vim.cmd("set termwinsize=" .. lines / 3 .. "x0")
+        vim.cmd("set termwinsize=" .. lines / 5 .. "x0")
     end
 
     -- open terminal
