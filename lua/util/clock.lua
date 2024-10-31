@@ -68,7 +68,8 @@ end
 -- }}}
 --# main{{{
 local floatClock = function()
-    local win_width = 17
+    local clock_sample = "1999/11/29 18:23"
+    local win_width = #clock_sample
     local win_height = 1
     local row_offset = 2
     local col_offset = 0
@@ -92,10 +93,10 @@ end
 vim.api.nvim_create_user_command("Clock", floatClock, { bang = true })
 -- }}}
 --# create autocmd{{{
-vim.api.nvim_create_augroup( "placeClock", {} )
+vim.api.nvim_create_augroup("placeClock", {})
 vim.api.nvim_create_autocmd('vimResized', {
     group = 'placeClock',
-    callback = function() 
+    callback = function()
         vim.cmd('Clock')
     end,
 })
