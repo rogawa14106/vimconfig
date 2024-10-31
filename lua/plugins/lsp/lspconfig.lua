@@ -52,8 +52,18 @@ return {
                     [vim.diagnostic.severity.INFO] = "󰋼",
                 },
             },
+            float = { border = "rounded" },
         })
 
+        -- hover window ui settings
+        vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+            vim.lsp.handlers.hover,
+            {
+                border = "rounded", -- "shadow" , "none", "single"
+                -- border = border
+                -- width = 100,
+            }
+        )
         -- used to enable autocompletion
         local capabilities = cmp_nvim_lsp.default_capabilities()
 
@@ -91,33 +101,13 @@ return {
                 }
                 lspconfig["lua_ls"].setup(opt)
             end,
-            -- clang
-            -- ["clangd"] = function()
-            -- local opt = {
-            -- capabilities = capabilities,
-            -- cmd = {
-            -- "clangd",
-            -- "--background-index",
-            -- "--clang-tidy",
-            -- "--header-insertion=iwyu",
-            -- "--completion-style=detailed",
-            -- "--function-arg-placeholders",
-            -- "--fallback-style=llvm",
-            -- },
-            -- init_options = {
-            -- usePlaceholders = true,
-            -- completeUnimported = true,
-            -- clangdFileStatus = true,
-            -- },
-            -- }
-            -- local opt_ext = vim.tbl_deep_extend(
-            -- "force",
-            -- LazyVim.opts("clangd_extensions.nvim") or {},
-            -- { server = { servers = { clangd = opt } } }
-            -- )
-            -- require("clangd_extentions").setup(opt_ext)
-            -- -- lspconfig["clangd"].setup(opt)
-            -- end,
+            -- clangd
+            ["clangd"] = function(serv_name)
+                local opt = {
+                    capabilities = capabilities,
+                }
+                lspconfig[serv_name].setup(opt)
+            end,
             -- python
             ["pylsp"] = function()
                 local opt = {
@@ -182,6 +172,7 @@ return {
                 },
                 cmd = {
                     "clangd",
+                    "--enable-config",
                     "--background-index",
                     "--clang-tidy",
                     "--header-insertion=iwyu",
@@ -205,9 +196,9 @@ return {
                 return false
             end,
         },
+        inlay_hints = { enabled = true },
     },
 }
 -- vim.opt.updatetime = 300
 -- vim.cmd("highlight LspReferenceText  cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
 -- vim.cmd("highlight LspReferenceRead  cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
--- vim.cmd("highlight LspReferenceWrite cterm=underline ctermfg=1 ctermbg=8 gui=underline guibg=#104040")
