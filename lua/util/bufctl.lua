@@ -1,64 +1,43 @@
-local helper = require('util.helper')
-
-local new_BufCtl = function()
+local BufCtl = function()
     local self = {
         bufnr = nil,
         winid = nil,
         pre_winid = nil,
         buflines = {},
-        -- bufnrs = {},
         bufinfos = {},
     }
 
-    local init
-    local create_win
-    local create_ui
-    local delete_win_all
-    local delete_win
-    local update_bufinfo
-    local redraw_bufline
-    local write_lines
-
-    local create_keymap
-    local select_buf
-    local delete_buf
-    local is_confirmed
-
-    init = function()
+    self.new = function()
         self.bufnr = vim.g.bufctl_bufnr
         self.winid = vim.g.bufctl_winid
         self.pre_winid = vim.fn.win_getid()
-        update_bufinfo()
+        self.update_bufinfo()
 
         -- winconfig
         local width = self.longest_line + 1
         local height = #self.buflines
-        local border_off = 2
-        local offset = 1
---         local border = {
---             ".", "-", ".", "|",
---             "'", "-", "`", "|",
---         }
-        local border = 'rounded'
+        local border_offset = 2
         local config = {
             window = {
                 width     = width,
                 height    = height,
-                col       = vim.opt.columns:get() - width - border_off - offset,
-                row       = vim.opt.lines:get() - height - border_off - offset - 1,
-                border    = border,
+                -- col       = vim.opt.columns:get() - width - border_off - offset,
+                col       = 0,
+                row       = vim.opt.lines:get() - border_offset,
+                border    = 'rounded',
                 focusable = true,
                 style     = 'minimal',
                 relative  = 'editor',
+                anchor    = 'SW',
             },
             color  = "NormalFloat"
         }
-        create_ui(config)
+        self.init_ui(config)
 
-        write_lines(0, -1, self.buflines)
+        self.write_lines(0, -1, self.buflines)
 
         -- set keymap
-        create_keymap()
+        self.init_keymap()
 
         -- disable left and right move
         vim.api.nvim_create_augroup('bufctl', {})
@@ -71,13 +50,11 @@ local new_BufCtl = function()
         })
     end
 
-    update_bufinfo = function()
+    self.update_bufinfo = function()
         local buf_infos = vim.fn.getbufinfo({ buflisted = 1 })
-        local cwd = vim.fs.normalize(vim.fn.getcwd())
 
         self.buflines = {}
         self.longest_line = 0
-        -- self.bufnrs = {}
         self.bufinfos = {}
 
         for i = 1, #buf_infos do
@@ -85,38 +62,24 @@ local new_BufCtl = function()
 
             local bufnr = bufinfo.bufnr
             local bufnr_str = string.format("%02d", bufnr)
-
-            local bufname = vim.fs.normalize(bufinfo.name)
-            -- replace cwd
-            bufname = string.gsub(bufname, cwd, ".")
-            -- get userprofile
-            local userprofile
-            if vim.fn.has('win32') == 1 then
-                userprofile = vim.fs.normalize(vim.env.USERPROFILE)
-            else
-                userprofile = vim.fs.normalize(vim.env.HOME)
-            end
-            bufname = string.gsub(bufname, userprofile, "~")
-            if bufinfo.variables.term_title ~= nil then
-                bufname = 'Terminal'
-            end
+            local bufname = vim.fs.basename(bufinfo.name)
             if bufname == "" then
                 bufname = "No Name"
             end
 
             local is_change = bufinfo.changed
-            local is_change_str = "-"
+            local is_change_char = "-"
             if is_change == 1 then
-                is_change_str = "+"
+                is_change_char = "+"
             end
 
             local is_current = (bufinfo.windows ~= nil) and (bufinfo.windows[1] == self.pre_winid)
-            local is_current_str = " "
+            local is_current_char = " "
             if is_current then
-                is_current_str = "!"
+                is_current_char = "!"
             end
 
-            local bufline = " [" .. bufnr_str .. "][" .. is_change_str .. "][" .. is_current_str .. "] " .. bufname
+            local bufline = " [" .. bufnr_str .. "][" .. is_change_char .. "][" .. is_current_char .. "] " .. bufname
 
             if self.longest_line < #bufline then
                 self.longest_line = #bufline
@@ -134,61 +97,53 @@ local new_BufCtl = function()
         end
     end
 
-    redraw_bufline = function()
-        write_lines(0, -1, self.buflines)
+    self.redraw_bufline = function()
+        self.write_lines(0, -1, self.buflines)
         local winconfig = {
             height = #self.buflines,
             width = self.longest_line + 1,
         }
         vim.api.nvim_win_set_config(self.winid, winconfig)
-        vim.api.nvim_win_set_option(self.winid, 'signcolumn', 'no')
+        vim.api.nvim_set_option_value('signcolumn', 'no', { win = self.winid })
     end
 
-    create_ui = function(config)
+    self.init_ui = function(config)
         -- create bufctl window
         local is_shown = (#vim.fn.win_findbuf(self.bufnr) > 0)
         local current_bufnr = vim.fn.bufnr()
         local is_current = (current_bufnr == self.bufnr)
         if is_shown and is_current then
-            delete_win_all()
+            self.close_all_window()
             return
         elseif is_shown then
             vim.fn.win_gotoid(self.winid)
         else
-            local win_main = create_win(config.window, self.bufnr, self.winid)
+            local win_main = self.init_window(config.window, self.bufnr, self.winid)
             self.bufnr = win_main.bufnr
             self.winid = win_main.winid
             vim.g.bufctl_bufnr = win_main.bufnr
             vim.g.bufctl_winid = win_main.winid
         end
+        -- initialize buffer highlight
+        self.init_highlight()
+    end
 
+    self.init_highlight = function()
         -- set colors
-        vim.api.nvim_win_set_option(self.winid, 'winhl', 'Normal:' .. config.color)
-        vim.api.nvim_win_set_option(self.winid, 'signcolumn', 'no')
+        vim.api.nvim_set_option_value('signcolumn', 'no', { win = self.winid })
         vim.fn.clearmatches(self.winid)
 
-        vim.fn.matchadd(
-        -- 'BufCtlNoFile', '\\v[^\\]]+$',
-        -- 10, 5, { window = self.winid })
-            'BufCtlNoFile', '\\v(No Name|Terminal)$',
-            11, 5, { window = self.winid })
-        vim.fn.matchadd(
-            "BufCtlFile", '\\v[^\\]/]+$',
-            10, 6, { window = self.winid })
-        vim.fn.matchadd(
-            'BufCtlCautionMark', '\\v\\[!\\]',
-            10, 7, { window = self.winid })
-        vim.fn.matchadd(
-            'BufCtlWarningMark', '\\v\\[[t+]\\]',
-            10, 8, { window = self.winid })
-
+        vim.fn.matchadd('BufCtlNoFile', '\\v(No Name|Terminal)$', 11, 5)
+        vim.fn.matchadd("BufCtlFile", '\\v[^\\]/]+$', 10, 6)
+        vim.fn.matchadd('BufCtlCautionMark', '\\v\\[!\\]', 10, 7)
+        vim.fn.matchadd('BufCtlWarningMark', '\\v\\[[t+]\\]', 10, 8)
         vim.cmd("hi! def link BufCtlFile Title")
         vim.cmd("hi! def link BufCtlNoFile Statement")
         vim.cmd("hi! def link BufCtlCautionMark ErrorMsg")
         vim.cmd("hi! def link BufCtlWarningMark WarningMsg")
     end
 
-    create_win = function(win_config, g_bufnr, g_winid)
+    self.init_window = function(win_config, g_bufnr, g_winid)
         local bufnr
         local winid
         if g_bufnr == nil then
@@ -208,67 +163,76 @@ local new_BufCtl = function()
         end
     end
 
-    delete_win_all = function()
-        delete_win(self.winid, self.bufnr)
+    self.close_all_window = function()
+        self.close_window(self.winid, self.bufnr)
     end
 
-    delete_win = function(winid, bufnr)
+    self.close_window = function(winid, bufnr)
         if (winid ~= nil) and (#vim.fn.win_findbuf(bufnr) > 0) then
             vim.api.nvim_win_close(winid, true)
         end
     end
 
-    write_lines = function(startl, endl, lines)
-        vim.api.nvim_buf_set_option(self.bufnr, 'modifiable', true)
-        vim.api.nvim_buf_set_option(self.bufnr, 'readonly', false)
+    self.write_lines = function(startl, endl, lines)
+        vim.api.nvim_set_option_value('modifiable', true, { buf = self.bufnr })
+        vim.api.nvim_set_option_value('readonly', false, { buf = self.bufnr })
         vim.api.nvim_buf_set_lines(self.bufnr, startl, endl, false, lines)
-        vim.api.nvim_buf_set_option(self.bufnr, 'modifiable', false)
-        vim.api.nvim_buf_set_option(self.bufnr, 'readonly', true)
+        vim.api.nvim_set_option_value('modifiable', false, { buf = self.bufnr })
+        vim.api.nvim_set_option_value('readonly', true, { buf = self.bufnr })
         vim.cmd("redraw")
     end
 
-    create_keymap = function()
+    self.init_keymap = function()
+        -- enter buffer
         vim.api.nvim_buf_set_keymap(self.bufnr, "n", "<Enter>", "", {
             noremap = true,
-            callback = select_buf,
+            callback = self.enter_buffer,
         })
+        -- delete buffer
         vim.api.nvim_buf_set_keymap(self.bufnr, "n", "D", "", {
             noremap = true,
-            callback = delete_buf,
+            callback = self.delete_buf,
+        })
+        -- close window
+        vim.api.nvim_buf_set_keymap(self.bufnr, 'n', 'q', '', {
+            callback = function()
+                self.close_all_window()
+            end,
         })
     end
 
-    select_buf = function()
+    -- enter buffer
+    self.enter_buffer = function()
         local linenr = vim.fn.line(".")
         local selected_buf = self.bufinfos[linenr].bufnr
-        delete_win_all()
+        self.close_all_window()
         vim.fn.win_gotoid(self.pre_winid)
         vim.cmd("b " .. selected_buf)
-        helper.highlightEcho("", "[BufCtl] enter buffer >> " .. self.bufinfos[linenr].bufname .. " ")
+        vim.notify("[BufCtl] enter buffer >> " .. self.bufinfos[linenr].bufname, vim.log.levels.INFO)
     end
 
-    delete_buf = function()
+    self.delete_buf = function()
         local linenr = vim.fn.line(".")
         local selected_bufnr = self.bufinfos[linenr].bufnr
         local is_current = self.bufinfos[linenr].is_current
         local is_change = self.bufinfos[linenr].is_change
         if is_current == true then
-            helper.highlightEcho("error", "current buffer can't be deleted")
+            vim.notify("current buffer can't be deleted", vim.log.levels.ERROR)
             return
         end
         if is_change == 1 then
-            if is_confirmed("buffer is modified.") == false then
-                helper.highlightEcho("info", "canceled buffer deletion")
+            if self.is_confirmed("buffer is modified.") == false then
+                vim.notify("canceled buffer deletion", vim.log.levels.INFO)
                 return
             end
         end
         vim.cmd("bd! " .. selected_bufnr)
-        update_bufinfo()
-        redraw_bufline()
+        self.update_bufinfo()
+        self.redraw_bufline()
     end
 
-    is_confirmed = function(msg)
-        local inputstr = helper.highlightInput("warning", "[BufCtl] " .. msg .. " type y to continue > ")
+    self.is_confirmed = function(msg)
+        local inputstr = vim.notify("[BufCtl] " .. msg .. " type y to continue > ", vim.log.levels.WARN)
         local result = false
         if inputstr == 'y' then
             result = true
@@ -277,18 +241,15 @@ local new_BufCtl = function()
     end
 
     return {
-        init = init
+        new = self.new
     }
-end
-
-
-local init_bufctl
-init_bufctl = function()
-    local bufctl = new_BufCtl()
-    bufctl.init()
 end
 
 vim.api.nvim_set_keymap("n", '<leader>b', '', {
     noremap = true,
-    callback = init_bufctl,
+    callback = function()
+        local bufctl = BufCtl()
+        bufctl.new()
+    end,
+    desc = 'Lauch BufCtl',
 })
