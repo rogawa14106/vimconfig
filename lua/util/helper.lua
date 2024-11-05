@@ -47,11 +47,11 @@ local highlightEcho = function(type, msg)
 end
 
 local highlightInput = function(type, prompt, text)
-    if type == 'error' then
+    if type == vim.log.levels.ERROR then
         vim.cmd("echohl ErrorMsg")
-    elseif type == 'warning' then
+    elseif type == vim.log.levels.WARN then
         vim.cmd("echohl WarningMsg")
-    elseif type == 'info' then
+    elseif type == vim.log.levels.INFO then
         vim.cmd("echohl DiffAdd")
     end
 
