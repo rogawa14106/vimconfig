@@ -60,17 +60,30 @@ local BufCtl = function()
         for i = 1, #buf_infos do
             local bufinfo = buf_infos[i]
 
+            -- Define bufnr
             local bufnr = bufinfo.bufnr
-            local bufnr_str = string.format("%02d", bufnr)
+            -- local bufnr_str = string.format("%03d", bufnr)
+
+            -- Define buffer name
             local bufname = vim.fs.basename(bufinfo.name)
+
             if bufname == "" then
                 bufname = "No Name"
             end
 
-            local is_change = bufinfo.changed
+            local is_term = string.match(bufinfo.name, '^term://') ~= nil
+            if is_term then
+                bufname = "Term: " .. bufname
+            end
+
+            -- Define buffer status
+            local is_change = bufinfo.changed == 1
             local is_change_char = "-"
-            if is_change == 1 then
+            if is_change then
                 is_change_char = "+"
+            end
+            if is_term then
+                is_change_char = "T"
             end
 
             local is_current = (bufinfo.windows ~= nil) and (bufinfo.windows[1] == self.pre_winid)
@@ -79,8 +92,11 @@ local BufCtl = function()
                 is_current_char = "!"
             end
 
-            local bufline = " [" .. bufnr_str .. "][" .. is_change_char .. "][" .. is_current_char .. "] " .. bufname
+            -- Define a line of buffer infomation
+            -- local bufline = " [" .. bufnr_str .. "][" .. is_change_char .. "][" .. is_current_char .. "] " .. bufname
+            local bufline = " [" .. is_current_char .. "]" .. "[" .. is_change_char .. "] " .. bufname
 
+            -- Update length of longest line.
             if self.longest_line < #bufline then
                 self.longest_line = #bufline
             end
@@ -90,6 +106,7 @@ local BufCtl = function()
                 bufname = bufname,
                 is_current = is_current,
                 is_change = is_change,
+                is_term = is_term,
             }
 
             self.buflines[#self.buflines + 1] = bufline
@@ -129,14 +146,12 @@ local BufCtl = function()
     end
 
     self.init_highlight = function()
-        -- set colors
-        vim.api.nvim_set_option_value('signcolumn', 'no', { win = self.winid })
+        -- Highlight the parts that match the regular expression.
         vim.fn.clearmatches(self.winid)
-
-        vim.fn.matchadd('BufCtlNoFile', '\\v(No Name|Terminal)$', 11, 5)
+        vim.fn.matchadd('BufCtlNoFile', '\\v(No Name|Term: .+)$', 11, 5)
         vim.fn.matchadd("BufCtlFile", '\\v[^\\]/]+$', 10, 6)
-        vim.fn.matchadd('BufCtlCautionMark', '\\v\\[!\\]', 10, 7)
-        vim.fn.matchadd('BufCtlWarningMark', '\\v\\[[t+]\\]', 10, 8)
+        vim.fn.matchadd('BufCtlCautionMark', '\\v\\[[T!]\\]', 10, 7)
+        vim.fn.matchadd('BufCtlWarningMark', '\\v\\[[+]\\]', 10, 8)
         vim.cmd("hi! def link BufCtlFile Title")
         vim.cmd("hi! def link BufCtlNoFile Statement")
         vim.cmd("hi! def link BufCtlCautionMark ErrorMsg")
@@ -204,35 +219,44 @@ local BufCtl = function()
     -- enter buffer
     self.enter_buffer = function()
         local linenr = vim.fn.line(".")
-        local selected_buf = self.bufinfos[linenr].bufnr
+        local selected_bufinfo = self.bufinfos[linenr]
+        -- close BufCtl and go to previous window
         self.close_all_window()
         vim.fn.win_gotoid(self.pre_winid)
-        vim.cmd("b " .. selected_buf)
-        vim.notify("[BufCtl] enter buffer >> " .. self.bufinfos[linenr].bufname, vim.log.levels.INFO)
+        -- enter selected buffer
+        vim.cmd("b " .. selected_bufinfo.bufnr)
+        vim.notify("[BufCtl] enter buffer >> " .. selected_bufinfo.bufname, vim.log.levels.INFO)
     end
 
     self.delete_buf = function()
         local linenr = vim.fn.line(".")
-        local selected_bufnr = self.bufinfos[linenr].bufnr
-        local is_current = self.bufinfos[linenr].is_current
-        local is_change = self.bufinfos[linenr].is_change
-        if is_current == true then
-            vim.notify("current buffer can't be deleted", vim.log.levels.ERROR)
+        local bufinfo = self.bufinfos[linenr]
+        if bufinfo.is_current == true then
+            vim.notify("Current buffer can't be deleted", vim.log.levels.ERROR)
             return
         end
-        if is_change == 1 then
-            if self.is_confirmed("buffer is modified.") == false then
-                vim.notify("canceled buffer deletion", vim.log.levels.INFO)
+        if bufinfo.is_term == true then
+            vim.notify("Terminal buffer can't be deleted", vim.log.levels.ERROR)
+            return
+        end
+        if bufinfo.is_change == true then
+            if self.is_confirmed("Buffer is modified.") == false then
+                vim.notify("Canceled buffer deletion", vim.log.levels.INFO)
                 return
             end
         end
-        vim.cmd("bd! " .. selected_bufnr)
+        vim.cmd("bd! " .. bufinfo.bufnr)
         self.update_bufinfo()
         self.redraw_bufline()
     end
 
     self.is_confirmed = function(msg)
-        local inputstr = vim.notify("[BufCtl] " .. msg .. " type y to continue > ", vim.log.levels.WARN)
+        -- local inputstr = vim.notify("[BufCtl] " .. msg .. " type y to continue > ", vim.log.levels.WARN)
+        local inputstr = require('util.helper').highlightInput(
+            vim.log.levels.WARN,
+            "[BufCtl] " .. msg .. " type y to continue > ",
+            ""
+        )
         local result = false
         if inputstr == 'y' then
             result = true
