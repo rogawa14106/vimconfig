@@ -11,7 +11,7 @@ return {
                     vim.keymap.set(mode, l, r, opts)
                 end
                 -- Navigation
-                map('n', '<Leader>hn', function()
+                map('n', '<Leader>h]', function()
                     if vim.wo.diff then
                         vim.cmd.normal({ '<Leader>hn', bang = true })
                     else
@@ -19,7 +19,7 @@ return {
                     end
                 end, { desc = "Go to next hunk" })
 
-                map('n', '<Leader>hp', function()
+                map('n', '<Leader>h[', function()
                     if vim.wo.diff then
                         vim.cmd.normal({ '<Leader>hp', bang = true })
                     else
