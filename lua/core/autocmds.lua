@@ -23,10 +23,9 @@ augroup END
 "}}}
 ]]
 
--- vim.api.nvim_create_augroup( "detectft", {} )
--- vim.api.nvim_create_autocmd('bufwinenter', {
--- group = 'detectft',
--- callback = function()
--- vim.cmd('filetype detect')
--- end,
--- })
+vim.api.nvim_create_autocmd('BufEnter', {
+    pattern = { "*.h" },
+    callback = function()
+        vim.cmd('set filetype=c')
+    end,
+})
