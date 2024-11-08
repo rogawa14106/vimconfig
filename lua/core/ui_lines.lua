@@ -313,7 +313,7 @@ MyStatusLine = function()
     return mystatusline
 end
 -- vim.api.nvim_eval_statusline(myStatusLine(), {use_winbar=true})
-vim.opt.statusline = "%!v:lua.MyStatusLine()"
+-- vim.opt.statusline = "%!v:lua.MyStatusLine()"
 -- }}}
 -- tabline{{{
 MyTabLine = function()
@@ -371,3 +371,107 @@ vim.opt.showtabline = 2
 vim.opt.tabline = "%!v:lua.MyTabLine()"
 -- }}}
 
+local stl_colors = {
+    blue = {
+        "7cf4cf",
+        "6ce4bf",
+        "5cd4af",
+        "4cb49f",
+        "3ca48f",
+        "2c947f",
+        "1c846f",
+        "0c745f",
+    },
+    mono = {
+        "81829h",
+        "717284",
+        "616274",
+        "515264",
+        "414254",
+        "313244",
+        "212234",
+        "111224",
+    },
+}
+---@param type "r"|"l"
+local make_separator = function(type, N, is_end)
+    local sep_list = {
+        ['r'] = "◣",
+        ['l'] = "◢",
+    }
+    local hi = ""
+    if is_end then
+        vim.cmd("hi uStlSepEnd" .. type .. " gui=none guifg=#" .. stl_colors.blue[N] .. "")
+        hi = "%#uStlSepEnd" .. type .. "#"
+    else
+        hi = "%#uStlSep" .. N .. "#"
+    end
+    local sep = hi .. sep_list[type] .. "%*"
+    return sep
+end
+
+local stat_mode = function()
+    local current_mode_str = vim.fn.mode()
+    local mode_list = {
+        { mode_str = "n", disp_str = "NORMAL",   color = "mModeNormal", },
+        { mode_str = "i", disp_str = "INSERT",   color = "mModeInsert", },
+        { mode_str = "R", disp_str = "REPLACE",  color = "mModeInsert", },
+        { mode_str = "c", disp_str = "COMMAND",  color = "mModeCommand", },
+        { mode_str = "v", disp_str = "VISUAL",   color = "mModeVisual", },
+        { mode_str = "V", disp_str = "V-LINE",   color = "mModeVisual", },
+        { mode_str = "", disp_str = "V-BLOCK",  color = "mModeVisual", },
+        { mode_str = "t", disp_str = "TERM-JOB", color = "mModeVisual", },
+    }
+    -- "%1*%#mmodeterm# TERMINAL-NORMAL %*"
+    local status_line_mode = ""
+    local is_match = false
+    for i = 1, #mode_list do
+        if mode_list[i].mode_str == current_mode_str then
+            status_line_mode = status_line_mode .. "%#" .. mode_list[i].color .. "#"
+            status_line_mode = status_line_mode .. " " .. mode_list[i].disp_str .. " "
+            is_match = true
+            break
+        end
+    end
+    if is_match == false then
+        status_line_mode = current_mode_str
+    end
+    status_line_mode = status_line_mode .. "%*"
+    return status_line_mode
+end
+
+StatusLine = function()
+    -- define colors
+    vim.cmd("hi uStlSep1 gui=none guifg=#" .. stl_colors.blue[1] .. " guibg=#" .. stl_colors.blue[2] .. "")
+    vim.cmd("hi uStlSep2 gui=none guifg=#" .. stl_colors.blue[2] .. " guibg=#" .. stl_colors.blue[3] .. "")
+    vim.cmd("hi uStlSep3 gui=none guifg=#" .. stl_colors.blue[3] .. " guibg=#" .. stl_colors.blue[4] .. "")
+    vim.cmd("hi uStlSep4 gui=none guifg=#" .. stl_colors.blue[4] .. " guibg=#" .. stl_colors.blue[5] .. "")
+    vim.cmd("hi uStlSep5 gui=none guifg=#" .. stl_colors.blue[5] .. " guibg=#" .. stl_colors.blue[6] .. "")
+    vim.cmd("hi uStlSep6 gui=none guifg=#" .. stl_colors.blue[6] .. " guibg=#" .. stl_colors.blue[7] .. "")
+    vim.cmd("hi uStlSep7 gui=none guifg=#" .. stl_colors.blue[7] .. " guibg=#" .. stl_colors.blue[8] .. "")
+
+    vim.cmd("hi uStlStat1 gui=none guifg=#" .. stl_colors.mono[8] .. " guibg=#" .. stl_colors.blue[2] .. "")
+    vim.cmd("hi uStlStat2 gui=none guifg=#" .. stl_colors.mono[8] .. " guibg=#" .. stl_colors.blue[3] .. "")
+    vim.cmd("hi uStlStat3 gui=none guifg=#" .. stl_colors.mono[8] .. " guibg=#" .. stl_colors.blue[4] .. "")
+    vim.cmd("hi uStlStat4 gui=none guifg=#" .. stl_colors.mono[8] .. " guibg=#" .. stl_colors.blue[5] .. "")
+    vim.cmd("hi uStlSepEndr gui=none")
+    vim.cmd("hi uStlSepEndl gui=none")
+
+    local stl = ""
+    -- left of stl
+    stl = stl .. stat_mode()
+    stl = stl .. "%#uStlStat1#" .. " %n%M " .. make_separator('r', 2)
+    stl = stl .. "%#uStlStat2#" .. " %F " .. make_separator('r', 3, true)
+
+    --center of stl
+    stl = stl .. "%<%="
+
+    --right of stl
+    stl = stl .. make_separator('l', 5, true) .. "%#uStlStat4#" .. " %c,%l/%L "
+    stl = stl .. make_separator('l', 4) .. "%#uStlStat3#" .. " %{&buftype!=''?&buftype:&filetype} "
+    stl = stl .. make_separator('l', 3) .. "%#uStlStat2#" .. " %{&fileencoding!=''?&fileencoding:&encoding} "
+    stl = stl .. make_separator('l', 2) .. "%#uStlStat1#" .. " %{&fileformat} "
+    return stl
+end
+
+vim.opt.statusline = "%!v:lua.StatusLine()"
