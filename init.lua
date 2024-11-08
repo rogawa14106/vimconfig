@@ -23,25 +23,21 @@ require("core.autocmds")
 require("core.ui_lines")
 --========================================================================================================================}}}
 --
--- COLORSCHEME ==========================================================================================================={{{
--- require("colorscheme.dark")
---========================================================================================================================}}}
---
 -- UTILITYS =============================================================================================================={{{
 -- BufCtl
 require("util.bufctl")
 
--- floatScrool
-require("util.floatscroll")
-
 -- fuzzy finder
 require("util.fim")
+
+-- floatScrool
+-- require("util.floatscroll")
 
 -- file explorer
 -- require("util.eim")
 
 -- clock
-require("util.clock")
+-- require("util.clock")
 
 -- translator
 -- require("util.translator")
@@ -56,7 +52,6 @@ require("./core/netrw")
 -- plugin package manager
 require("./lazy")
 --========================================================================================================================}}}
---
 --
 -- help memo
 -- :digraphs
