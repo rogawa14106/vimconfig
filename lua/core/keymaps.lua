@@ -248,8 +248,8 @@ end
 
 -- visual
 -- move lines{{{
-vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv", { noremap = true, desc = "Move selected lines up" })
-vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv", { noremap = true, desc = "Move selected lines up" })
+-- vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv", { noremap = true, desc = "Move selected lines up" })
+-- vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv", { noremap = true, desc = "Move selected lines up" })
 -- }}}
 -- surround_str{{{
 local surround_str = function(lchar, rchar)
