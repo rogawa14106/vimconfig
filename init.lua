@@ -19,6 +19,12 @@ require("core.keymaps")
 -- auto cmds
 require("core.autocmds")
 
+-- status line
+require("core.status_line")
+
+-- tab line
+require("core.tab_line")
+
 -- fold, status, tab lines
 require("core.ui_lines")
 --========================================================================================================================}}}
