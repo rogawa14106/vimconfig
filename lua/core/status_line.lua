@@ -27,14 +27,14 @@ end
 M.stat_mode = function()
     local current_mode_str = vim.fn.mode()
     local mode_list = {
-        { mode_str = "n", disp_str = "NORMAL",   color = "mModeNormal", },
-        { mode_str = "i", disp_str = "INSERT",   color = "mModeInsert", },
-        { mode_str = "R", disp_str = "REPLACE",  color = "mModeInsert", },
-        { mode_str = "c", disp_str = "COMMAND",  color = "mModeCommand", },
-        { mode_str = "v", disp_str = "VISUAL",   color = "mModeVisual", },
-        { mode_str = "V", disp_str = "V-LINE",   color = "mModeVisual", },
-        { mode_str = "", disp_str = "V-BLOCK",  color = "mModeVisual", },
-        { mode_str = "t", disp_str = "TERM-JOB", color = "mModeTerm", },
+        { mode_str = "n", disp_str = "NORMAL",   color = "uModeNormal", },
+        { mode_str = "i", disp_str = "INSERT",   color = "uModeInsert", },
+        { mode_str = "R", disp_str = "REPLACE",  color = "uModeInsert", },
+        { mode_str = "c", disp_str = "COMMAND",  color = "uModeCommand", },
+        { mode_str = "v", disp_str = "VISUAL",   color = "uModeVisual", },
+        { mode_str = "V", disp_str = "V-LINE",   color = "uModeVisual", },
+        { mode_str = "", disp_str = "V-BLOCK",  color = "uModeVisual", },
+        { mode_str = "t", disp_str = "TERM-JOB", color = "uModeTerm", },
     }
     -- "%1*%#mmodeterm# TERMINAL-NORMAL %*"
     local status_line_mode = ""
@@ -67,7 +67,8 @@ M.stat_modified = function()
     return status_modified
 end
 
-StatusLine = function()
+-- highlight settings
+M.set_highlight = function()
     local fg_color = M.stl_colors.mono[8]
     -- define colors
     for i = 1, #M.main_colors - 1 do
@@ -83,6 +84,18 @@ StatusLine = function()
     -- not current statusline color
     vim.cmd("hi StatusLineNC guibg=#" .. fg_color .. "")
 
+    vim.cmd("hi uModeNormal gui=bold guifg=#" .. fg_color .. " guibg=#" .. M.stl_colors.mode.normal)
+    vim.cmd("hi uModeInsert gui=bold guifg=#" .. fg_color .. " guibg=#" .. M.stl_colors.mode.insert)
+    vim.cmd("hi uModeVisual gui=bold guifg=#" .. fg_color .. " guibg=#" .. M.stl_colors.mode.visual)
+    vim.cmd("hi uModeCommand gui=bold guifg=#" .. fg_color .. " guibg=#" .. M.stl_colors.mode.command)
+    vim.cmd("hi uModeTerm gui=bold guifg=#" .. fg_color .. " guibg=#" .. M.stl_colors.mode.terminal)
+end
+
+-- main
+StatusLine = function()
+    -- highlight settings
+    M.set_highlight()
+
     -- create status line
     local stl = ""
     -- left of stl
@@ -97,9 +110,10 @@ StatusLine = function()
     --right of stl
     stl = stl .. M.make_separator('l', 4, true) .. "%#uStlStat4#" .. " %cc%lr/%L "
     stl = stl .. M.make_separator('l', 3) .. "%#uStlStat3#" .. " %{&buftype!=''?&buftype:&filetype} "
-    stl = stl .. M.make_separator('l', 2) .. "%#uStlStat2#" .. " %{&fileencoding!=''?&fileencoding:&encoding} "
-    stl = stl .. M.make_separator('l', 1) .. "%#uStlStat1#" .. " %{&fileformat} "
+    stl = stl .. M.make_separator('l', 2) .. "%#uStlStat2#" .. " %{&fileformat} "
+    stl = stl .. M.make_separator('l', 1) .. "%#uStlStat1#" .. " %{&fileencoding!=''?&fileencoding:&encoding} "
     return stl
 end
 
+-- attach status line
 vim.opt.statusline = "%!v:lua.StatusLine()"

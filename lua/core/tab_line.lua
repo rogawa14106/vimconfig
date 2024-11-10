@@ -4,10 +4,14 @@ local colors = require("core.design").colors
 M.tl_colors = {
     tl_fg = colors.mono[1],
     tl_bg = colors.mono[8],
-    tl_act = colors.blue[6],
-    tl_stb = colors.mono[4],
-    tl_info_act = colors.blue[8],
+    tl_act = colors.mono[1],
+    tl_stb = colors.mono[2],
+    tl_info_act = colors.blue[7],
     tl_info_stb = colors.mono[6],
+    tl_icons = colors.dev.ft,
+    tl_flg = {
+        modify = colors.orange[2],
+    }
 }
 M.icons = require("core.design").icons
 
@@ -74,7 +78,7 @@ M.create_tab_element = function(self, tab_index)
     if tab.is_current then
         tab_str = tab_str .. [[%#uTlElmAct#]]
     else
-        tab_str = tab_str .. [[%#uTlStb#]]
+        tab_str = tab_str .. [[%#uTlElmStb#]]
     end
     tab_str = tab_str
 
@@ -163,12 +167,23 @@ M.init_buf_list = function(self)
     end
 end
 
-M.filetype_icon = function(file_type)
+M.filetype_icon = function(file_type, is_current)
     local icon = M.icons.dev.ft[file_type]
     if icon == nil then
         icon = M.icons.dev.ft.txt
     end
-    return icon
+    local icon_elm = ""
+    if M.tl_colors.tl_icons[file_type] then
+        icon_elm = "%#uFtIcon" .. file_type .. "#"
+    end
+    icon_elm = icon_elm .. icon
+    if is_current then
+        icon_elm = icon_elm .. [[%#uTlElmAct#]]
+    else
+        icon_elm = icon_elm .. [[%#uTlElmStb#]]
+    end
+    return icon_elm
+    -- return icon
 end
 
 ---@return string @vim tabline string
@@ -181,44 +196,44 @@ M.create_buf_element = function(self, i)
     end
 
     -- Add Separator
-    if buf.is_current and buf.is_end then
-        buf_str = buf_str .. [[%#uTlSepActEnd#]] .. self.icons.separator.flat_fill
-    elseif buf.is_current and (not buf.is_end) then
-        buf_str = buf_str .. [[%#uTlSepAct#]] .. self.icons.separator.flat_fill
-    elseif (not buf.is_current) and buf.is_end then
-        buf_str = buf_str .. [[%#uTlSepStb#]]
-    else
-        buf_str = buf_str .. [[%#uTlSepStb#]] .. self.icons.separator.flat_fill
-    end
+    -- if buf.is_current and buf.is_end then
+    -- buf_str = buf_str .. [[%#uTlSepActEnd#]] .. self.icons.separator.flat_fill
+    -- elseif buf.is_current and (not buf.is_end) then
+    -- buf_str = buf_str .. [[%#uTlSepAct#]] .. self.icons.separator.flat_fill
+    -- elseif (not buf.is_current) and buf.is_end then
+    -- buf_str = buf_str .. [[%#uTlSepStb#]]
+    -- else
+    -- buf_str = buf_str .. [[%#uTlSepStb#]] .. self.icons.separator.flat_fill
+    -- end
 
-    -- Add buffer information(buffer number and flags)
+    -- Add buffer header (buffer number)
     if buf.is_current then
         buf_str = buf_str .. [[%#uTlInfoAct#]]
     else
         buf_str = buf_str .. [[%#uTlInfoStb#]]
     end
-    -- modify flag
-    if buf.is_modified then
-        buf_str = buf_str .. " " .. [[%#uTlModified#]] .. M.icons.status.add
-    else
-        buf_str = buf_str .. " "
-    end
     -- buffer number
-    buf_str = buf_str .. buf.nr .. " "
+    buf_str = buf_str .. " " .. buf.nr .. " "
 
 
     -- Change color bright if buf is current buf
-    if buf.is_current then
-        buf_str = buf_str .. [[%#uTlElmAct#]]
-    else
-        buf_str = buf_str .. [[%#uTlStb#]]
-    end
+    -- if buf.is_current then
+    -- buf_str = buf_str .. [[%#uTlElmAct#]]
+    -- else
+    -- buf_str = buf_str .. [[%#uTlElmStb#]]
+    -- end
     if buf.name == nil then
         return buf_str
     end
     -- Add a buf name.
-    buf_str = buf_str .. " " .. self.filetype_icon(buf.type) .. buf.name .. " "
+    buf_str = buf_str .. "" .. self.filetype_icon(buf.type, buf.is_current) .. buf.name
 
+    -- Add modify flag
+    if buf.is_modified then
+        buf_str = buf_str .. "%#uTlFlgMod#" .. M.icons.signs.dot -- .. ""
+    end
+
+    buf_str = buf_str .. " "
     return buf_str
 end
 
@@ -237,15 +252,26 @@ end
 
 -- highlght{{{
 M.set_highlight = function()
-    vim.cmd("hi uTlElmAct gui=bold guifg=#" .. M.tl_colors.tl_fg .. " guibg=#" .. M.tl_colors.tl_act)
+    -- tabline elements highlight
+    vim.cmd("hi uTlElmAct gui=bold guifg=#" .. M.tl_colors.tl_act .. " guibg=none")
+    vim.cmd("hi uTlElmStb gui=bold guifg=#" .. M.tl_colors.tl_stb .. " guibg=none")
+    -- tabline information header highlight
     vim.cmd("hi uTlInfoAct gui=bold guifg=#" .. M.tl_colors.tl_fg .. " guibg=#" .. M.tl_colors.tl_info_act)
-    vim.cmd("hi uTlStb gui=bold guifg=#" .. M.tl_colors.tl_fg .. " guibg=#" .. M.tl_colors.tl_stb)
     vim.cmd("hi uTlInfoStb gui=bold guifg=#" .. M.tl_colors.tl_fg .. " guibg=#" .. M.tl_colors.tl_info_stb)
+    -- tabline separator highlight TODO abolition
     vim.cmd("hi uTlSepAct gui=bold guifg=#" .. M.tl_colors.tl_bg .. " guibg=#" .. M.tl_colors.tl_act)
     vim.cmd("hi uTlSepStb gui=bold guifg=#" .. M.tl_colors.tl_bg .. " guibg=#" .. M.tl_colors.tl_stb)
     vim.cmd("hi uTlSepActEnd gui=bold guifg=#" .. M.tl_colors.tl_bg .. " guibg=#" .. M.tl_colors.tl_act)
     vim.cmd("hi uTlSepStbEnd gui=bold guifg=#" .. M.tl_colors.tl_bg .. " guibg=#" .. M.tl_colors.tl_stb)
+    -- tabline fill highlight
     vim.cmd("hi uTlFill gui=bold guifg=#" .. M.tl_colors.tl_bg .. " guibg=#" .. M.tl_colors.tl_bg)
+
+    -- flags highlight
+    vim.cmd("hi uTlFlgMod gui=bold guifg=#" .. M.tl_colors.tl_flg.modify .. " guibg=none")
+
+    -- icon highlight
+    local design = require('core.design')
+    design.set_icon_hi_ft(design)
 end
 -- }}}
 
