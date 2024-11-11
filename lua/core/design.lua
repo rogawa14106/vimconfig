@@ -59,18 +59,19 @@ M.colors = {
     },
     dev = {
         ft = {
-            txt = "fdfdfd",
-            lua = "55A2FF",
+            text = "fdfdfd",
+            lua = "55a2ff",
             vim = "199f4b",
             json = "fdfd55",
             markdown = "fdfdfd",
-            c = "55A2FF",
-            python = "3572A5",
+            c = "55a2ff",
+            python = "3572a5",
             terraform = "7b42bb",
-            hcl = "844FBA",
-            gitignore = "FF6500",
+            hcl = "844fba",
+            gitignore = "ff6500",
             conf = "989888",
             tmux = "199f4b",
+            make = "a32d2a",
         }
     }
 }
@@ -95,7 +96,7 @@ M.icons = {
     dev = {
         git = "󰊤 ",
         ft = {
-            txt       = " ",
+            text      = " ",
             lua       = " ",
             vim       = " ",
             json      = " ",
@@ -108,6 +109,7 @@ M.icons = {
             sh        = " ",
             conf      = " ",
             tmux      = " ",
+            make      = " ",
         }
     }
 }
