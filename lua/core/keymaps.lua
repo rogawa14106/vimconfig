@@ -9,42 +9,43 @@ vim.g.mapleader = " "
 
 -- normal
 -- toggle comment{{{
-local comment_strs = {
-    vim = '"',
-    c   = '//',
-    cs  = '//',
-    py  = '#',
-    ttl = ';',
-    lua = '--',
-    bat = 'rem',
-    ps1 = '#',
-    sh  = '#',
-}
+local load_visual_text = function()
+    local zreg_bf = vim.fn.getreg("z")
+    vim.cmd('noautocmd normal! "zy')
+    local selected_text = vim.fn.getreg("z")
+    vim.fn.setreg("z", zreg_bf)
 
-local comment_in = function(comment_str, linenr)
+    local lines = vim.split(selected_text, '\n')
+    if lines == nil then
+        return
+    end
+    lines[#lines] = nil -- delete element that line break only
+    return lines
+end
+
+local comment_out = function(comment_str, linenr)
     vim.fn.setpos(".", { 0, linenr, 0, 0 })
     vim.cmd("noautocmd normal! ^i" .. comment_str .. " ")
 end
 
-local comment_out = function(top, bot, comment_str)
-    local cmd = top .. "," .. bot .. "s/\\v" .. comment_str .. "(\\s|)//"
-    vim.cmd(cmd)
-    vim.cmd("nohl")
+local comment_in = function(comment_str, lines, top, bot)
+    comment_str = string.gsub(comment_str, '%-', '%%-')
+    for i = 1, #lines do
+        lines[i] = string.gsub(lines[i], comment_str .. " ?(.+)", "%1")
+        print(comment_str, lines[i])
+    end
+    vim.cmd("noautocmd normal! '<")
+    vim.api.nvim_buf_set_lines(vim.fn.bufnr(), top - 1, bot, true, lines)
 end
 
 local tgl_comment = function()
-    -- def commentout str
-    local extension = vim.fn.expand("%:e")
-    local comment_str = comment_strs[extension]
-    if comment_str == nil then
-        comment_str = "#"
-    end
+    -- only visual line mode
+    if vim.fn.mode() ~= "V" then return end
 
-    -- leave visual
-    local zreg = vim.fn.getreg("z")
-    vim.cmd('noautocmd normal! "zy')
-    vim.fn.setreg("z", zreg)
+    -- load lines selected
+    local lines = load_visual_text()
 
+    -- get selected domain
     local topline = vim.fn.line("'<")
     local botline = vim.fn.line("'>")
     local pos = { 0, 0 }
@@ -54,16 +55,17 @@ local tgl_comment = function()
         pos = { topline, botline }
     end
 
-    -- toggle
+    -- toggle comments
     local topline_str = vim.api.nvim_buf_get_lines(0, pos[1] - 1, pos[1], false)
+    local comment_str = string.gsub(vim.bo.commentstring, " %%s", "")
     local is_commented = string.find(topline_str[1], comment_str, 1, true)
 
     if is_commented == nil then
         for i = pos[1], pos[2] do
-            comment_in(comment_str, i)
+            comment_out(comment_str, i)
         end
     else
-        comment_out(pos[1], pos[2], comment_str)
+        comment_in(comment_str, lines, pos[1], pos[2])
     end
 end
 
