@@ -170,12 +170,16 @@ end
 M.filetype_icon = function(file_type, is_current)
     local icon = M.icons.dev.ft[file_type]
     if icon == nil then
-        icon = M.icons.dev.ft.txt
+        icon = M.icons.dev.ft.text
     end
+
     local icon_elm = ""
     if M.tl_colors.tl_icons[file_type] then
         icon_elm = "%#uFtIcon" .. file_type .. "#"
+    else
+        icon_elm = "%#uFtIcontext#"
     end
+
     icon_elm = icon_elm .. icon
     if is_current then
         icon_elm = icon_elm .. [[%#uTlElmAct#]]
@@ -183,7 +187,6 @@ M.filetype_icon = function(file_type, is_current)
         icon_elm = icon_elm .. [[%#uTlElmStb#]]
     end
     return icon_elm
-    -- return icon
 end
 
 ---@return string @vim tabline string
