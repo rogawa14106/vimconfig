@@ -31,7 +31,7 @@ end
 local comment_in = function(comment_str, lines, top, bot)
     comment_str = string.gsub(comment_str, '%-', '%%-')
     for i = 1, #lines do
-        lines[i] = string.gsub(lines[i], comment_str .. " ?(.+)", "%1")
+        lines[i] = string.gsub(lines[i], "^(%s*)" .. comment_str .. " ?(.+)", "%1%2")
         print(comment_str, lines[i])
     end
     vim.cmd("noautocmd normal! '<")
