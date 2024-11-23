@@ -31,7 +31,7 @@ return {
                 "vim",
                 "cpp", --clang, cpp
                 "python",
-                -- "hcl",
+                "hcl",
                 "terraform",
                 "markdown",
                 "yaml",
