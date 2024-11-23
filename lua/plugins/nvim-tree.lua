@@ -13,7 +13,7 @@ return {
                 -- relativenumber = false,
             },
             renderer = {
-                group_empty = true,
+                group_empty = false,
                 indent_markers = {
                     enable = true,
                 },
@@ -84,7 +84,8 @@ return {
         -- end)
 
         -- highlihght settings
-        vim.cmd("hi NvimTreeGitDirty guifg=orange")
-        vim.cmd("hi NvimTreeGitStagedIcon guifg=green")
+        vim.cmd("hi NvimTreeGitDirty guifg=#f39c12")
+        vim.cmd("hi NvimTreeGitStagedIcon guifg=#1acd94")
+        vim.cmd("hi NvimTreeGitNew guifg=#1a9dc4")
     end
 }
