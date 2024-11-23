@@ -63,15 +63,25 @@ return {
                 vim.keymap.set('n', '<C-[>', api.tree.change_root_to_parent, opts('Up'))
                 -- toggle help
                 vim.keymap.set('n', '?', api.tree.toggle_help, opts('Help'))
-                -- create file / directory
-                vim.keymap.set('n', '?', api.tree.toggle_help, opts('Help'))
             end,
         })
 
         -- keymap settings
         local keymap = vim.keymap
-        -- open explorer
+        -- open explorer in cwd
         keymap.set('n', '<Leader>e', "<CMD>NvimTreeFocus<CR>")
+        -- keymap.set('n', '<Leader>e', function()
+        -- local path = vim.fn.getcwd()
+        -- api.tree.focus()
+        -- api.tree.change_root(path)
+        -- end)
+
+        -- Open explorer in file path of current file.
+        -- keymap.set('n', '<Leader>E', function()
+        -- local path = vim.fn.expand("%:p:h")
+        -- api.tree.focus()
+        -- api.tree.change_root(path)
+        -- end)
 
         -- highlihght settings
         vim.cmd("hi NvimTreeGitDirty guifg=orange")
