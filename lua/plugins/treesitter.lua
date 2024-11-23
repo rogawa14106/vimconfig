@@ -26,6 +26,17 @@ return {
             autotag = {
                 enable = true
             },
+            incremental_selection = {
+                enable = true,
+                keymaps = {
+                    init_selection = "gs", -- set to `false` to disable one of the mappings
+                    node_incremental = "<Tab>",
+                    node_decremental = "<S-Tab>",
+                    -- node_incremental = "ga",
+                    -- scope_incremental = "grc",
+                    -- node_decremental = "gd",
+                },
+            },
             ensure_installed = {
                 "lua",
                 "vim",
