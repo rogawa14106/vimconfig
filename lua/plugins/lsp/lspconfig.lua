@@ -67,22 +67,6 @@ return {
         -- used to enable autocompletion
         local capabilities = cmp_nvim_lsp.default_capabilities()
 
-        -- define autocmd to detect filetype
-        vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
-            pattern = { "*.tf" },
-            group = vim.api.nvim_create_augroup("DetectFiletype", {}),
-            callback = function()
-                -- set filetype
-                vim.opt.filetype = "terraform"
-
-                -- activate tree sitter parser(work around)
-                local current_pos = vim.fn.getpos(".")
-                local key = vim.api.nvim_replace_termcodes("ggO<C-[>dd<Cmd>w<CR>", true, true, true)
-                vim.api.nvim_feedkeys(key, 'n', false)
-                vim.fn.setpos(".", current_pos)
-            end,
-        })
-
         -- setup each lsp
         -- default setup
         local default_setup_handler = {
@@ -95,7 +79,7 @@ return {
                 lspconfig[server].setup(default_setup_handler)
             end,
             -- lua
-            ["lua_ls"] = function()
+            ["lua_ls"] = function(server)
                 local opt = {
                     capabilities = capabilities,
                     settings = {
@@ -106,24 +90,24 @@ return {
                         },
                     },
                 }
-                lspconfig["lua_ls"].setup(opt)
+                lspconfig[server].setup(opt)
             end,
             -- clangd
-            ["clangd"] = function(serv_name)
+            ["clangd"] = function(server)
                 local opt = {
                     capabilities = capabilities,
                 }
-                lspconfig[serv_name].setup(opt)
+                lspconfig[server].setup(opt)
             end,
             -- python
-            ["pylsp"] = function()
+            ["pylsp"] = function(server)
                 local opt = {
                     capabilities = capabilities,
                 }
-                lspconfig["pylsp"].setup(opt)
+                lspconfig[server].setup(opt)
             end,
             -- terraform
-            ["terraformls"] = function()
+            ["terraformls"] = function(server)
                 local opt = {
                     capabilities = capabilities,
                     -- root_dir = lspconfig.util.root_pattern('.terraform', '.git'),
@@ -132,24 +116,24 @@ return {
                     -- client.server_capabilities.semanticTokensProvider = nil
                     -- end,
                 }
-                lspconfig["terraformls"].setup(opt)
+                lspconfig[server].setup(opt)
                 -- print(vim.inspect(lspconfig.terraformls))
             end,
             -- yaml
-            ["yamlls"] = function()
+            ["yamlls"] = function(server)
                 local opt = {
                     on_attach = function(client)
                         client.server_capabilities.documentFormattingProvider = true
                     end,
                 }
-                lspconfig["yamlls"].setup(opt)
+                lspconfig[server].setup(opt)
             end,
             -- markdown
-            ["marksman"] = function()
+            ["marksman"] = function(server)
                 local opt = {
                     root_dir = lspconfig.util.root_pattern("README.md", "*.MD"),
                 }
-                lspconfig["marksman"].setup(opt)
+                lspconfig[server].setup(opt)
             end,
         })
     end,
