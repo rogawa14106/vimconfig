@@ -77,8 +77,8 @@ return {
 
                 -- activate tree sitter parser(work around)
                 local current_pos = vim.fn.getpos(".")
-                local key = vim.api.nvim_replace_termcodes("ggI <C-h><C-[>", true, true, true)
-                vim.api.nvim_feedkeys(key .. "", 'n', false)
+                local key = vim.api.nvim_replace_termcodes("ggO<C-[>dd<Cmd>w<CR>", true, true, true)
+                vim.api.nvim_feedkeys(key, 'n', false)
                 vim.fn.setpos(".", current_pos)
             end,
         })
