@@ -135,6 +135,13 @@ return {
                 }
                 lspconfig[server].setup(opt)
             end,
+            -- openscad
+            ["openscad_lsp"] = function(server)
+                local opt = {
+                    capabilities = capabilities,
+                }
+                lspconfig[server].setup(opt)
+            end,
         })
     end,
     opts = {
