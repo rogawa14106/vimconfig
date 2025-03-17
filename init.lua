@@ -36,6 +36,9 @@ require("util.bufctl")
 -- fuzzy finder
 require("util.fim")
 
+-- preview markdown
+require("util.preview_md")
+
 -- floatScrool
 -- require("util.floatscroll")
 
@@ -50,6 +53,7 @@ require("util.fim")
 
 -- mark utility
 -- require("util.visualmark")
+
 --========================================================================================================================}}}
 --
 -- PLUGINS ==============================================================================================================={{{

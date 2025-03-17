@@ -142,6 +142,18 @@ return {
                 }
                 lspconfig[server].setup(opt)
             end,
+            -- java
+            ["jdtls"] = function(server)
+                local opt = {
+                    capabilities = capabilities,
+                }
+                lspconfig[server].setup(opt)
+                -- lombokのアノテーションが効かないときは以下実施
+                -- 1. lombok.jarをインストールして以下に配置
+                --    $HOME/.local/share/java/lombok.jar
+                -- 2. .bashrcに以下追記
+                --    export JDTLS_JVM_ARGS="-javaagent:$HOME/.local/share/java/lombok.jar"
+            end,
         })
     end,
     opts = {
