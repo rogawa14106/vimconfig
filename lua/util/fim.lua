@@ -179,19 +179,26 @@ local function showFoundFiles()
 end
 -- }}}
 --# close all windows{{{
-local function close_Fim()
+local function close_Fim(pre_winid)
     vim.api.nvim_win_close(vim.g.fim_info_winid, true)
     vim.api.nvim_win_close(vim.g.fim_selector_winid, true)
     vim.api.nvim_win_close(vim.g.fim_input_winid, true)
     vim.api.nvim_win_close(vim.g.fim_prompt_winid, true)
+    vim.fn.win_gotoid(pre_winid)
 end
 -- }}}
 --# common keymappings{{{
-local function create_keymap_quitfim(bufnr)
+local function create_keymap_quitfim(bufnr, pre_winid)
     vim.api.nvim_buf_set_keymap(bufnr, "n", '<leader>ff', '', {
         noremap = true,
         callback = function()
-            close_Fim()
+            close_Fim(pre_winid)
+        end,
+    })
+    vim.api.nvim_buf_set_keymap(bufnr, "n", 'q', '', {
+        noremap = true,
+        callback = function()
+            close_Fim(pre_winid)
         end,
     })
 end
@@ -245,7 +252,7 @@ local function create_selector(config, pre_winid)
     vim.b.fimMsg = vim.fn.matchadd("FimMsg", '<\\s.\\+\\s>')
 
     -- create keymaps
-    create_keymap_quitfim(vim.g.fim_selector_bufnr)
+    create_keymap_quitfim(vim.g.fim_selector_bufnr, pre_winid)
 
     vim.api.nvim_buf_set_keymap(0, "n", '<Enter>', '', {
         noremap = true,
