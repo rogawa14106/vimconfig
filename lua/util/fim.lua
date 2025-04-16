@@ -136,11 +136,15 @@ end
 --################################### ui #############################################
 --# write lines to nomodifiable buffer{{{
 local function writeLine(bufnr, startl, endl, msg)
-    vim.api.nvim_buf_set_option(bufnr, 'modifiable', true)
-    vim.api.nvim_buf_set_option(bufnr, 'readonly', false)
+    -- vim.api.nvim_buf_set_option(bufnr, 'modifiable', true)
+    -- vim.api.nvim_buf_set_option(bufnr, 'readonly', false)
+    vim.api.nvim_set_option_value('modifiable', true, { buf = bufnr })
+    vim.api.nvim_set_option_value('readonly', false, { buf = bufnr })
     vim.api.nvim_buf_set_lines(bufnr, startl, endl, false, msg)
-    vim.api.nvim_buf_set_option(bufnr, 'modifiable', false)
-    vim.api.nvim_buf_set_option(bufnr, 'readonly', true)
+    -- vim.api.nvim_buf_set_option(bufnr, 'modifiable', false)
+    -- vim.api.nvim_buf_set_option(bufnr, 'readonly', true)
+    vim.api.nvim_set_option_value('modifiable', false, { buf = bufnr })
+    vim.api.nvim_set_option_value('readonly', true, { buf = bufnr })
 end
 -- }}}
 --# write the result of search to the file selector{{{
@@ -194,19 +198,19 @@ end
 -- }}}
 --# common autocmd {{{
 --local function au_win_leave(bufnr, prewinid)
-    --vim.api.nvim_create_augroup('fimCommon', {})
-    --vim.api.nvim_create_autocmd('BufWinLeave', {
-        --group = 'fimCommon',
-        --callback = function(e)
-            --vim.fn.win_gotoid(prewinid)
-            --vim.api.nvim_win_close(vim.g.fim_info_winid, true)
-            --vim.api.nvim_win_close(vim.g.fim_selector_winid, true)
-            --vim.api.nvim_win_close(vim.g.fim_input_winid, true)
-            --vim.api.nvim_win_close(vim.g.fim_prompt_winid, true)
-            ----vim.cmd("b " .. vim.g.fim_input_bufnr)
-        --end,
-        --buffer = bufnr,
-    --})
+--vim.api.nvim_create_augroup('fimCommon', {})
+--vim.api.nvim_create_autocmd('BufWinLeave', {
+--group = 'fimCommon',
+--callback = function(e)
+--vim.fn.win_gotoid(prewinid)
+--vim.api.nvim_win_close(vim.g.fim_info_winid, true)
+--vim.api.nvim_win_close(vim.g.fim_selector_winid, true)
+--vim.api.nvim_win_close(vim.g.fim_input_winid, true)
+--vim.api.nvim_win_close(vim.g.fim_prompt_winid, true)
+----vim.cmd("b " .. vim.g.fim_input_bufnr)
+--end,
+--buffer = bufnr,
+--})
 --end
 -- }}}
 --
@@ -220,10 +224,14 @@ local function create_infobox(config, information)
     vim.fn.matchadd("FimMsg", '<\\s.\\+\\s>')
 
     -- set options
-    vim.api.nvim_win_set_option(vim.g.fim_info_winid, 'winhl', 'Normal:LineNr')
-    vim.api.nvim_win_set_option(vim.g.fim_info_winid, 'signcolumn', 'no')
-    vim.api.nvim_buf_set_option(0, 'modifiable', false)
-    vim.api.nvim_buf_set_option(0, 'readonly', true)
+    -- vim.api.nvim_win_set_option(vim.g.fim_info_winid, 'winhl', 'Normal:LineNr')
+    -- vim.api.nvim_win_set_option(vim.g.fim_info_winid, 'signcolumn', 'no')
+    -- vim.api.nvim_buf_set_option(0, 'modifiable', false)
+    -- vim.api.nvim_buf_set_option(0, 'readonly', true)
+    vim.api.nvim_set_option_value('winhl', 'Normal:Visual', { win = vim.g.fim_info_winid })
+    vim.api.nvim_set_option_value('signcolumn', 'no', { win = vim.g.fim_info_winid })
+    vim.api.nvim_set_option_value('modifiable', false, { buf = 0 })
+    vim.api.nvim_set_option_value('readonly', true, { buf = 0 })
 end
 -- }}}
 --# create file select window (selector) {{{
@@ -293,10 +301,14 @@ local function create_selector(config, pre_winid)
     })
 
     -- set options
-    vim.api.nvim_win_set_option(vim.g.fim_selector_winid, 'winhl', 'Normal:LineNr')
-    vim.api.nvim_win_set_option(vim.g.fim_selector_winid, 'signcolumn', 'no')
-    vim.api.nvim_buf_set_option(0, 'modifiable', false)
-    vim.api.nvim_buf_set_option(0, 'readonly', true)
+    -- vim.api.nvim_win_set_option(vim.g.fim_selector_winid, 'winhl', 'Normal:LineNr')
+    -- vim.api.nvim_win_set_option(vim.g.fim_selector_winid, 'signcolumn', 'no')
+    -- vim.api.nvim_buf_set_option(0, 'modifiable', false)
+    -- vim.api.nvim_buf_set_option(0, 'readonly', true)
+    vim.api.nvim_set_option_value('winhl', 'Normal:Visual', { win = vim.g.fim_selector_winid })
+    vim.api.nvim_set_option_value('signcolumn', 'no', { win = vim.g.fim_selector_winid })
+    vim.api.nvim_set_option_value('modifiable', false, { buf = 0 })
+    vim.api.nvim_set_option_value('readonly', true, { buf = 0 })
 end
 -- }}}
 --# create inputbox (input) {{{
@@ -371,22 +383,29 @@ local function create_inputbox(config)
     })
 
     -- set options
-    vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'winhl', 'Normal:Visual')
-    vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'signcolumn', 'no')
-    vim.api.nvim_buf_set_option(0, 'modifiable', true)
-    vim.api.nvim_buf_set_option(0, 'readonly', false)
+    -- vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'winhl', 'Normal:Visual')
+    -- vim.api.nvim_win_set_option(vim.g.fim_input_winid, 'signcolumn', 'no')
+    -- vim.api.nvim_buf_set_option(0, 'modifiable', true)
+    -- vim.api.nvim_buf_set_option(0, 'readonly', false)
+    vim.api.nvim_set_option_value('winhl', 'Normal:Visual', { win = vim.g.fim_input_winid })
+    vim.api.nvim_set_option_value('signcolumn', 'no', { win = vim.g.fim_input_winid })
+    vim.api.nvim_set_option_value('modifiable', true, { buf = 0 })
+    vim.api.nvim_set_option_value('readonly', false, { buf = 0 })
 end
 -- }}}
 --# create inputbox prompt (prompt){{{
 local function create_prompt(config, prompt)
     vim.g.fim_prompt_bufnr = vim.api.nvim_create_buf(false, true)
---     vim.g.fim_prompt_winid = vim.api.nvim_open_win(vim.g.fim_prompt_bufnr, false, config)
+    --     vim.g.fim_prompt_winid = vim.api.nvim_open_win(vim.g.fim_prompt_bufnr, false, config)
     vim.g.fim_prompt_winid = vim.api.nvim_open_win(vim.g.fim_prompt_bufnr, true, config)
     writeLine(vim.g.fim_prompt_bufnr, 0, -1, { prompt })
 
-    vim.api.nvim_win_set_option(vim.g.fim_prompt_winid, 'winhl', 'Normal:Visual')
-    vim.api.nvim_buf_set_option(vim.g.fim_prompt_bufnr, 'modifiable', true)
-    vim.api.nvim_buf_set_option(vim.g.fim_prompt_bufnr, 'readonly', false)
+    -- vim.api.nvim_win_set_option(vim.g.fim_prompt_winid, 'winhl', 'Normal:Visual')
+    -- vim.api.nvim_buf_set_option(vim.g.fim_prompt_bufnr, 'modifiable', true)
+    -- vim.api.nvim_buf_set_option(vim.g.fim_prompt_bufnr, 'readonly', false)
+    vim.api.nvim_set_option_value('winhl', 'Normal:Visual', { win = vim.g.fim_prompt_winid })
+    vim.api.nvim_set_option_value('modifiable', true, { buf = vim.g.fim_prompt_bufnr })
+    vim.api.nvim_set_option_value('readonly', false, { buf = vim.g.fim_prompt_bufnr })
 end
 -- }}}
 --
@@ -433,10 +452,10 @@ local function create_ffwin(pre_winid)
             "╭", "─", "╮", "│",
             "┤", "─", "├", "│",
         },
---         border    = {
---             ".", "-", ".", "|",
---             "", "", "", "|",
---         },
+        --         border    = {
+        --             ".", "-", ".", "|",
+        --             "", "", "", "|",
+        --         },
         focusable = true,
         style     = 'minimal',
         relative  = 'editor',
@@ -451,10 +470,10 @@ local function create_ffwin(pre_winid)
             "", "─", "┤", "│",
             "'", "", "", "",
         },
---         border    = {
---             "", "-", ".", "|",
---             "'", "", "", "",
---         },
+        --         border    = {
+        --             "", "-", ".", "|",
+        --             "'", "", "", "",
+        --         },
         focusable = true,
         style     = 'minimal',
         relative  = 'editor',
@@ -482,10 +501,10 @@ local function create_ffwin(pre_winid)
             "├", "─", "┤", "│",
             "╯", "─", "╰", "│"
         },
---         border    = {
---             "|", "", "|", "|",
---             "'", "-", "`", "|",
---         },
+        --         border    = {
+        --             "|", "", "|", "|",
+        --             "'", "-", "`", "|",
+        --         },
         focusable = false,
         style     = 'minimal',
         relative  = 'editor',

@@ -78,6 +78,7 @@ return {
             }),
             formatting = {
                 -- kind: kind of completion text, abbr: completion text, menu: completion menu
+                expandable_indicator = true,
                 fields = { cmp.ItemField.Kind, cmp.ItemField.Abbr, cmp.ItemField.Menu },
                 format = lspkind.cmp_format({
                     -- mode = "synbol",
