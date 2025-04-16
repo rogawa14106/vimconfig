@@ -34,21 +34,20 @@ return {
                 float = { border = "rounded" },
             },
 
-            --[[
             -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
             -- Be aware that you also will need to properly configure your LSP server to
             -- provide the inlay hints.
             inlay_hints = {
                 enabled = true,
-                -- exclude = { "vue" }, -- filetypes for which you don't want to enable inlay hints
+                exclude = {}, -- filetypes for which you don't want to enable inlay hints
             },
             -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
             -- Be aware that you also will need to properly configure your LSP server to
             -- provide the code lenses.
             codelens = {
-                enabled = false,
+                enabled = true,
             },
-            -- ]] --
+
             -- add any global capabilities here
             capabilities = {
                 -- offsetEncoding = { "utf-8", "utf-16" },
@@ -74,9 +73,9 @@ return {
                     -- for specific lsp servers
                     -- ---@type LazyKeysSpec[]
                     -- keys = {},
-                    on_attach = function(_, bufnr)
-                        vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-                    end,
+                    -- on_attach = function(_, bufnr)
+                    -- vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+                    -- end,
                     settings = {
                         Lua = {
                             diagnostics = {
@@ -129,13 +128,13 @@ return {
 
     ---@param opts PluginLspOpts
     config = function(_, opts)
-        local lspconfig = require("lspconfig")
-        -- local mason_lspconfig = require("mason-lspconfig")
+        -- local lspconfig = require("lspconfig")
 
+        local user_lsp_augroup = vim.api.nvim_create_augroup("UserLspConfig", {})
         -- keymapping
         local keymap = vim.keymap
         vim.api.nvim_create_autocmd("LspAttach", {
-            group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+            group = user_lsp_augroup,
             callback = function(e)
                 -- Buffer local keymapping
                 -- see :h lsp-buf
@@ -156,11 +155,40 @@ return {
                 keymap.set("n", "g[", "<cmd>lua vim.diagnostic.goto_prev()<CR>", { buffer = e.buf, silent = true })
             end,
         })
+        -- inlay_hints
+        if opts.inlay_hints.enabled then
+            vim.api.nvim_create_autocmd("LspAttach", {
+                group = user_lsp_augroup,
+                callback = function(args)
+                    local buffer = args.buf ---@type number
+                    -- local client = vim.lsp.get_client_by_id(args.data.client_id)
+                    if
+                        vim.api.nvim_buf_is_valid(buffer)
+                        and vim.bo[buffer].buftype == ""
+                        and not vim.tbl_contains(opts.inlay_hints.exclude, vim.bo[buffer].filetype)
+                    then
+                        vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
+                    end
+                end,
+            })
+        end
 
-        -- TODO inlay_hints
-        -- TODO codelens
+        -- codelens
+        if opts.codelens.enabled then
+            vim.api.nvim_create_autocmd("LspAttach", {
+                group = user_lsp_augroup,
+                callback = function(args)
+                    local buffer = args.buf ---@type number
+                    vim.lsp.codelens.refresh()
+                    vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+                        buffer = buffer,
+                        callback = vim.lsp.codelens.refresh,
+                    })
+                end,
+            })
+        end
 
-        -- diagnostic setup
+        -- diagnostic
         vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
         -- used to enable autocompletion
@@ -197,7 +225,7 @@ return {
                     return
                 end
             end
-            lspconfig[server].setup(server_opts)
+            require("lspconfig")[server].setup(server_opts)
             -- print(vim.inspect(server_opts))
         end
 
