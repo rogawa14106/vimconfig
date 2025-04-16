@@ -319,7 +319,7 @@ local function create_selector(config, pre_winid)
 end
 -- }}}
 --# create inputbox (input) {{{
-local function create_inputbox(config)
+local function create_inputbox(config, pre_winid)
     if (vim.fn.exists('fim_input_bufnr') ~= 1) or (vim.fn.bufnr(vim.g.fim_input_bufnr) == -1) then
         vim.g.fim_input_bufnr = vim.api.nvim_create_buf(false, true)
     end
@@ -348,7 +348,7 @@ local function create_inputbox(config)
     })
 
     -- quit Fim
-    create_keymap_quitfim(vim.g.fim_input_bufnr)
+    create_keymap_quitfim(vim.g.fim_input_bufnr, pre_winid)
 
     -- autocmd
     --au_win_leave(vim.g.fim_input_bufnr, pre_winid)
@@ -520,7 +520,7 @@ local function create_ffwin(pre_winid)
     create_selector(config_selector, pre_winid)
     create_infobox(config_infobox, information)
     create_prompt(config_prompt, prompt)
-    create_inputbox(config_inputbox)
+    create_inputbox(config_inputbox, pre_winid)
     --vim.fn.win_gotoid(vim.g.fim_input_winid)
 end
 -- }}}
