@@ -7,6 +7,13 @@ return {
         { "antosha417/nvim-lsp-file-operations", config = true },
         { "folke/neodev.nvim",                   opts = {} },
     },
+    -- See below helps.
+    -- :h lsp-client
+    -- :h vim.lsp.ClientConfig
+    -- :h vim.lsp.Client
+    -- :h lsp-config
+    --
+    -- :lua vim.print(vim.tbl_keys(vim.lsp.handlers))
     opts = function()
         ---@class PluginLspOpts
         local options = {
@@ -104,11 +111,16 @@ return {
                         },
                     },
                 },
-                clangd = {
-                    on_attach = function(_, bufnr)
-                        vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-                    end,
-                }
+                -- c, cpp..
+                -- https://www.lazyvim.org/extras/lang/clangd
+                -- clangd = {
+                -- },
+                -- python
+                -- pyright = {
+                -- },
+                -- java
+                -- jdtls = {
+                -- },
             },
             -- you can do any additional lsp server setup here
             -- return true if you don't want this server to be setup with lspconfig
@@ -180,7 +192,8 @@ return {
                 callback = function(args)
                     local buffer = args.buf ---@type number
                     vim.lsp.codelens.refresh()
-                    vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+                    --vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+                    vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
                         buffer = buffer,
                         callback = vim.lsp.codelens.refresh,
                     })

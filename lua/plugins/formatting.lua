@@ -13,9 +13,8 @@ return {
                 markdown = { "prettier" },
                 make = { "prettier" },
                 -- lua = { "stylua" },
-                -- python = { "isort", "black" },
-                python = {},
-                -- c = { "clang-format" },
+                python = { "black" },
+                c = { "clang-format" },
             },
             --]] --
 
@@ -33,7 +32,6 @@ return {
             notify_on_error = true,
             -- Conform will notify you when no formatters are available for the buffer
             notify_no_formatters = true,
-
         })
     end,
 }
